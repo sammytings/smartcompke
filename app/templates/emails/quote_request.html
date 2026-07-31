@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f7fb;
+padding:30px;
+}
+
+.container{
+background:#fff;
+border-radius:12px;
+padding:30px;
+max-width:700px;
+margin:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+h2{
+color:#0d6efd;
+}
+
+.label{
+font-weight:bold;
+width:220px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>New Quote Request</h2>
+
+<table>
+
+<tr>
+<td class="label">Company</td>
+<td>{{ company_name }}</td>
+</tr>
+
+<tr>
+<td class="label">Contact Person</td>
+<td>{{ contact_person }}</td>
+</tr>
+
+<tr>
+<td class="label">Email</td>
+<td>{{ email }}</td>
+</tr>
+
+<tr>
+<td class="label">Phone</td>
+<td>{{ phone }}</td>
+</tr>
+
+<tr>
+<td class="label">WhatsApp</td>
+<td>{{ whatsapp }}</td>
+</tr>
+
+<tr>
+<td class="label">KRA PIN</td>
+<td>{{ kra_pin }}</td>
+</tr>
+
+<tr>
+<td class="label">Address</td>
+<td>{{ address }}</td>
+</tr>
+
+<tr>
+<td class="label">City</td>
+<td>{{ city }}</td>
+</tr>
+
+<tr>
+<td class="label">Billing</td>
+<td>{{ billing_type }}</td>
+</tr>
+
+<tr>
+<td class="label">Additional Notes</td>
+<td>{{ notes|linebreaks }}</td>
+</tr>
+
+</table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends "dashboard/base.html" %}
+
+{% load humanize %}
+
+{% block content %}
+
+<h2>
+
+{{ category.name }}
+
+Inventory
+
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Image</th>
+
+<th>Product</th>
+
+<th>Brand</th>
+
+<th>Variants</th>
+
+<th>Total Stock</th>
+
+<th>Value</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for product in products %}
+
+<tr>
+
+<td>
+
+<img
+src="{{ product.image.url }}"
+width="70">
+
+</td>
+
+<td>
+
+{{ product.name }}
+
+</td>
+
+<td>
+
+{{ product.brand }}
+
+</td>
+
+<td>
+
+{{ product.variants.count }}
+
+</td>
+
+<td>
+
+{{ product.stock }}
+
+</td>
+
+<td>
+
+KES {{ product.price|floatformat:0|intcomma }}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

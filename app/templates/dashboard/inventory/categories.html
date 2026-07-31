@@ -1,0 +1,155 @@
+{% extends "dashboard/base.html" %}
+
+{% load humanize %}
+
+{% block content %}
+
+<div class="page-header">
+
+<h2>Inventory Categories</h2>
+
+</div>
+
+<div class="table-card">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Category</th>
+
+<th>Brands</th>
+
+<th>Products</th>
+
+<th>Variants</th>
+
+<th>Total Stock</th>
+
+<th>Inventory Value</th>
+
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for row in data %}
+
+<tr>
+
+<td>
+
+{{ row.category.name }}
+
+</td>
+
+<td>
+
+{{ row.brands }}
+
+</td>
+
+<td>
+
+{{ row.products }}
+
+</td>
+
+<td>
+
+{{ row.variants }}
+
+</td>
+
+<td>
+
+{{ row.stock|intcomma }}
+
+</td>
+
+<td>
+
+KES {{ row.value|floatformat:0|intcomma }}
+
+</td>
+
+<td>
+
+<a
+href="{% url 'inventory_category_detail' row.category.id %}"
+class="btn">
+
+Open
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<style>
+
+.table-card{
+
+background:#fff;
+
+border-radius:12px;
+
+overflow:hidden;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th{
+
+padding:15px;
+
+background:#f3f4f6;
+
+}
+
+td{
+
+padding:15px;
+
+border-top:1px solid #eee;
+
+}
+
+.btn{
+
+padding:8px 18px;
+
+background:#2563eb;
+
+color:white;
+
+text-decoration:none;
+
+border-radius:6px;
+
+}
+
+</style>
+
+{% endblock %}

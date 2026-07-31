@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Request a Quote | SmartComputersKE Technologies{% endblock %}
+
+{% block content %}
+
+<style>
+:root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#16a34a;
+    --border:#e5e7eb;
+    --bg:#f8fafc;
+    --text:#1f2937;
+}
+
+.quote-section{
+    background:var(--bg);
+    padding:60px 0;
+}
+
+.quote-card{
+    max-width:950px;
+    margin:auto;
+    background:#fff;
+    border-radius:20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.08);
+    overflow:hidden;
+}
+
+.quote-header{
+    background:linear-gradient(135deg,#2563eb,#1e40af);
+    color:#fff;
+    padding:45px;
+}
+
+.quote-header h1{
+    margin:0;
+    font-size:34px;
+    font-weight:700;
+}
+
+.quote-header p{
+    margin-top:12px;
+    opacity:.9;
+}
+
+.quote-body{
+    padding:45px;
+}
+
+.section-title{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:25px;
+    color:var(--text);
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+label{
+    font-weight:600;
+    margin-bottom:8px;
+    color:#374151;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:14px 16px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    font-size:15px;
+    transition:.25s;
+    background:#fff;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.1);
+}
+
+textarea{
+    resize:vertical;
+    min-height:140px;
+}
+
+.billing-box{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+.billing-box label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:500;
+    cursor:pointer;
+}
+
+button.quote-btn{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:16px 30px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.25s;
+    width:100%;
+}
+
+button.quote-btn:hover{
+    background:var(--primary-dark);
+    transform:translateY(-2px);
+}
+
+.quote-note{
+    background:#eff6ff;
+    border-left:5px solid var(--primary);
+    padding:18px;
+    border-radius:10px;
+    margin-bottom:35px;
+    color:#334155;
+}
+
+@media(max-width:768px){
+
+.quote-header{
+padding:30px;
+}
+
+.quote-body{
+padding:25px;
+}
+
+.form-grid{
+grid-template-columns:1fr;
+}
+
+}
+</style>
+
+
+<section class="quote-section">
+
+<div class="container">
+
+<div class="quote-card">
+
+<div class="quote-header">
+
+<h1>Request an Official Quotation</h1>
+
+<p>
+Fill in the details below and our sales team will prepare
+a professional quotation tailored to your requirements.
+</p>
+
+</div>
+
+<div class="quote-body">
+
+<div class="quote-note">
+
+<strong>Need a corporate quotation?</strong><br>
+
+Please provide accurate company information.
+Our team usually responds within a few hours during business days.
+
+</div>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="section-title">
+Company Information
+</div>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Company Name *</label>
+{{ form.company_name }}
+</div>
+
+<div class="form-group">
+<label>Contact Person *</label>
+{{ form.contact_person }}
+</div>
+
+<div class="form-group">
+<label>Email Address *</label>
+{{ form.email }}
+</div>
+
+<div class="form-group">
+<label>Phone Number *</label>
+{{ form.phone }}
+</div>
+
+<div class="form-group">
+<label>WhatsApp Number</label>
+{{ form.whatsapp }}
+</div>
+
+<div class="form-group">
+<label>KRA PIN</label>
+{{ form.kra_pin }}
+</div>
+
+<div class="form-group full">
+<label>Company Address</label>
+{{ form.address }}
+</div>
+
+<div class="form-group">
+<label>City</label>
+{{ form.city }}
+</div>
+
+<div class="form-group">
+<label>Billing Preference</label>
+
+<div class="billing-box">
+{{ form.billing_type }}
+</div>
+
+</div>
+
+<div class="form-group full">
+<label>Additional Requirements</label>
+{{ form.notes }}
+</div>
+
+<div class="form-group full">
+
+<button class="quote-btn" type="submit">
+
+<i class="fas fa-file-invoice"></i>
+
+&nbsp;
+
+Request Official Quotation
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}

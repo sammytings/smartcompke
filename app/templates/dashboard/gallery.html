@@ -1,0 +1,79 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<h2>
+
+Gallery
+
+</h2>
+
+<hr>
+
+<form
+
+method="POST"
+
+enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<input
+
+type="file"
+
+name="image"
+
+multiple
+
+required>
+
+<br><br>
+
+<button>
+
+Upload Images
+
+</button>
+
+</form>
+
+<hr>
+
+<div>
+
+{% for image in images %}
+
+<div style="display:inline-block;margin:10px;">
+
+<img
+
+src="{{ image.image.url }}"
+
+width="150">
+
+<br><br>
+
+<a
+
+href="{% url 'dashboard_delete_product_image' image.id %}">
+
+Delete
+
+</a>
+
+</div>
+
+{% empty %}
+
+<p>
+
+No Images
+
+</p>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

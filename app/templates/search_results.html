@@ -1,0 +1,809 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Search Results{% if query %} for "{{ query }}"{% endif %} — Smartcomputerske Technologies{% endblock %}
+
+{% block content %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/shared-components.css' %}">
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS — matched to the Deals page palette so search
+     results feel like the same site, not a bolted-on screen.
+
+     Product cards below use the SAME markup/classes as index.html's
+     cards (.prod-card, .tool-btn, .wishlist, .compare-btn, .wa-btn,
+     .btn-cart-add, .js-add-to-cart-form, .js-wishlist-toggle) —
+     inlined directly on this page (not via a separate partial) so
+     it can never silently drift out of sync with index.html again.
+     Add to Cart / Wishlist / WhatsApp / Compare behavior comes from
+     the shared shared-components.js, same as every other page.
+     ============================================================ */
+  .sck-search {
+    --primary-blue:   #0B5ED7;
+    --primary-blue-d: #084298;
+    --primary-blue-l: #E7F0FE;
+    --accent-red:     #D62828;
+    --accent-red-d:   #A31E1E;
+    --accent-red-bg:  #FBE9E9;
+    --ink:            #1B2430;
+    --ink-soft:       #2A333F;
+    --muted:          #6B7280;
+    --surface:        #FFFFFF;
+    --surface-alt:    #F5F8FC;
+    --border:         #E5E9F0;
+    --green:          #1A8A4A;
+    --green-bg:       #E4F5EE;
+    --r-xl: 22px;
+    --r-lg: 16px;
+    --r-md: 14px;
+    --r-sm: 8px;
+    --shadow-sm: 0 2px 10px rgba(11,94,215,.08);
+    --shadow-md: 0 10px 28px rgba(11,94,215,.14);
+    --shadow-lg: 0 24px 56px rgba(11,94,215,.20);
+    --shadow-blue: 0 10px 24px rgba(11,94,215,.22);
+    --font-display: 'Poppins', 'Segoe UI', sans-serif;
+    --font-body: 'Poppins', 'Segoe UI', sans-serif;
+
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--surface-alt);
+    padding: 40px 0 72px;
+  }
+
+  .sck-search .wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  .sck-search h2, .sck-search h3, .sck-search h4,
+  .sck-search .filter-btn, .sck-search .prod-name,
+  .sck-search .prod-price, .sck-search .prod-brand,
+  .sck-search .btn-cart-add {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* ============================================================
+     RESULTS HEADER
+     ============================================================ */
+  .sck-search .results-header { margin-bottom: 32px; }
+  .sck-search .eyebrow-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+  }
+  .sck-search .eyebrow-sm::before {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: var(--accent-red);
+    border-radius: 2px;
+  }
+  .sck-search .results-header h2 {
+    position: relative;
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    padding-bottom: 14px;
+    color: var(--ink);
+  }
+  .sck-search .results-header h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 46px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--primary-blue);
+  }
+  .sck-search .results-header .result-meta { font-size: 14.5px; color: var(--muted); margin: 0; }
+  .sck-search .results-header .result-meta strong { color: var(--ink); font-weight: 700; }
+
+  /* ============================================================
+     LAYOUT
+     ============================================================ */
+  .sck-search .search-layout {
+    display: grid;
+    grid-template-columns: 272px 1fr;
+    gap: 30px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .sck-search .search-layout { grid-template-columns: 1fr; }
+  }
+
+  /* ============================================================
+     FILTERS SIDEBAR   (logic untouched — styling only)
+     ============================================================ */
+  .sck-search .filters {
+    position: sticky;
+    top: 90px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 26px 22px 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  @media (max-width: 900px) { .sck-search .filters { position: static; } }
+
+  .sck-search .filters-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sck-search .filters-title svg { width: 17px; height: 17px; color: var(--primary-blue); }
+
+  .sck-search .filters h4 {
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 20px 0 9px;
+  }
+  .sck-search .filters h4:first-of-type { margin-top: 0; }
+
+  .sck-search .filters select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--surface-alt) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 11px 34px 11px 13px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: border-color .16s ease, box-shadow .16s ease;
+  }
+  .sck-search .filters select:hover { border-color: #cfd6e0; }
+  .sck-search .filters select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(11,94,215,.14);
+  }
+
+  .sck-search .filter-options { display: flex; flex-direction: column; gap: 10px; }
+  .sck-search .filter-options label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .sck-search .filter-options input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    cursor: pointer;
+    position: relative;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .sck-search .filter-options input[type="checkbox"]:hover { border-color: var(--primary-blue); }
+  .sck-search .filter-options input[type="checkbox"]:checked {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+  }
+  .sck-search .filter-options input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .sck-search .filter-btn {
+    width: 100%;
+    margin-top: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--primary-blue);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 13px 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .18s ease, box-shadow .18s ease, transform .12s ease;
+  }
+  .sck-search .filter-btn:hover { background: var(--primary-blue-d); box-shadow: var(--shadow-blue); }
+  .sck-search .filter-btn:active { transform: translateY(1px); }
+
+  .sck-search .filters-clear {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .sck-search .filters-clear:hover { color: var(--accent-red); border-color: var(--accent-red); }
+
+  /* ============================================================
+     RESULTS GRID
+     ============================================================ */
+  .sck-search .results { min-width: 0; }
+
+  .sck-search .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+  @media (max-width: 1180px) { .sck-search .products-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 760px)  { .sck-search .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+  @media (max-width: 480px)  { .sck-search .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+  /* ---- Product card — identical structure/classes to index.html's
+     featured-product card, re-skinned in colors for this page. ---- */
+  .sck-search .products-grid .prod-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid rgba(11,94,215,.08);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .sck-search .products-grid .prod-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: #d7e3f7;
+  }
+
+  /* ---- Image container: fixed-height stage, image always centered
+     and fully contained (never cropped, never overflowing), with the
+     same soft multiply blend index.html uses so white product-shot
+     backgrounds sit flush against the card instead of showing a hard
+     edge. ---- */
+  .sck-search .products-grid .prod-media {
+    position: relative;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 20px;
+    background: var(--surface-alt);
+  }
+  .sck-search .products-grid .prod-media a {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  .sck-search .products-grid .prod-media img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    transition: transform .35s ease;
+  }
+  .sck-search .products-grid .prod-card:hover .prod-media img { transform: scale(1.06); }
+
+  @media (max-width: 992px) { .sck-search .products-grid .prod-media { height: 215px; } }
+  @media (max-width: 768px) { .sck-search .products-grid .prod-media { height: 180px; padding: 16px; } }
+  @media (max-width: 480px) { .sck-search .products-grid .prod-media { height: 155px; padding: 12px; } }
+
+  /* overlay tool stack: wishlist / compare / whatsapp */
+  .sck-search .product-tools {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 5;
+  }
+  .sck-search .tool-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: .15s ease;
+  }
+  .sck-search .tool-btn:hover { background: var(--primary-blue); color: #fff; transform: scale(1.06); }
+  .sck-search .tool-btn.wishlist:hover { background: var(--accent-red); color: #fff; }
+  .sck-search .tool-btn.wishlist.active { color: var(--accent-red); }
+  .sck-search .tool-btn.wishlist.active svg { fill: var(--accent-red); }
+  .sck-search .tool-btn.compare-btn:hover { color: var(--primary-blue); }
+  .sck-search .tool-btn svg { width: 16px; height: 16px; }
+
+  .sck-search .tool-btn.wa-btn { background: #25d366; color: #fff; }
+  .sck-search .tool-btn.wa-btn:hover { background: #1fb959; color: #fff; }
+  .sck-search .tool-btn.wa-btn svg { width: 16px; height: 16px; }
+
+  .sck-search .prod-tag {
+    position: absolute;
+    left: -6px;
+    top: 14px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    padding: 5px 11px 5px 13px;
+    border-radius: 0 6px 6px 0;
+    z-index: 4;
+    background: var(--accent-red);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(214,40,40,.35);
+  }
+
+  .sck-search .prod-body {
+    padding: 17px 18px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    background: var(--surface);
+  }
+
+  .sck-search .product-title-link { text-decoration: none; color: inherit; }
+  .sck-search .product-title-link:hover .prod-name { color: var(--primary-blue); }
+
+  .sck-search .prod-brand {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--primary-blue);
+  }
+  .sck-search .prod-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.32;
+    transition: color .15s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sck-search .prod-specs {
+    font-size: 12.5px;
+    font-family: var(--font-body);
+    color: var(--muted);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(1.45em * 2);
+  }
+
+  .sck-search .badge-row { display: flex; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+  .sck-search .badge-stock, .sck-search .badge-condition {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .sck-search .badge-stock.in { background: var(--green-bg); color: var(--green); }
+  .sck-search .badge-stock.out { background: var(--accent-red-bg); color: var(--accent-red-d); }
+  .sck-search .badge-condition { background: var(--surface-alt); color: var(--ink-soft); border: 1px solid var(--border); }
+
+  .sck-search .prod-rating { font-size: 12px; font-family: var(--font-body); color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .sck-search .prod-rating .stars { color: var(--primary-blue); letter-spacing: 1px; }
+
+  .sck-search .price-container { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+  .sck-search .prod-price { color: var(--accent-red); font-size: 19px; font-weight: 800; font-family: var(--font-display); }
+  .sck-search .prod-old-price { color: var(--muted); text-decoration: line-through; font-size: 13px; }
+  .sck-search .vat-note { font-size: 10.5px; font-family: var(--font-body); color: #9198a3; margin-top: -1px; width: 100%; }
+
+  .sck-search .prod-actions { display: flex; gap: 8px; padding: 12px 18px 18px; margin-top: auto; }
+
+  /* Add to Cart — pill button, matches index.html's btn-cart-add.
+     Base behaviour (loading/success/error states, spinner) comes from
+     shared-components.css/js; these rules only recolor it for this page. */
+  .sck-search .btn-cart-add {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: var(--primary-blue);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 11px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .sck-search .btn-cart-add:hover:not(:disabled) { background: var(--primary-blue-d); }
+  .sck-search .btn-cart-add:active:not(:disabled) { transform: scale(.97); }
+  .sck-search .btn-cart-add:disabled { cursor: default; }
+  .sck-search .btn-cart-add.is-loading,
+  .sck-search .btn-cart-add.sc-loading { pointer-events: none; background: var(--primary-blue); }
+  .sck-search .btn-cart-add.is-loading .btn-icon,
+  .sck-search .btn-cart-add.is-loading .btn-label { opacity: .55; }
+  .sck-search .btn-cart-add.is-success { pointer-events: none; background: var(--green); }
+  .sck-search .btn-cart-add.is-error { pointer-events: none; background: var(--accent-red-d); }
+
+  .sck-search .cart-loader { display: none; width: 20px; height: 16px; flex-shrink: 0; position: relative; }
+  .sck-search .btn-cart-add.is-loading .cart-loader,
+  .sck-search .btn-cart-add.sc-loading .cart-loader { display: inline-block; }
+  .sck-search .btn-cart-add.is-loading .btn-icon,
+  .sck-search .btn-cart-add.sc-loading .btn-icon { display: none; }
+  .sck-search .cart-loader svg { width: 100%; height: 100%; overflow: visible; }
+  .sck-search .cart-loader .cart-body { stroke: #fff; animation: sck-cart-bob 0.9s ease-in-out infinite; transform-origin: center; }
+  .sck-search .cart-loader .cart-wheel { fill: #fff; transform-origin: center; animation: sck-cart-spin 0.6s linear infinite; }
+  @keyframes sck-cart-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+  @keyframes sck-cart-spin { to { transform: rotate(360deg); } }
+
+  /* ============================================================
+     EMPTY STATE
+     ============================================================ */
+  .sck-search .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--r-lg);
+    padding: 64px 24px;
+  }
+  .sck-search .no-results .no-results-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: var(--primary-blue-l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-blue);
+  }
+  .sck-search .no-results .no-results-icon svg { width: 26px; height: 26px; }
+  .sck-search .no-results h3 { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--ink); margin: 0 0 8px; }
+  .sck-search .no-results p { font-size: 14px; color: var(--muted); margin: 0; }
+
+  /* ============================================================
+     PAGINATION
+     ============================================================ */
+  .sck-search .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+  }
+  .sck-search .pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink-soft);
+    font-weight: 700;
+    font-size: 13.5px;
+    font-family: var(--font-body);
+    text-decoration: none;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .sck-search .pagination a:hover { background: var(--primary-blue-l); border-color: var(--primary-blue); color: var(--primary-blue); }
+  .sck-search .pagination span { font-size: 13px; font-weight: 600; color: var(--muted); padding: 0 4px; }
+</style>
+
+<div class="sck-search">
+  <div class="wrap">
+
+    <div class="results-header">
+      <span class="eyebrow-sm">Search</span>
+      <h2>Search Results</h2>
+      {% if query %}
+        <p class="result-meta">
+          <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found for
+          <strong>&ldquo;{{ query }}&rdquo;</strong>
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="search-layout">
+
+      <!-- FILTERS (unchanged logic) -->
+      <aside class="filters">
+        <form method="GET">
+
+          <div class="filters-title">
+            Filter Results
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h18M6 12h12M10 19h4"/>
+            </svg>
+          </div>
+
+          <input type="hidden" name="q" value="{{ query }}">
+
+          <h4>Category</h4>
+          <select name="category">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+              {{ category.name }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <h4>Brand</h4>
+          <select name="brand">
+            <option value="">All Brands</option>
+            {% for brand in brands %}
+            <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %}selected{% endif %}>
+              {{ brand.name }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <h4>Condition</h4>
+          <select name="condition">
+            <option value="">All</option>
+            <option value="New" {% if request.GET.condition == "New" %}selected{% endif %}>New</option>
+            <option value="Used" {% if request.GET.condition == "Used" %}selected{% endif %}>Used</option>
+            <option value="Refurbished" {% if request.GET.condition == "Refurbished" %}selected{% endif %}>Refurbished</option>
+          </select>
+
+          <h4>Sort By</h4>
+          <select name="sort">
+            <option value="">Newest</option>
+            <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>Price: Low → High</option>
+            <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>Price: High → Low</option>
+            <option value="name" {% if request.GET.sort == "name" %}selected{% endif %}>Name (A-Z)</option>
+          </select>
+
+          <h4>Show Only</h4>
+          <div class="filter-options">
+            <label>
+              <input type="checkbox" name="featured" value="1" {% if request.GET.featured %}checked{% endif %}>
+              Featured
+            </label>
+            <label>
+              <input type="checkbox" name="trending" value="1" {% if request.GET.trending %}checked{% endif %}>
+              Trending
+            </label>
+            <label>
+              <input type="checkbox" name="new_arrival" value="1" {% if request.GET.new_arrival %}checked{% endif %}>
+              New Arrivals
+            </label>
+          </div>
+
+          <button type="submit" class="filter-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+            </svg>
+            Apply Filters
+          </button>
+        </form>
+
+        <a class="filters-clear" href="?q={{ query }}">Clear all filters</a>
+      </aside>
+
+      <!-- RESULTS -->
+      <section class="results">
+
+        <div class="products-grid">
+          {% for product in products %}
+          <article class="prod-card">
+            <div class="prod-media">
+              <a href="{% url 'product_detail' product.slug %}">
+                {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+{% elif product.primary_image %}
+    <img src="{{ product.primary_image.url }}" alt="{{ product.name }}">
+{% else %}
+    <img src="{% static 'images/no-image.png' %}" alt="No image available">
+{% endif %}
+              </a>
+
+              {% if product.discount_price %}
+              <div class="prod-tag">SALE</div>
+              {% endif %}
+
+              <div class="product-tools">
+                <button type="button" class="tool-btn wishlist js-wishlist-toggle" data-url="/wishlist/toggle/{{ product.id }}/" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}" title="Add to Wishlist">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+                  </svg>
+                </button>
+                <button type="button" class="tool-btn compare-btn" data-product="{{ product.id }}" title="Compare Product">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
+                  </svg>
+                </button>
+                <a class="tool-btn wa-btn" href="https://wa.me/254700000000?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}" target="_blank" rel="noopener" title="Order via WhatsApp" aria-label="Order via WhatsApp">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor"><path d="M16.004 3C9.377 3 3.999 8.377 3.999 15.003c0 2.34.63 4.53 1.727 6.417L3.5 28.5l7.27-2.19a12.94 12.94 0 005.234 1.096h.005c6.627 0 12.005-5.377 12.005-12.003C28.014 8.377 22.636 3 16.004 3zm0 21.803a9.77 9.77 0 01-4.98-1.363l-.357-.212-3.65 1.1 1.117-3.556-.232-.365a9.79 9.79 0 01-1.5-5.204c0-5.41 4.4-9.81 9.807-9.81 2.62 0 5.084 1.022 6.94 2.878a9.744 9.744 0 012.867 6.937c0 5.41-4.4 9.595-9.812 9.595zm5.373-7.34c-.294-.148-1.74-.859-2.01-.957-.27-.099-.467-.148-.663.148-.196.295-.76.957-.932 1.153-.172.196-.343.222-.638.074-.294-.148-1.243-.458-2.367-1.462-.875-.78-1.466-1.744-1.638-2.038-.172-.295-.018-.454.13-.601.133-.133.294-.345.442-.517.147-.172.196-.295.294-.492.098-.196.049-.369-.025-.517-.074-.148-.663-1.6-.909-2.192-.24-.575-.483-.497-.663-.507-.172-.008-.369-.01-.565-.01-.196 0-.517.074-.787.369-.27.295-1.03 1.006-1.03 2.454 0 1.448 1.055 2.847 1.202 3.043.147.196 2.077 3.174 5.033 4.45.703.303 1.252.484 1.68.62.706.225 1.348.193 1.856.117.566-.084 1.74-.712 1.985-1.4.245-.688.245-1.278.172-1.4-.074-.123-.27-.197-.564-.345z"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="prod-body">
+              {% if product.brand %}<div class="prod-brand">{{ product.brand.name }}</div>{% endif %}
+              <a href="{% url 'product_detail' product.slug %}" class="product-title-link">
+                <div class="prod-name">{{ product.name }}</div>
+              </a>
+              {% if product.short_description %}
+              <div class="prod-specs">{{ product.short_description }}</div>
+              {% endif %}
+              <div class="badge-row">
+                {% if product.stock > 0 %}
+                <span class="badge-stock in">✓ In Stock</span>
+                {% else %}
+                <span class="badge-stock out">Out of Stock</span>
+                {% endif %}
+                {% if product.condition %}<span class="badge-condition">{{ product.condition }}</span>{% endif %}
+              </div>
+              <div class="price-container">
+                {% if product.discount_price %}
+                <div class="prod-price">KSh {{ product.discount_price_with_vat|floatformat:0 }}</div>
+                <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
+                {% else %}
+                <div class="prod-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
+                {% endif %}
+                <div class="vat-note">✓ Includes 16% VAT</div>
+              </div>
+            </div>
+
+            <div class="prod-actions">
+              <form action="{% url 'add_to_cart' product.id %}" method="post" class="js-add-to-cart-form" style="width:100%;">
+                {% csrf_token %}
+                <button class="btn-cart-add" type="submit" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
+                  <span class="cart-loader" aria-hidden="true">
+                    <svg viewBox="0 0 26 22" fill="none">
+                      <g class="cart-body">
+                        <path d="M1 1h3l2.2 12.4a2 2 0 0 0 2 1.6h9.6a2 2 0 0 0 2-1.6L22 5.5H6.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </g>
+                      <circle class="cart-wheel" cx="9.5" cy="19" r="1.8"/>
+                      <circle class="cart-wheel" cx="17.5" cy="19" r="1.8"/>
+                    </svg>
+                  </span>
+                  <svg class="btn-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+                  </svg>
+                  <span class="btn-label">Add to Cart</span>
+                </button>
+              </form>
+            </div>
+          </article>
+          {% empty %}
+            <div class="no-results">
+              <div class="no-results-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                </svg>
+              </div>
+              <h3>No products found</h3>
+              <p>Try changing your search or filters.</p>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if products.has_other_pages %}
+        <div class="pagination">
+          {% if products.has_previous %}
+            <a href="?q={{ query }}&page={{ products.previous_page_number }}">&larr; Previous</a>
+          {% endif %}
+          <span>Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+          {% if products.has_next %}
+            <a href="?q={{ query }}&page={{ products.next_page_number }}">Next &rarr;</a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+      </section>
+
+    </div>
+
+  </div>
+</div>
+
+{# Fallback toast — only fires if shared-components.js's showToast()
+   somehow isn't available, so a notification is never silently lost.
+   Same pattern used on index.html and cart.html for consistency. #}
+<div id="scSearchToast" role="status" aria-live="polite"
+     style="position:fixed;top:20px;right:20px;background:#1B2430;color:#fff;padding:15px 22px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.24);opacity:0;transform:translateY(-20px);transition:.3s;z-index:99999;font-weight:600;pointer-events:none;"></div>
+
+<!-- Shared cart / wishlist / toast engine — the SAME script index.html
+     and cart.html use. Add to Cart (.js-add-to-cart-form), Wishlist
+     (.js-wishlist-toggle) and toasts on this page are now driven by
+     that one shared implementation instead of a page-local copy, so
+     they can't drift out of sync with the rest of the site again. -->
+<script src="{% static 'js/shared-components.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Safety net only — does nothing if shared-components.js already
+  // defines window.showToast (which it does site-wide).
+  if (typeof window.showToast !== 'function') {
+    window.showToast = function (message) {
+      var toast = document.getElementById('scSearchToast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+      clearTimeout(window.showToast._t);
+      window.showToast._t = setTimeout(function () {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+      }, 2200);
+    };
+  }
+
+  // Same compare-button wiring as index.html, so "Compare" behaves
+  // identically wherever a product card appears on the site.
+  document.querySelectorAll(".compare-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var productId = this.dataset.product;
+      fetch("/compare/add/" + productId + "/", {
+        method: "GET",
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (data.added) {
+            button.style.color = "#1d5fd1";
+          }
+        });
+    });
+  });
+});
+</script>
+
+{% endblock %}

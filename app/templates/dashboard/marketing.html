@@ -1,0 +1,944 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Product Marketing{% endblock %}
+
+{% block content %}
+
+<div class="marketing-page">
+
+    <!-- =============================== -->
+    <!-- PAGE HEADER -->
+    <!-- =============================== -->
+
+    <div class="page-header">
+
+        <div class="page-header-title">
+
+            <div class="page-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 13v-2z"/><path d="M11.6 16.5L13 21h-2.5l-2-5"/></svg>
+            </div>
+
+            <div>
+                <h2>Product Marketing</h2>
+                <p>Promote products to your customers and subscribers by email.</p>
+            </div>
+
+        </div>
+
+        <div>
+
+            <a href="{% url 'marketing_history' %}" class="btn-history">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+                Marketing History
+            </a>
+
+        </div>
+
+    </div>
+
+
+<form method="POST" action="{% url 'send_marketing_campaign' %}" id="marketingForm">
+{% csrf_token %}
+
+<div class="marketing-grid">
+
+<!-- ===================================================== -->
+<!-- LEFT SIDE -->
+<!-- ===================================================== -->
+
+<div>
+
+<div class="card">
+
+<div class="card-header">
+    <span class="card-header-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/><path d="M18 2l4 4-11 11H7v-4z"/></svg>
+    </span>
+    Marketing Details
+</div>
+
+<div class="card-body">
+
+<div class="form-group">
+    <label>Campaign Title</label>
+    {{ form.title }}
+</div>
+
+<div class="form-group">
+    <label>Email Subject</label>
+    {{ form.subject }}
+</div>
+
+<div class="form-group">
+    <label>Additional Message</label>
+    {{ form.message }}
+    <span class="field-hint">This message appears above the selected products in the email.</span>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ======================================== -->
+<!-- PRODUCTS -->
+<!-- ======================================== -->
+
+<div class="card mt-4">
+
+<div class="card-header product-header">
+
+    <h4>
+        <span class="card-header-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </span>
+        Select Products
+    </h4>
+
+    <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="searchProduct" placeholder="Search product name or SKU...">
+    </div>
+
+</div>
+
+<div class="table-responsive">
+
+<table id="productsTable">
+
+<thead>
+<tr>
+    <th class="th-check"><input id="checkAll" type="checkbox"></th>
+    <th>Image</th>
+    <th>Product</th>
+    <th>Brand</th>
+    <th>Category</th>
+    <th>Price</th>
+    <th>Stock</th>
+</tr>
+</thead>
+
+<tbody>
+{% for product in products %}
+<tr>
+
+<td class="th-check">
+    <input class="product-check" type="checkbox" name="products" value="{{ product.id }}">
+</td>
+
+<td width="70">
+    {% if product.image %}
+    <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
+    {% else %}
+    <div class="product-image product-image-placeholder">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    </div>
+    {% endif %}
+</td>
+
+<td>
+    <strong>{{ product.name }}</strong>
+    <br>
+    <small>SKU: {{ product.sku }}</small>
+</td>
+
+<td><span class="pill pill-neutral">{{ product.brand }}</span></td>
+
+<td>{{ product.category }}</td>
+
+<td><strong class="price-cell">KSh {{ product.current_price }}</strong></td>
+
+<td>
+    {% if product.stock > 5 %}
+    <span class="pill pill-success">{{ product.stock }} in stock</span>
+    {% elif product.stock > 0 %}
+    <span class="pill pill-warning">{{ product.stock }} left</span>
+    {% else %}
+    <span class="pill pill-danger">Out of stock</span>
+    {% endif %}
+</td>
+
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="empty-row">No products available.</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- RIGHT -->
+<!-- ================================================= -->
+
+<div>
+
+<div class="card sticky-card">
+
+<div class="card-header">
+    <span class="card-header-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </span>
+    Campaign Summary
+</div>
+
+<div class="card-body">
+
+<div class="summary-item">
+    <span>Recipients</span>
+    <strong id="recipientCount">{{ recipient_count }}</strong>
+</div>
+
+<hr>
+
+<div class="recipient-section">
+
+    <h5>Send To</h5>
+
+    <label class="recipient-option">
+        <input type="radio" name="recipient_type" value="customers" checked>
+        <span class="recipient-option-text">
+            <strong>Registered Customers</strong>
+            <small>Everyone with an account on the store</small>
+        </span>
+    </label>
+
+    <label class="recipient-option">
+        <input type="radio" name="recipient_type" value="subscribers">
+        <span class="recipient-option-text">
+            <strong>Newsletter Subscribers</strong>
+            <small>Everyone who joined the mailing list</small>
+        </span>
+    </label>
+
+    <label class="recipient-option">
+        <input type="radio" name="recipient_type" value="both">
+        <span class="recipient-option-text">
+            <strong>Both</strong>
+            <small>Customers and subscribers combined</small>
+        </span>
+    </label>
+
+</div>
+
+<hr>
+
+<div class="summary-item">
+    <span>Selected Products</span>
+    <strong id="selectedProducts">0</strong>
+</div>
+
+<div class="summary-item">
+    <span>Email Subject</span>
+    <strong id="subjectPreview">--</strong>
+</div>
+
+<hr>
+
+<h5>Automatic Marketing Message</h5>
+
+<div class="auto-message">
+    <p class="auto-message-title">🔥 Great News!</p>
+    <p>We've just reduced prices on selected products. Don't miss these amazing offers before stock runs out. Shop now and enjoy genuine products, warranty and nationwide delivery.</p>
+</div>
+
+<hr>
+
+<button class="btn-preview" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    Preview Email
+</button>
+
+<button class="btn-send" type="submit">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    Send Marketing Email
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+<script src="{% static 'js/marketing.js' %}"></script>
+<style>
+/* ==========================================
+   BASE / PAGE
+========================================== */
+
+.marketing-page{
+    --mk-primary:#2563eb;
+    --mk-primary-d:#1d4ed8;
+    --mk-primary-tint:#eef3ff;
+    --mk-ink:#0f172a;
+    --mk-ink-soft:#1f2937;
+    --mk-muted:#64748b;
+    --mk-border:#e6e9f0;
+    --mk-surface:#ffffff;
+    --mk-surface-alt:#f8fafc;
+    --mk-bg:#f4f6fb;
+    --mk-success:#0f8a5f;
+    --mk-success-bg:#e7f6ef;
+    --mk-warning:#b45309;
+    --mk-warning-bg:#fef3e0;
+    --mk-danger:#b91c1c;
+    --mk-danger-bg:#fdecec;
+    --mk-radius-lg:18px;
+    --mk-radius-md:12px;
+    --mk-radius-sm:9px;
+    --mk-shadow-sm:0 1px 2px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.06);
+    --mk-shadow-md:0 8px 24px rgba(15,23,42,.07);
+    --mk-shadow-lg:0 20px 45px rgba(15,23,42,.12);
+    font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+    color:var(--mk-ink-soft);
+    padding:32px clamp(16px,3vw,40px) 60px;
+    background:var(--mk-bg);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+}
+
+.marketing-page *{ box-sizing:border-box; }
+
+.marketing-page hr{
+    border:none;
+    border-top:1px solid var(--mk-border);
+    margin:20px 0;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+}
+
+.page-header-title{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.page-icon{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:linear-gradient(135deg,var(--mk-primary),#1e40af);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 10px 22px rgba(37,99,235,.28);
+}
+
+.page-header h2{
+    margin:0;
+    font-size:24px;
+    font-weight:700;
+    letter-spacing:-0.015em;
+    color:var(--mk-ink);
+}
+
+.page-header p{
+    margin:4px 0 0;
+    color:var(--mk-muted);
+    font-size:14px;
+}
+
+.btn-history{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    color:var(--mk-ink-soft);
+    border:1px solid var(--mk-border);
+    padding:11px 20px;
+    border-radius:var(--mk-radius-sm);
+    text-decoration:none;
+    font-weight:600;
+    font-size:13.5px;
+    box-shadow:var(--mk-shadow-sm);
+    transition:border-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.btn-history:hover{
+    border-color:var(--mk-primary);
+    color:var(--mk-primary-d);
+    transform:translateY(-1px);
+    box-shadow:var(--mk-shadow-md);
+}
+
+/* ==========================================
+   GRID
+========================================== */
+
+.marketing-grid{
+    display:grid;
+    grid-template-columns:1fr 360px;
+    gap:24px;
+    align-items:start;
+}
+
+.mt-4{ margin-top:24px; }
+
+/* ==========================================
+   CARDS
+========================================== */
+
+.card{
+    background:var(--mk-surface);
+    border-radius:var(--mk-radius-lg);
+    border:1px solid var(--mk-border);
+    box-shadow:var(--mk-shadow-sm);
+    overflow:hidden;
+    margin-bottom:0;
+    transition:box-shadow .25s ease;
+}
+
+.card:hover{
+    box-shadow:var(--mk-shadow-md);
+}
+
+.card-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--mk-surface-alt);
+    padding:18px 24px;
+    border-bottom:1px solid var(--mk-border);
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--mk-ink);
+    letter-spacing:-0.01em;
+}
+
+.card-header h4{
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--mk-ink);
+}
+
+.card-header-icon{
+    width:28px;
+    height:28px;
+    border-radius:8px;
+    background:var(--mk-primary-tint);
+    color:var(--mk-primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.card-body{
+    padding:24px;
+}
+
+/* ==========================================
+   FORM
+========================================== */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+.form-group:last-child{
+    margin-bottom:0;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    font-size:13.5px;
+    color:var(--mk-ink-soft);
+}
+
+.field-hint{
+    display:block;
+    margin-top:6px;
+    font-size:12px;
+    color:var(--mk-muted);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group textarea,
+.form-group select,
+.form-control{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--mk-border);
+    border-radius:var(--mk-radius-sm);
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--mk-ink);
+    background:#fff;
+    transition:border-color .2s ease, box-shadow .2s ease;
+}
+
+.form-group textarea{
+    min-height:110px;
+    resize:vertical;
+    line-height:1.55;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.form-control:focus{
+    outline:none;
+    border-color:var(--mk-primary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+/* ==========================================
+   PRODUCT HEADER / SEARCH
+========================================== */
+
+.product-header{
+    justify-content:space-between;
+}
+
+.search-wrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.search-wrap svg{
+    position:absolute;
+    left:14px;
+    color:var(--mk-muted);
+    pointer-events:none;
+}
+
+#searchProduct{
+    width:280px;
+    padding:10px 14px 10px 38px;
+    border-radius:var(--mk-radius-sm);
+    border:1.5px solid var(--mk-border);
+    font-size:13.5px;
+    font-family:inherit;
+    color:var(--mk-ink);
+    transition:border-color .2s ease, box-shadow .2s ease;
+}
+
+#searchProduct:focus{
+    outline:none;
+    border-color:var(--mk-primary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.table-responsive{
+    overflow:auto;
+    max-height:560px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+}
+
+thead{
+    position:sticky;
+    top:0;
+    z-index:2;
+    background:var(--mk-surface-alt);
+}
+
+th{
+    padding:14px 16px;
+    text-align:left;
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--mk-muted);
+    border-bottom:1px solid var(--mk-border);
+    white-space:nowrap;
+}
+
+th.th-check, td.th-check{
+    width:44px;
+}
+
+td{
+    padding:12px 16px;
+    border-bottom:1px solid var(--mk-surface-alt);
+    vertical-align:middle;
+    color:var(--mk-ink-soft);
+}
+
+td strong{
+    color:var(--mk-ink);
+    font-weight:600;
+    font-size:13.5px;
+}
+
+td small{
+    color:var(--mk-muted);
+    font-size:12px;
+}
+
+tbody tr{
+    transition:background .15s ease;
+}
+
+tbody tr:hover{
+    background:var(--mk-surface-alt);
+}
+
+tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.selected-row{
+    background:var(--mk-primary-tint) !important;
+}
+
+.empty-row{
+    text-align:center;
+    padding:40px 16px;
+    color:var(--mk-muted);
+    font-style:italic;
+}
+
+.product-image{
+    width:52px;
+    height:52px;
+    object-fit:cover;
+    border-radius:10px;
+    border:1px solid var(--mk-border);
+    display:block;
+}
+
+.product-image-placeholder{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--mk-surface-alt);
+    color:#c7cdd6;
+}
+
+.price-cell{
+    color:var(--mk-ink);
+    white-space:nowrap;
+}
+
+/* ---- status / brand pills ---- */
+
+.pill{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 11px;
+    border-radius:999px;
+    font-size:11.5px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.pill-neutral{ background:var(--mk-surface-alt); color:var(--mk-ink-soft); border:1px solid var(--mk-border); }
+.pill-success{ background:var(--mk-success-bg); color:var(--mk-success); }
+.pill-warning{ background:var(--mk-warning-bg); color:var(--mk-warning); }
+.pill-danger{ background:var(--mk-danger-bg); color:var(--mk-danger); }
+
+/* ==========================================
+   RECIPIENT SELECTION
+========================================== */
+
+.recipient-section h5,
+.card-body h5{
+    margin:0 0 14px;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--mk-muted);
+}
+
+.recipient-option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:13px 14px;
+    margin-bottom:10px;
+    border:1.5px solid var(--mk-border);
+    border-radius:var(--mk-radius-sm);
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+}
+
+.recipient-option:last-child{
+    margin-bottom:0;
+}
+
+.recipient-option:hover{
+    background:var(--mk-primary-tint);
+    border-color:#bcd0f7;
+}
+
+.recipient-option input{
+    width:17px;
+    height:17px;
+    margin-top:2px;
+    accent-color:var(--mk-primary);
+    flex-shrink:0;
+    cursor:pointer;
+}
+
+.recipient-option:has(input:checked){
+    border-color:var(--mk-primary);
+    background:var(--mk-primary-tint);
+}
+
+.recipient-option-text{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.recipient-option-text strong{
+    font-size:13.5px;
+    color:var(--mk-ink);
+    font-weight:600;
+}
+
+.recipient-option-text small{
+    font-size:12px;
+    color:var(--mk-muted);
+    line-height:1.4;
+}
+
+/* ==========================================
+   SUMMARY
+========================================== */
+
+.sticky-card{
+    position:sticky;
+    top:24px;
+}
+
+.summary-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:0;
+    font-size:13.5px;
+    color:var(--mk-ink-soft);
+    padding:4px 0;
+}
+
+.summary-item strong{
+    color:var(--mk-primary);
+    font-size:14px;
+    max-width:60%;
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* ==========================================
+   AUTO MESSAGE
+========================================== */
+
+.auto-message{
+    background:var(--mk-surface-alt);
+    border-left:4px solid var(--mk-primary);
+    padding:16px;
+    border-radius:0 var(--mk-radius-sm) var(--mk-radius-sm) 0;
+    font-size:13px;
+    color:var(--mk-ink-soft);
+    line-height:1.6;
+}
+
+.auto-message p{
+    margin:0 0 8px;
+}
+
+.auto-message p:last-child{
+    margin-bottom:0;
+    color:var(--mk-muted);
+}
+
+.auto-message-title{
+    font-weight:700;
+    color:var(--mk-ink);
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.btn-preview,
+.btn-send{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:13px;
+    border:none;
+    border-radius:var(--mk-radius-sm);
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    transition:background .2s ease, transform .2s ease, box-shadow .2s ease;
+    font-family:inherit;
+}
+
+.btn-preview{
+    background:#fff;
+    color:var(--mk-ink-soft);
+    border:1.5px solid var(--mk-border);
+    margin-bottom:12px;
+}
+
+.btn-preview:hover{
+    background:var(--mk-surface-alt);
+    border-color:#c9d2e0;
+}
+
+.btn-send{
+    background:linear-gradient(135deg,var(--mk-success),#0b6e4a);
+    color:#fff;
+    box-shadow:0 12px 26px rgba(15,138,95,.28);
+}
+
+.btn-send:hover{
+    transform:translateY(-1px);
+    box-shadow:0 16px 32px rgba(15,138,95,.34);
+}
+
+.btn-send:active,
+.btn-preview:active{
+    transform:translateY(0);
+}
+
+/* ==========================================
+   CHECKBOX
+========================================== */
+
+input[type="checkbox"]{
+    width:17px;
+    height:17px;
+    cursor:pointer;
+    accent-color:var(--mk-primary);
+}
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+.table-responsive::-webkit-scrollbar{
+    width:8px;
+    height:8px;
+}
+
+.table-responsive::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb{
+    background:#d7dce6;
+    border-radius:20px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover{
+    background:#c1c8d6;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:1200px){
+    .marketing-grid{
+        grid-template-columns:1fr;
+    }
+    .sticky-card{
+        position:relative;
+        top:0;
+    }
+}
+
+@media(max-width:768px){
+
+    .marketing-page{
+        padding:20px 16px 48px;
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:14px;
+    }
+
+    .btn-history{
+        width:100%;
+        justify-content:center;
+    }
+
+    .product-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:14px;
+    }
+
+    #searchProduct{
+        width:100%;
+    }
+
+    .card-body{
+        padding:18px;
+    }
+
+    th, td{
+        padding:11px 12px;
+        font-size:12.5px;
+    }
+
+    .product-image{
+        width:44px;
+        height:44px;
+    }
+}
+</style>
+
+{% endblock %}

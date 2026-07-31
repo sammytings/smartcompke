@@ -1,0 +1,110 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<h2>Brand Inventory</h2>
+
+<div class="table-card">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Logo</th>
+
+<th>Brand</th>
+
+<th>Categories</th>
+
+<th>Products</th>
+
+<th>Variants</th>
+
+<th>Stock</th>
+
+<th>Value</th>
+
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for row in data %}
+
+<tr>
+
+<td>
+
+{% if row.brand.logo %}
+
+<img src="{{ row.brand.logo.url }}" width="60">
+
+{% endif %}
+
+</td>
+
+<td>
+
+{{ row.brand.name }}
+
+</td>
+
+<td>
+
+{{ row.categories }}
+
+</td>
+
+<td>
+
+{{ row.products }}
+
+</td>
+
+<td>
+
+{{ row.variants }}
+
+</td>
+
+<td>
+
+{{ row.stock|intcomma }}
+
+</td>
+
+<td>
+
+KES {{ row.value|floatformat:0|intcomma }}
+
+</td>
+
+<td>
+
+<a
+class="btn"
+href="{% url 'inventory_brand_detail' row.brand.id %}">
+
+View
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,625 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ product.name }} — Product Workspace
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/workspace.css' %}">
+{% endblock %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data" id="workspaceForm">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next_page }}">
+
+    <div class="workspace">
+
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+        <div class="workspace-header">
+            <div>
+                <h2>{{ product.name }}</h2>
+                <p>Product Workspace</p>
+            </div>
+            <div>
+                <a class="btn btn-secondary" href="{% url 'dashboard_products' %}">Back</a>
+                <button type="submit" class="btn btn-primary">Save Product</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- GENERAL -->
+        <!-- ================================================= -->
+        <section id="general" class="workspace-section">
+            <h3>General Information</h3>
+
+            <div class="form-row">
+                <label>Product Name</label>
+                {{ product_form.name }}
+            </div>
+
+            <div class="form-row">
+                <label>Slug</label>
+                {{ product_form.slug }}
+            </div>
+
+            <div class="form-row">
+                <label>Category</label>
+                {{ product_form.category }}
+            </div>
+
+            <div class="form-row">
+                <label>Brand</label>
+                {{ product_form.brand }}
+            </div>
+
+            <div class="form-row">
+                <label>Short Description</label>
+                {{ product_form.short_description }}
+            </div>
+
+            <div class="form-row">
+                <label>Description</label>
+                {{ product_form.description }}
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- PRICING -->
+        <!-- ================================================= -->
+        <section id="pricing" class="workspace-section">
+            <h3>Pricing</h3>
+
+            <div class="form-row">
+                <label>Regular Price</label>
+                {{ variant_form.price }}
+            </div>
+
+            <div class="form-row">
+                <label>Discount Price</label>
+                {{ variant_form.discount_price }}
+            </div>
+
+            <div class="form-row">
+                <label>Discount Starts</label>
+                {{ variant_form.discount_start }}
+            </div>
+
+            <div class="form-row">
+                <label>Discount Ends</label>
+                {{ variant_form.discount_end }}
+            </div>
+
+            <div class="form-row form-row-checkbox">
+                <label>{{ product_form.vat_inclusive }} VAT Included</label>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- INVENTORY -->
+        <!-- ================================================= -->
+        <section id="inventory" class="workspace-section">
+            <h3>Inventory</h3>
+
+            <div class="form-row">
+                <label>SKU</label>
+                {{ variant_form.sku }}
+            </div>
+
+            <div class="form-row">
+                <label>Stock</label>
+                {{ variant_form.stock }}
+            </div>
+
+            <div class="form-row">
+                <label>Variant Image</label>
+                {{ variant_form.image }}
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- PRODUCT SETTINGS -->
+        <!-- ================================================= -->
+        <section id="settings" class="workspace-section">
+            <h3>Product Settings</h3>
+
+            <div class="form-row">
+                <label>Condition</label>
+                {{ product_form.condition }}
+            </div>
+
+            <div class="form-row">
+                <label>Warranty</label>
+                {{ product_form.warranty }}
+            </div>
+
+            <label class="checkbox-label">{{ product_form.featured }} Featured</label>
+            <label class="checkbox-label">{{ product_form.new_arrival }} New Arrival</label>
+            <label class="checkbox-label">{{ product_form.trending }} Trending</label>
+            <label class="checkbox-label">{{ product_form.active }} Active</label>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- VARIANTS -->
+        <!-- ================================================= -->
+        <section id="variants" class="workspace-section">
+            <h3>Variants</h3>
+
+            <a class="btn btn-outline" href="{% url 'dashboard_add_variant' product.id %}">Add Variant</a>
+
+            <table class="workspace-table">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for variant in variants %}
+                    <tr>
+                        <td>{{ variant.sku }}</td>
+                        <td>{{ variant.price }}</td>
+                        <td>{{ variant.stock }}</td>
+                        <td>
+                            {% if variant.active %}
+                                <span class="status status-active">Active</span>
+                            {% else %}
+                                <span class="status status-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="link-edit" href="{% url 'dashboard_edit_variant' variant.id %}">Edit</a>
+                            <a class="link-delete" href="{% url 'dashboard_delete_variant' variant.id %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No variants</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- GALLERY (includes main product image) -->
+        <!-- ================================================= -->
+        <section id="gallery" class="workspace-section">
+            <h3>Product Image &amp; Gallery</h3>
+
+            <div class="image-preview-wrap">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" width="180" id="mainPreview">
+                {% else %}
+                    <img src="" width="180" id="mainPreview" style="display:none;">
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <label>Main Product Image</label>
+                {{ product_form.image }}
+            </div>
+
+            <hr>
+
+            <h4>Gallery Images</h4>
+            <div class="gallery-grid">
+                {% for image in product.productimage_set.all %}
+                <div class="gallery-item">
+                    <img src="{{ image.image.url }}" width="120">
+                    <a class="link-delete" href="{% url 'dashboard_delete_product_image' image.id %}">Delete Image</a>
+                </div>
+                {% empty %}
+                <p>No gallery images uploaded.</p>
+                {% endfor %}
+            </div>
+
+            <hr>
+
+            <a class="btn btn-outline" href="{% url 'dashboard_product_gallery' product.id %}">Manage Gallery</a>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- SPECIFICATIONS -->
+        <!-- ================================================= -->
+        <section id="specifications" class="workspace-section">
+            <h3>Specifications</h3>
+
+            <table class="workspace-table">
+                <thead>
+                    <tr>
+                        <th>Specification</th>
+                        <th>Value</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spec in product.default_variant.attributes.all %}
+                    <tr>
+                        <td>{{ spec.specification.name }}</td>
+                        <td>{{ spec.value }}</td>
+                        <td>
+                            <a class="link-edit" href="{% url 'dashboard_edit_variant_specification' spec.id %}">Edit</a>
+                            |
+                            <a class="link-delete" href="{% url 'dashboard_delete_variant_specification' spec.id %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No specifications yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <br>
+            <a class="btn btn-outline" href="{% url 'dashboard_product_specifications' product.id %}">Add Specification</a>
+        </section>
+
+        <hr>
+
+        <!-- ================================================= -->
+        <!-- PRODUCT STATUS -->
+        <!-- ================================================= -->
+        <section id="status" class="workspace-section">
+            <h3>Product Status</h3>
+            <ul class="status-list">
+                <li>{% if product.active %}<span class="status status-active">✔ Active</span>{% else %}<span class="status status-inactive">✖ Inactive</span>{% endif %}</li>
+                <li>{% if product.featured %}<span class="status status-active">✔ Featured</span>{% else %}<span class="status status-inactive">✖ Not Featured</span>{% endif %}</li>
+                <li>{% if product.trending %}<span class="status status-active">✔ Trending</span>{% else %}<span class="status status-inactive">✖ Not Trending</span>{% endif %}</li>
+                <li>{% if product.new_arrival %}<span class="status status-active">✔ New Arrival</span>{% else %}<span class="status status-inactive">✖ Normal Product</span>{% endif %}</li>
+                <li>{% if product.vat_inclusive %}<span class="status status-active">✔ VAT Included</span>{% else %}<span class="status status-inactive">✖ VAT Exclusive</span>{% endif %}</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <div class="workspace-footer">
+            <button type="submit" class="btn btn-primary">Save Product</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const imageInput = document.querySelector('input[name="image"]');
+    const preview = document.getElementById("mainPreview");
+
+    if (imageInput && preview) {
+        imageInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'dashboard/js/workspace.js' %}"></script>
+<style>/* ==========================================================
+   Product Workspace — Blue & Red Theme
+   ========================================================== */
+
+:root {
+    --ws-blue: #1e3a8a;
+    --ws-blue-light: #3b82f6;
+    --ws-blue-bg: #eff6ff;
+    --ws-red: #dc2626;
+    --ws-red-light: #f87171;
+    --ws-red-bg: #fef2f2;
+    --ws-border: #dbeafe;
+    --ws-text: #1f2937;
+    --ws-radius: 8px;
+}
+
+.workspace {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #ffffff;
+    color: var(--ws-text);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- Header ---------- */
+.workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 3px solid var(--ws-blue);
+}
+
+.workspace-header h2 {
+    margin: 0;
+    color: var(--ws-blue);
+    font-weight: 700;
+}
+
+.workspace-header p {
+    margin: 4px 0 0;
+    color: var(--ws-red);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ---------- Sections ---------- */
+.workspace-section {
+    background: var(--ws-blue-bg);
+    border: 1px solid var(--ws-border);
+    border-left: 4px solid var(--ws-blue);
+    border-radius: var(--ws-radius);
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.workspace-section h3,
+.workspace-section h4 {
+    color: var(--ws-blue);
+    margin-top: 0;
+    border-bottom: 1px solid var(--ws-border);
+    padding-bottom: 8px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--ws-border);
+    margin: 24px 0;
+}
+
+/* ---------- Form Rows ---------- */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+}
+
+.form-row label {
+    font-weight: 600;
+    color: var(--ws-blue);
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+    border: 1px solid var(--ws-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.95rem;
+    background: #ffffff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+    outline: none;
+    border-color: var(--ws-blue-light);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.form-row-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ws-text);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    font-weight: 500;
+    color: var(--ws-text);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-block;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, transform 0.05s;
+}
+
+.btn-primary {
+    background: var(--ws-red);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: #b91c1c;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: var(--ws-text);
+}
+
+.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--ws-blue);
+    border: 1.5px solid var(--ws-blue);
+}
+
+.btn-outline:hover {
+    background: var(--ws-blue);
+    color: #ffffff;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* ---------- Tables ---------- */
+.workspace-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    background: #ffffff;
+}
+
+.workspace-table th {
+    background: var(--ws-blue);
+    color: #ffffff;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.workspace-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--ws-border);
+    font-size: 0.9rem;
+}
+
+.workspace-table tr:hover td {
+    background: var(--ws-blue-bg);
+}
+
+/* ---------- Status Badges ---------- */
+.status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-inactive {
+    background: var(--ws-red-bg);
+    color: var(--ws-red);
+}
+
+.status-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ---------- Links ---------- */
+.link-edit {
+    color: var(--ws-blue);
+    text-decoration: none;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.link-edit:hover {
+    text-decoration: underline;
+}
+
+.link-delete {
+    color: var(--ws-red);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link-delete:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Image Previews / Gallery ---------- */
+.image-preview-wrap {
+    margin-bottom: 12px;
+}
+
+.image-preview-wrap img {
+    border: 2px solid var(--ws-blue);
+    border-radius: var(--ws-radius);
+    object-fit: cover;
+}
+
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.gallery-item {
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    padding: 10px;
+}
+
+.gallery-item img {
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid var(--ws-border);
+}
+
+/* ---------- Footer ---------- */
+.workspace-footer {
+    text-align: right;
+    padding-top: 10px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+    .workspace-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .workspace-table {
+        display: block;
+        overflow-x: auto;
+    }
+}</style>
+{% endblock %}

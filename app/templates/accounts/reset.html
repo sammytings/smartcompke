@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reset Password - SmartComputersKE{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="card">
+        <h1>Forgot your <span>password</span>?</h1>
+        <p class="card-subtitle">
+            Enter the email address linked to your account and we'll send you a link to reset your password.
+        </p>
+
+        {% if form.non_field_errors %}
+            <div class="form-errors-top">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-errors">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-blue btn-block">Send Reset Link</button>
+        </form>
+    </div>
+
+    <p class="divider-note">
+        Remembered it? <a href="{% url 'login' %}">Back to login</a>.
+    </p>
+</div>
+{% endblock %}

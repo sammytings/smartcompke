@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Brands | SmartComputersKE{% endblock %}
+
+{% block content %}
+
+<section class="brand-page">
+
+    <div class="wrap">
+
+        <!-- Breadcrumb -->
+
+        <nav class="breadcrumb">
+
+            <a href="{% url 'home' %}">Home</a>
+
+            <span>/</span>
+
+            <span>Brands</span>
+
+        </nav>
+
+        <!-- Hero -->
+
+        <div class="brand-hero">
+
+            <div>
+
+                <span class="eyebrow">Official Brands</span>
+
+                <h1>Shop by Brand</h1>
+
+                <p>
+                    Browse genuine products from the world's leading technology brands.
+                </p>
+
+            </div>
+
+            <form method="GET" class="brand-search">
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Search brands..."
+                >
+
+                <button type="submit">
+
+                    <i class="fas fa-search"></i>
+
+                </button>
+
+            </form>
+
+        </div>
+
+        {% if brands %}
+
+        <div class="brands-grid">
+
+            {% for brand in brands %}
+
+            <a
+                href="{% url 'brand_products' brand.slug %}"
+                class="brand-card"
+            >
+
+                <div class="logo">
+
+                    {% if brand.logo %}
+
+                    <img
+                        src="{{ brand.logo.url }}"
+                        alt="{{ brand.name }}"
+                    >
+
+                    {% else %}
+
+                    <i class="fas fa-tags"></i>
+
+                    {% endif %}
+
+                </div>
+
+                <h3>{{ brand.name }}</h3>
+
+                <p>
+
+                    {{ brand.product_count }}
+
+                    Product{{ brand.product_set.count|pluralize }}
+
+                </p>
+
+                <span>
+
+                    View Products
+
+                    <i class="fas fa-arrow-right"></i>
+
+                </span>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <i class="fas fa-tags"></i>
+
+            <h2>No Brands Found</h2>
+
+            <p>
+
+                There are currently no brands available.
+
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+<style>
+
+.brand-page{
+
+padding:60px 0;
+
+background:#f8fafc;
+
+min-height:80vh;
+
+}
+
+.wrap{
+
+width:min(1200px,94%);
+
+margin:auto;
+
+}
+
+.breadcrumb{
+
+margin-bottom:25px;
+
+font-size:14px;
+
+color:#64748b;
+
+}
+
+.breadcrumb a{
+
+text-decoration:none;
+
+color:#2563eb;
+
+font-weight:600;
+
+}
+
+.breadcrumb span{
+
+margin:0 8px;
+
+}
+
+.brand-hero{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:30px;
+
+margin-bottom:45px;
+
+}
+
+.eyebrow{
+
+display:inline-block;
+
+padding:6px 14px;
+
+background:#dbeafe;
+
+color:#2563eb;
+
+border-radius:30px;
+
+font-size:13px;
+
+font-weight:700;
+
+margin-bottom:12px;
+
+}
+
+.brand-hero h1{
+
+font-size:42px;
+
+margin-bottom:10px;
+
+}
+
+.brand-hero p{
+
+color:#64748b;
+
+max-width:550px;
+
+line-height:1.7;
+
+}
+
+.brand-search{
+
+display:flex;
+
+background:#fff;
+
+border-radius:50px;
+
+overflow:hidden;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.brand-search input{
+
+border:none;
+
+padding:16px 22px;
+
+width:300px;
+
+outline:none;
+
+}
+
+.brand-search button{
+
+border:none;
+
+background:#2563eb;
+
+color:#fff;
+
+padding:0 24px;
+
+cursor:pointer;
+
+}
+
+.brands-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+
+gap:28px;
+
+}
+
+.brand-card{
+
+background:#fff;
+
+border-radius:20px;
+
+padding:30px;
+
+text-align:center;
+
+text-decoration:none;
+
+color:#111827;
+
+transition:.3s;
+
+border:1px solid #e5e7eb;
+
+}
+
+.brand-card:hover{
+
+transform:translateY(-8px);
+
+box-shadow:0 20px 40px rgba(0,0,0,.08);
+
+border-color:#2563eb;
+
+}
+
+.logo{
+
+height:100px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+margin-bottom:20px;
+
+}
+
+.logo img{
+
+max-width:180px;
+
+max-height:90px;
+
+object-fit:contain;
+
+filter:none;
+
+}
+
+.logo i{
+
+font-size:60px;
+
+color:#2563eb;
+
+}
+
+.brand-card h3{
+
+font-size:22px;
+
+margin-bottom:10px;
+
+}
+
+.brand-card p{
+
+color:#6b7280;
+
+margin-bottom:20px;
+
+}
+
+.brand-card span{
+
+display:inline-flex;
+
+align-items:center;
+
+gap:8px;
+
+font-weight:700;
+
+color:#dc2626;
+
+}
+
+.empty-state{
+
+text-align:center;
+
+padding:100px 20px;
+
+}
+
+.empty-state i{
+
+font-size:70px;
+
+color:#2563eb;
+
+margin-bottom:20px;
+
+}
+
+.empty-state h2{
+
+margin-bottom:10px;
+
+}
+
+.empty-state p{
+
+color:#64748b;
+
+}
+
+@media(max-width:900px){
+
+.brand-hero{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+.brand-search{
+
+width:100%;
+
+}
+
+.brand-search input{
+
+width:100%;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.brand-hero h1{
+
+font-size:32px;
+
+}
+
+.brands-grid{
+
+grid-template-columns:1fr 1fr;
+
+gap:18px;
+
+}
+
+.brand-card{
+
+padding:20px;
+
+}
+
+.logo img{
+
+max-width:130px;
+
+}
+
+}
+
+</style>
+
+{% endblock %}

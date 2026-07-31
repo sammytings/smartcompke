@@ -1,0 +1,1470 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.name }} — Smartcomputerske Technologies{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ============ PDP-ONLY ADDITIONS ============
+     Spacing scale: 8 12 16 20 24 32 40 48
+     Type scale: 12 13 14 16 20 24 32 40
+  */
+
+  @keyframes pdpFadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  }
+
+  .reveal{opacity:0;animation:pdpFadeUp .4s ease forwards;}
+  .reveal-1{animation-delay:.05s;}
+
+  .ic-svg{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ic-svg svg{display:block;}
+
+  /* ---- Gallery ---- */
+  .gallery-main{cursor:zoom-in;position:relative;}
+  .gallery-main img{transition:opacity .2s ease, transform .25s ease;}
+  .gallery-main:hover img{transform:scale(1.02);}
+  .gallery-main:focus-visible{outline:2px solid var(--indigo);outline-offset:3px;}
+
+  .gallery-badges{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:8px;z-index:3;}
+  .gallery-badges span{display:inline-flex;align-items:center;gap:5px;background:var(--indigo);color:#fff;font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;box-shadow:var(--shadow-sm);}
+  .gallery-badges span.cond{background:var(--ink);}
+  .gallery-badges span.sale-flag{background:var(--amber-deep);}
+
+  .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--ink);z-index:4;transition:background .15s,color .15s;}
+  .gallery-nav:hover{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+  .gallery-nav:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;}
+  .gallery-nav.prev{left:12px;}
+  .gallery-nav.next{right:12px;}
+
+  .gallery-zoom-hint{position:absolute;bottom:14px;right:14px;display:flex;align-items:center;gap:6px;background:rgba(17,20,28,.72);color:#fff;font-size:11.5px;font-weight:600;padding:6px 10px;border-radius:999px;z-index:3;pointer-events:none;opacity:0;transition:opacity .15s;}
+  .gallery-main:hover .gallery-zoom-hint{opacity:1;}
+
+  .gallery-zoom-overlay{position:fixed;inset:0;background:rgba(10,12,20,.92);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+  .gallery-zoom-overlay.open{opacity:1;pointer-events:auto;}
+  .gallery-zoom-overlay img{max-width:90vw;max-height:88vh;object-fit:contain;border-radius:8px;animation:pdpFadeUp .25s ease both;}
+  .gallery-zoom-close{position:absolute;top:20px;right:24px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.25);cursor:pointer;transition:background .15s;}
+  .gallery-zoom-close:hover{background:rgba(255,255,255,.22);}
+  .gallery-zoom-close:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+
+  /* ---- Trust strip ---- */
+  .trust-strip{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 4px;}
+  .trust-strip span{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--success);background:var(--success-tint);padding:6px 12px;border-radius:6px;}
+  .trust-strip svg{color:var(--success);flex-shrink:0;}
+
+  .save-badge{background:var(--amber-tint);color:var(--amber-deep);font-weight:700;font-size:12px;padding:4px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:5px;}
+
+  /* ---- Info grid (brand / category / warranty / delivery) ---- */
+  .pdp-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0;}
+  .pdp-info-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:8px;transition:border-color .15s;}
+  .pdp-info-item:hover{border-color:var(--indigo);}
+  .pdp-info-item .ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .pdp-info-item .ic.tone-indigo{background:var(--indigo-tint);color:var(--indigo);}
+  .pdp-info-item .ic.tone-amber{background:var(--amber-tint);color:var(--amber-deep);}
+  .pdp-info-item .ic.tone-success{background:var(--success-tint);color:var(--success);}
+  .pdp-info-item .ic.tone-navy{background:#E7E9F2;color:var(--ink);}
+  .pdp-info-item .lbl{font-size:12px;color:var(--graphite-soft);margin-bottom:1px;}
+  .pdp-info-item .val{font-size:13px;font-weight:600;color:var(--ink);}
+
+  /* ---- Feature strip ---- */
+  .pdp-feature-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:48px;}
+  .pdp-feature-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 16px;text-align:center;transition:border-color .15s,transform .15s;}
+  .pdp-feature-card:hover{border-color:var(--indigo);transform:translateY(-2px);}
+  .pdp-feature-card .ic{width:40px;height:40px;border-radius:50%;background:var(--indigo-tint);color:var(--indigo);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+  .pdp-feature-card .ic.tone-success{background:var(--success-tint);color:var(--success);}
+  .pdp-feature-card .ic.tone-amber{background:var(--amber-tint);color:var(--amber-deep);}
+  .pdp-feature-card .ic.tone-navy{background:#E7E9F2;color:var(--ink);}
+  .pdp-feature-card .ic.tone-purple{background:#F1E9FE;color:#7C3AED;}
+  .pdp-feature-card b{display:block;font-size:13px;color:var(--ink);margin-bottom:2px;font-weight:600;}
+  .pdp-feature-card span{font-size:12px;color:var(--graphite-soft);}
+
+  /* ---- Delivery calculator ---- */
+  .delivery-calc{margin-top:20px;padding-top:20px;border-top:1px solid var(--line);}
+  .delivery-calc-head{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;margin-bottom:12px;color:var(--ink);}
+  .delivery-calc-head .ic-svg{width:24px;height:24px;border-radius:6px;background:var(--indigo-tint);color:var(--indigo);}
+  .delivery-result{transform-origin:top;}
+  .delivery-result.show{animation:pdpFadeUp .25s ease both;}
+
+  /* ---- Frequently bought together ---- */
+  .fbt-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px;}
+  .fbt-items{display:flex;align-items:center;gap:10px;flex:1;flex-wrap:wrap;}
+  .fbt-item{display:flex;flex-direction:column;align-items:center;gap:6px;width:112px;text-align:center;}
+  .fbt-item img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--line-soft);}
+  .fbt-item .name{font-size:11.5px;font-weight:600;line-height:1.3;}
+  .fbt-item .price{font-size:12px;color:var(--indigo);font-weight:600;}
+  .fbt-plus{font-size:18px;color:var(--graphite-soft);}
+  .fbt-summary{flex:0 0 220px;border-left:1px solid var(--line);padding-left:24px;}
+  .fbt-summary .total{font-size:22px;font-weight:700;color:var(--ink);margin:4px 0 14px;}
+  .fbt-summary label{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--graphite);margin-bottom:6px;}
+  @media (max-width:900px){ .fbt-summary{flex-basis:100%;border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:16px;} }
+
+  /* ---- Recommended products carousel ---- */
+  .rec-carousel{position:relative;}
+  .rec-track{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x mandatory;padding:4px 2px 16px;-webkit-overflow-scrolling:touch;}
+  .rec-track::-webkit-scrollbar{height:6px;}
+  .rec-track::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px;}
+  .rec-track .prod-card{flex:0 0 250px;scroll-snap-align:start;}
+  .rec-track.dragging{cursor:grabbing;scroll-behavior:auto;user-select:none;}
+  .rec-arrow{position:absolute;top:38%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:5;transition:border-color .15s,color .15s;}
+  .rec-arrow:hover{border-color:var(--indigo);color:var(--indigo);}
+  .rec-arrow.left{left:-16px;}
+  .rec-arrow.right{right:-16px;}
+  @media (max-width:600px){ .rec-arrow{display:none;} }
+
+  /* ---- CTA banner ---- */
+  .pdp-cta{background:var(--ink);border-radius:12px;padding:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .pdp-cta h3{color:#fff;font-size:20px;margin-bottom:4px;font-weight:700;}
+  .pdp-cta p{color:#B7BFCE;font-size:13.5px;margin:0;}
+  .pdp-cta-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+  /* ---- Prev/Next footer nav ---- */
+  .pdp-footnav{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;margin:40px 0;flex-wrap:wrap;}
+  .pdp-footnav a{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--graphite);transition:color .15s;}
+  .pdp-footnav a:hover{color:var(--indigo);}
+  .pdp-footnav .to-cat{color:var(--indigo);}
+
+  @media (max-width:1080px){
+    .pdp-feature-grid{grid-template-columns:repeat(3,1fr);}
+    .pdp-info-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:600px){
+    .pdp-feature-grid{grid-template-columns:repeat(2,1fr);}
+    .pdp-cta{padding:24px;}
+  }
+
+  .pdp-section-block{margin:40px 0;}
+
+  .section-heading-premium{
+    position:relative;
+    font-size:18px;
+    font-weight:700;
+    color:var(--ink);
+    margin:0 0 18px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--line);
+  }
+  .section-heading-premium::after{
+    content:'';
+    position:absolute;
+    left:0;
+    bottom:-2px;
+    width:40px;
+    height:2px;
+    background:var(--indigo);
+  }
+
+  .pdp-body-text{
+    font-size:14px;
+    line-height:1.7;
+    color:var(--graphite);
+  }
+
+  /* ---- Specifications table ---- */
+  .specs-table-wrap{
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .specs-table-premium{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  .specs-table-premium tr:nth-child(even){
+    background:var(--panel);
+  }
+  .specs-table-premium tr{
+    transition:background .15s ease;
+  }
+  .specs-table-premium tr:hover{
+    background:var(--indigo-tint);
+  }
+  .specs-table-premium td{
+    padding:12px 20px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  .specs-table-premium tr:last-child td{
+    border-bottom:none;
+  }
+  .specs-table-premium td.spec-name{
+    width:36%;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .specs-table-premium td.spec-value{
+    color:var(--graphite);
+  }
+  @media (max-width:600px){
+    .specs-table-premium td{padding:10px 14px;font-size:13px;}
+    .specs-table-premium td.spec-name{width:44%;}
+  }
+
+  .tool-btn{
+    position:relative;
+  }
+  .tool-btn::after{
+    content:attr(title);
+    position:absolute;
+    right:48px;
+    top:50%;
+    transform:translateY(-50%);
+    background:#111;
+    color:#fff;
+    font-size:11px;
+    padding:5px 8px;
+    border-radius:6px;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transition:.2s;
+  }
+  .tool-btn:hover::after{
+    opacity:1;
+  }
+
+  /* ---- Variant selector (dropdown + live spec preview) ---- */
+  .variant-selector{
+    margin:22px 0;
+  }
+  .variant-selector__label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:10px;
+    letter-spacing:.01em;
+  }
+  .variant-selector__select-wrap{
+    position:relative;
+  }
+  .variant-selector__select{
+    width:100%;
+    appearance:none;
+    -webkit-appearance:none;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:14px 44px 14px 16px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .variant-selector__select:hover{
+    border-color:var(--indigo);
+  }
+  .variant-selector__select:focus-visible{
+    outline:none;
+    border-color:var(--indigo);
+    box-shadow:0 0 0 3px var(--indigo-tint);
+  }
+  .variant-selector__select-wrap::after{
+    content:'';
+    position:absolute;
+    right:16px;
+    top:50%;
+    width:10px;
+    height:10px;
+    border-right:2px solid var(--graphite-soft);
+    border-bottom:2px solid var(--graphite-soft);
+    transform:translateY(-65%) rotate(45deg);
+    pointer-events:none;
+  }
+  .variant-selector__preview{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+    padding:14px 16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    min-height:20px;
+  }
+  .variant-selector__chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:999px;
+  }
+  .spinner{
+    width:16px;
+    height:16px;
+    border:2px solid rgba(255,255,255,.3);
+    border-top-color:#fff;
+    border-radius:50%;
+    display:inline-block;
+    margin-right:8px;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{
+    to{ transform:rotate(360deg); }
+  }
+  .variant-selector__chip::before{
+    content:'';
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--indigo);
+    flex-shrink:0;
+  }
+  .variant-selector__preview:empty::before{
+    content:'Select a configuration above to see full specifications.';
+    font-size:12.5px;
+    color:var(--graphite-soft);
+    font-style:italic;
+  }
+  .variant-selector__stock-tag{
+    font-size:11.5px;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .variant-selector__stock-tag.in{background:var(--success-tint);color:var(--success);}
+  .variant-selector__stock-tag.low{background:var(--amber-tint);color:var(--amber-deep);}
+  .variant-selector__stock-tag.out{background:#FCE8E6;color:#B3261E;}
+
+  /* ---- Badge pulse feedback (cart / wishlist counters in header) ---- */
+  .badge-pulse{animation:badgePulse .35s ease;}
+  @keyframes badgePulse{
+    0%{transform:scale(1);}
+    40%{transform:scale(1.35);}
+    100%{transform:scale(1);}
+  }
+  .wish-btn-lg.active{color:#e0245e;border-color:#e0245e;}
+  .wish-btn-lg.active svg{fill:#e0245e;stroke:#e0245e;}
+
+  /* ---- Add to Cart button: identical fly-icon → checkmark animation
+         used across the homepage / deals / category pages, so every
+         "Add to Cart" button in the store behaves the same way ---- */
+  .btn-cart-add{ position:relative; overflow:hidden; }
+  .btn-cart-add .btn-icon, .btn-cart-add .btn-label{ transition:opacity .15s; }
+  .btn-cart-add .cart-loader{ display:none; }
+  .btn-cart-add.is-adding{ pointer-events:none; }
+  .btn-cart-add.is-adding .btn-label{ opacity:.35; }
+  .btn-cart-add.is-adding .btn-icon{ animation:sck-cart-fly 1.1s cubic-bezier(.5,0,.3,1) infinite; }
+  @keyframes sck-cart-fly{
+    0%   { transform:translateX(0) scale(1);     opacity:1; }
+    45%  { transform:translateX(70px) scale(.7);  opacity:0; }
+    50%  { transform:translateX(-70px) scale(.7); opacity:0; }
+    100% { transform:translateX(0) scale(1);      opacity:1; }
+  }
+  .btn-cart-add.is-added{ background:#12A150 !important; pointer-events:none; }
+  .btn-cart-add.is-added .btn-icon{ display:none; }
+  .btn-cart-add.is-added .btn-label{ opacity:0; width:0; overflow:hidden; }
+  .btn-cart-add.is-added .cart-loader{
+    display:flex; position:absolute; inset:0; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn-cart-add.is-added .cart-loader svg,
+  .btn-cart-add.is-added .cart-loader span{ display:none; }
+  .btn-cart-add.is-added .cart-loader::before{ content:"✓"; font-size:14px; font-weight:800; color:#fff; }
+  .btn-cart-add.is-added .cart-loader::after{
+     font-size:13.5px; font-weight:700; color:#fff;
+    letter-spacing:-0.01em; animation:sck-pop-in .22s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes sck-pop-in{ from{ opacity:0; transform:scale(.78); } to{ opacity:1; transform:scale(1); } }
+
+  /* ---- Heart pulse feedback for the wishlist toggle (matches homepage) ---- */
+  .wish-btn-lg.is-wishing, .tool-btn.wishlist.is-wishing{
+    pointer-events:none; animation:sck-wish-pulse .4s ease;
+  }
+  @keyframes sck-wish-pulse{ 0%{ transform:scale(1); } 50%{ transform:scale(1.32); } 100%{ transform:scale(1); } }
+
+  /* ---- Themed toast — identical to the homepage / deals / category pages ---- */
+  .sck-toast-wrap{
+    position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(24px); z-index:99999;
+    display:flex; align-items:center; gap:12px; max-width:min(92vw,380px);
+    background:linear-gradient(135deg,#16307F,#0B1330); color:#fff;
+    padding:14px 20px 14px 16px; border-radius:16px; border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 24px 48px rgba(6,12,28,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
+    font-family:'Inter','Segoe UI',sans-serif; opacity:0; pointer-events:none;
+    transition:opacity .3s cubic-bezier(.2,.7,.3,1), transform .35s cubic-bezier(.2,.7,.3,1);
+  }
+  .sck-toast-wrap.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .sck-toast-wrap .sck-toast-ic{
+    flex-shrink:0; width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.14); color:#F5B400;
+  }
+  .sck-toast-wrap.sck-toast-error .sck-toast-ic{ color:#ff9aa2; background:rgba(220,38,38,.22); }
+  .sck-toast-wrap .sck-toast-body{ display:flex; flex-direction:column; gap:1px; }
+  .sck-toast-wrap .sck-toast-title{ font-weight:700; font-size:13.5px; letter-spacing:-0.01em; }
+  .sck-toast-wrap .sck-toast-msg{ font-size:12px; color:#c3cbe0; line-height:1.4; }
+  @media (max-width:520px){ .sck-toast-wrap{ bottom:90px; padding:12px 16px 12px 14px; } }
+
+  /* ---- WhatsApp order button on product cards — identical to the homepage ---- */
+  .btn-whatsapp-card{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px;
+    border-radius:10px; border:none; background:#25D366; color:#fff; font-size:12.5px; font-weight:700;
+    cursor:pointer; text-decoration:none; transition:background .16s ease, transform .16s ease; letter-spacing:-0.01em;
+  }
+  .btn-whatsapp-card:hover{ background:#1ebe5a; transform:translateY(-1px); color:#fff; }
+  .btn-whatsapp-card svg{ flex-shrink:0; }
+</style>
+
+<div class="wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Home</a><span class="sep">/</span>
+    {% if product.category %}
+    <a href="{% url 'category_products' product.category.slug %}">{{ product.category.name }}</a><span class="sep">/</span>
+    {% endif %}
+    <span class="current">{{ product.name }}</span>
+  </div>
+</div>
+
+<!-- ============ HERO / MAIN PDP ============ -->
+<section class="wrap">
+  <div class="pdp-layout">
+
+    <!-- GALLERY -->
+    <div class="reveal">
+      <div class="gallery-main" id="galleryMain" tabindex="0" role="button" aria-label="Product image, press Enter to zoom">
+        <div class="gallery-badges">
+          {% if product.condition %}<span class="cond">{{ product.get_condition_display }}</span>{% endif %}
+          {% if product.new_arrival %}<span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6z"/></svg>New</span>{% endif %}
+          {% if product.discount_price %}<span class="sale-flag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>Sale</span>{% endif %}
+        </div>
+        <button class="gallery-nav prev" id="galleryPrev" aria-label="Previous image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        {% if product.image %}
+        <img id="galleryMainImg" src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+        <img id="galleryMainImg" src="{% static 'images/no-image.png' %}" alt="No image available">
+        {% endif %}
+        <button class="gallery-nav next" id="galleryNext" aria-label="Next image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <span class="gallery-zoom-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+          Click to zoom
+        </span>
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs">
+        <div class="gallery-thumb active" data-full="{{ product.image.url }}">
+          <img src="{{ product.image.url }}" alt="{{ product.name }} — main view">
+        </div>
+        {% for img in product.gallery.all %}
+        <div class="gallery-thumb" data-full="{{ img.image.url }}">
+          <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }} — view {{ forloop.counter }}">
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- ZOOM LIGHTBOX -->
+      <div class="gallery-zoom-overlay" id="galleryZoomOverlay" role="dialog" aria-modal="true" aria-label="Zoomed product image">
+        <button class="gallery-zoom-close" id="galleryZoomClose" aria-label="Close zoomed image">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <img id="galleryZoomImg" src="" alt="">
+      </div>
+    </div>
+
+    <!-- PURCHASE INFO -->
+    <div class="pdp-info reveal reveal-1">
+      <div class="prod-brand">{{ product.brand.name|default:"Smartcomputerske" }}</div>
+      <h1>{{ product.name }}</h1>
+
+      <div class="prod-rating">
+        <span class="stars">★★★★★</span>
+        <span>{{ product.average_rating|default:"4.8" }} ({{ product.review_count|default:"0" }} reviews)</span>
+        <span class="sep">·</span>
+        <span>SKU: <span id="productSku">{{ product.sku|default:product.id }}</span></span>
+      </div>
+
+      <div class="pdp-price-row">
+        {% if product.discount_price %}
+          <div class="prod-price vat-price" id="productPrice" data-base="{{ product.discount_price }}">KSh {{ product.discount_price }}</div>
+          <div class="prod-old-price" id="productOldPrice">KSh {{ product.price }}</div>
+          <span class="save-badge" id="saveBadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg><span id="saveBadgeText">Save KSh {{ product.savings_amount|default:"0" }}</span></span>
+        {% else %}
+          <div class="prod-price vat-price" id="productPrice" data-base="{{ product.price }}">KSh {{ product.price }}</div>
+          <div class="prod-old-price" id="productOldPrice" style="display:none;">KSh {{ product.price }}</div>
+          <span class="save-badge" id="saveBadge" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg><span id="saveBadgeText">Save KSh 0</span></span>
+        {% endif %}
+      </div>
+      <div class="vat-note">Price {{ product.vat_included|yesno:"includes,excludes" }} 16% VAT</div>
+
+      {% if variants %}
+      <div class="variant-selector">
+        <label class="variant-selector__label" for="variantSelect">Choose Configuration</label>
+
+        <div class="variant-selector__select-wrap">
+          <select id="variantSelect" class="variant-selector__select">
+            <option value=""
+              data-price="{{ product.discount_price|default:product.price }}"
+              data-old-price="{{ product.price }}"
+              data-has-discount="{% if product.discount_price %}1{% else %}0{% endif %}"
+              data-stock="{{ product.stock }}"
+              data-sku="{{ product.sku|default:product.id }}"
+              data-image="{% if product.image %}{{ product.image.url }}{% endif %}"
+              data-name="Standard Configuration"
+              data-spec-text="Standard Configuration">
+              Standard Configuration — KSh {{ product.discount_price|default:product.price }}
+            </option>
+
+            {% for variant in variants %}
+            {# ---------------------------------------------------------------
+               NOTE: this assumes each variant exposes its configuration via
+               variant.attributes.all, with attr.attribute.name / attr.value
+               (matching the "test1: v1" pills shown in your admin screen).
+               If your model uses a different related name, swap
+               "variant.attributes.all" and "attr.attribute.name" below —
+               everything else keeps working unchanged. If that relation
+               doesn't exist, this degrades gracefully to variant.variant_name.
+            #}
+            <option value="{{ variant.id }}"
+              data-price="{{ variant.current_price }}"
+              data-stock="{{ variant.stock }}"
+              data-sku="{{ variant.sku }}"
+              data-image="{% if variant.image %}{{ variant.image.url }}{% endif %}"
+              data-name="{{ variant.variant_name }}"
+              data-spec-text="{% for attr in variant.attributes.all %}{{ attr.attribute.name }}: {{ attr.value }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not variant.attributes.all %}{{ variant.variant_name }}{% endif %}">
+              {% for attr in variant.attributes.all %}{{ attr.attribute.name }}: {{ attr.value }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not variant.attributes.all %}{{ variant.variant_name }}{% endif %} — KSh {{ variant.current_price }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Live breakdown of the selected configuration, since a native <select>
+             can't render multi-line rich content per option -->
+        <div class="variant-selector__preview" id="variantPreview" aria-live="polite"></div>
+      </div>
+      {% endif %}
+
+      <div class="pdp-meta-row" id="stockBadge">
+        {% if product.stock > 5 %}
+          <span class="badge-stock in"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" style="vertical-align:-1px;margin-right:3px;"><path d="M20 6L9 17l-5-5"/></svg>In Stock</span>
+        {% elif product.stock > 0 %}
+          <span class="badge-stock low">Only {{ product.stock }} left</span>
+        {% else %}
+          <span class="badge-stock out">Out of Stock</span>
+        {% endif %}
+        {% if product.condition %}<span class="badge-condition">{{ product.get_condition_display }}</span>{% endif %}
+        {% if product.warranty %}<span class="badge-condition"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="vertical-align:-1px;margin-right:3px;"><path d="M12 2l8 3.5v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5v-6z"/></svg>{{ product.warranty }}</span>{% endif %}
+      </div>
+
+      <p class="pdp-desc">{{ product.short_description }}</p>
+
+      <div class="trust-strip">
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Genuine Product</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 2l8 3.5v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5v-6z"/></svg>Official Warranty</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Nationwide Delivery</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Secure Payment</span>
+      </div>
+
+      <div class="pdp-info-grid">
+        <div class="pdp-info-item">
+          <div class="ic tone-indigo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.6 12.3 12.7 20.2a2 2 0 0 1-2.8 0L3.3 13.6a2 2 0 0 1-.6-1.4V5a1.8 1.8 0 0 1 1.8-1.8h7.2c.5 0 1 .2 1.4.6l7.5 7.5a2 2 0 0 1 0 3z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg></div>
+          <div><div class="lbl">Brand</div><div class="val">{{ product.brand.name|default:"—" }}</div></div>
+        </div>
+        <div class="pdp-info-item">
+          <div class="ic tone-navy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
+          <div><div class="lbl">Category</div><div class="val">{{ product.category.name|default:"—" }}</div></div>
+        </div>
+        <div class="pdp-info-item">
+          <div class="ic tone-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l8 3.5v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5v-6z"/></svg></div>
+          <div><div class="lbl">Warranty</div><div class="val">{{ product.warranty|default:"12 Months" }}</div></div>
+        </div>
+        <div class="pdp-info-item">
+          <div class="ic tone-amber"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+          <div><div class="lbl">Delivery</div><div class="val">1–3 Business Days</div></div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div class="qty-stepper">
+          <button type="button" id="qtyMinus" aria-label="Decrease quantity">−</button>
+          <input type="text" id="qtyInput" value="1" inputmode="numeric" aria-label="Quantity">
+          <button type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
+        </div>
+        <span class="result-count" id="stockHint">{{ product.stock }} units available</span>
+      </div>
+
+      <!-- ============ ADD TO CART / WISHLIST / COMPARE ============
+           These now behave exactly like the home page product cards:
+           - Add to Cart is a real <form class="js-add-to-cart-form">
+             submitted the same way the home page cart forms are, with
+             the same cart-loader spinner swap on the button.
+           - Wishlist is a ".js-wishlist-toggle" button using the same
+             toggle + toast + active-state pattern as the home page.
+           - Compare uses the same ".compare-btn" fetch pattern as the
+             home page cards. -->
+      <div class="pdp-actions">
+        <form action="{% url 'add_to_cart' product.id %}" method="post" class="js-add-to-cart-form" id="pdpAddToCartForm" style="display:contents;">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" id="cartQuantityInput" value="1">
+          <input type="hidden" name="variant_id" id="cartVariantInput" value="">
+          <button class="btn-cart-add" type="submit" id="addToCartBtn" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
+            <span class="cart-loader" aria-hidden="true">
+              <svg viewBox="0 0 26 22" fill="none">
+                <g class="cart-body">
+                  <path d="M1 1h3l2.2 12.4a2 2 0 0 0 2 1.6h9.6a2 2 0 0 0 2-1.6L22 5.5H6.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+                <circle class="cart-wheel" cx="9.5" cy="19" r="1.8"/>
+                <circle class="cart-wheel" cx="17.5" cy="19" r="1.8"/>
+              </svg>
+            </span>
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="btn-label">Add to Cart</span>
+          </button>
+        </form>
+
+    <form method="POST" action="{% url 'buy_now' variant.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="quantity" id="buy-now-qty" value="1">
+
+    <button type="submit" class="btn btn-danger">
+        Buy Now
+    </button>
+</form>
+        <a class="btn-wa-order-lg" id="whatsappLink" data-product-name="{{ product.name }}" href="https://wa.me/254700000000?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}%20(KSh%20{{ product.price }})" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.8 1.4 6.6 0 12-5.4 12-12 0-3.2-1.3-6.2-3.5-8.3z"/></svg>
+          WhatsApp
+        </a>
+        <button
+          type="button"
+          id="wishlistBtn"
+          class="wish-btn-lg js-wishlist-toggle"
+          data-url="{% url 'add_to_wishlist' product.id %}"
+          data-product-id="{{ product.id }}"
+          data-product-name="{{ product.name|escapejs }}"
+          title="Add to Wishlist"
+          aria-label="Add to wishlist">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        </button>
+        <button class="wish-btn-lg compare-btn" id="compareBtn" data-product="{{ product.id }}" title="Compare Product" aria-label="Add to compare">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        </button>
+      </div>
+
+      <!-- DELIVERY CALCULATOR -->
+      <div class="delivery-calc">
+        <div class="delivery-calc-head">
+          <span class="ic-svg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
+          Estimate delivery to your location
+        </div>
+        <div class="delivery-calc-grid">
+          <select id="deliveryCounty">
+            <option value="">Select County</option>
+            <option value="nairobi-cbd">Nairobi CBD</option>
+            <option value="nairobi-outer">Nairobi (Outer)</option>
+            <option value="kiambu">Kiambu</option>
+            <option value="machakos">Machakos</option>
+            <option value="upcountry">Other / Upcountry</option>
+          </select>
+          <select id="deliverySpeed">
+            <option value="standard">Standard Delivery</option>
+            <option value="express">Express (Same Day)</option>
+          </select>
+          <button class="view-all" id="calcDeliveryBtn" type="button">Calculate</button>
+        </div>
+        <div class="delivery-result" id="deliveryResult">
+          <span>Estimated delivery fee</span>
+          <b id="deliveryFeeVal">KSh 0</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if specifications %}
+  <div class="pdp-section-block">
+    <h2 class="section-heading-premium">Specifications</h2>
+    <div class="specs-table-wrap">
+        <table class="specs-table-premium">
+            <tbody>
+                {% for spec in specifications %}
+                <tr>
+                    <td class="spec-name">{{ spec.specification.name }}</td>
+                    <td class="spec-value">{{ spec.value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if product.description %}
+  <div class="pdp-section-block">
+    <h2 class="section-heading-premium">Description</h2>
+    <div class="pdp-body-text">{{ product.description|linebreaks }}</div>
+  </div>
+  {% endif %}
+
+  <!-- Warranty / Shipping -->
+  <div class="pdp-tabs pdp-section-block">
+    <div class="tab-nav" role="tablist">
+      <button class="tab-btn active" data-tab="warranty" role="tab">Warranty</button>
+      <button class="tab-btn" data-tab="shipping" role="tab">Shipping</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-warranty">
+      <p class="pdp-desc">Every unit sold by Smartcomputerske Technologies includes an official {{ product.warranty|default:"12-month" }} warranty, honoured in-store on Kimathi Street, Nairobi CBD. Keep your receipt or order confirmation for warranty claims, and reach out to our support team for troubleshooting before returning any unit.</p>
+    </div>
+
+    <div class="tab-panel" id="tab-shipping">
+      <p class="pdp-desc">We offer same-day delivery within Nairobi CBD, next-day delivery within greater Nairobi, and 2–4 day delivery upcountry via trusted courier partners. Delivery fees are calculated automatically based on your location using the calculator above.</p>
+    </div>
+  </div>
+
+  <!-- ============ FEATURE STRIP ============ -->
+  <div class="pdp-feature-grid">
+    <div class="pdp-feature-card"><div class="ic tone-success"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div><b>Genuine Hardware</b><span>Verified &amp; tested</span></div>
+    <div class="pdp-feature-card"><div class="ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l8 3.5v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5v-6z"/></svg></div><b>Official Warranty</b><span>Honoured in-store</span></div>
+    <div class="pdp-feature-card"><div class="ic tone-amber"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><b>Secure Payments</b><span>M-Pesa, Visa, Bank</span></div>
+    <div class="pdp-feature-card"><div class="ic tone-navy"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div><b>Fast Delivery</b><span>Nairobi &amp; upcountry</span></div>
+    <div class="pdp-feature-card"><div class="ic tone-purple"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 1 4.2 7.6"/><path d="M3 12v6h6"/></svg></div><b>After-Sales Support</b><span>Setup &amp; troubleshooting</span></div>
+  </div>
+
+  <!-- ============ FREQUENTLY BOUGHT TOGETHER ============ -->
+  {% if bundle_items %}
+  <section class="section">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Bundle &amp; Save</span><h2>Frequently bought together</h2></div>
+    </div>
+    <div class="fbt-wrap">
+      <div class="fbt-items">
+        <div class="fbt-item">
+          {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% endif %}
+          <div class="product-tools">
+            <button type="button" class="tool-btn wishlist js-wishlist-toggle" title="Add to Wishlist" data-url="{% url 'add_to_wishlist' product.id %}" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+              </svg>
+            </button>
+            <button type="button" class="tool-btn compare-btn" title="Compare Product" data-product="{{ product.id }}">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
+              </svg>
+            </button>
+          </div>
+          <div class="name">{{ product.name }}</div>
+          <div class="price">KSh {{ product.price }}</div>
+        </div>
+        {% for item in bundle_items %}
+        <span class="fbt-plus">+</span>
+        <div class="fbt-item">
+          {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}">{% endif %}
+          <div class="name">{{ item.name }}</div>
+          <div class="price">KSh {{ item.price }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="fbt-summary">
+        <span class="result-count">Total for {{ bundle_items|length|add:1 }} items</span>
+        <div class="total">KSh {{ bundle_total }}</div>
+        <label><input type="checkbox" checked disabled> {{ product.name }}</label>
+        {% for item in bundle_items %}
+        <label><input type="checkbox" checked> {{ item.name }}</label>
+        {% endfor %}
+        <button type="button" class="btn-cart-add" id="addBundleBtn" style="width:100%;margin-top:10px;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ============ RECOMMENDED PRODUCTS ============
+       Styled and behaving exactly like the home page product grid:
+       - clicking the image goes to the product detail page
+       - floating wishlist / compare / WhatsApp tools appear on hover
+       - Add to Cart is a real form with the same cart-loader button
+  ============ -->
+  <section class="section">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">You May Also Like</span><h2>Recommended for you</h2><p>More {{ product.category.name|default:"hardware" }} picked from the same category.</p></div>
+    </div>
+    <div class="rec-carousel">
+      <button class="rec-arrow left" id="recArrowLeft" aria-label="Scroll left">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="rec-track" id="recTrack">
+        {% for item in recommended_products %}
+        <article class="prod-card">
+          <div class="prod-media">
+            <a href="{% url 'product_detail' item.slug %}">
+              {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}">{% else %}<img src="{% static 'images/no-image.png' %}" alt="No image">{% endif %}
+            </a>
+            {% if item.discount_price %}<div class="prod-tag">Sale</div>{% endif %}
+            {% if item.brand %}<div class="brand-badge">{{ item.brand.name }}</div>{% endif %}
+            <div class="product-tools">
+              <button type="button" class="tool-btn wishlist js-wishlist-toggle" data-url="{% url 'add_to_wishlist' item.id %}" data-product-id="{{ item.id }}" data-product-name="{{ item.name|escapejs }}" title="Add to Wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+                </svg>
+              </button>
+              <button type="button" class="tool-btn compare-btn" data-product="{{ item.id }}" title="Compare Product">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="prod-body">
+            {% if item.brand %}<div class="prod-brand">{{ item.brand.name }}</div>{% endif %}
+            <a href="{% url 'product_detail' item.slug %}" class="product-title-link">
+              <div class="prod-name">{{ item.name }}</div>
+            </a>
+            {% if item.short_description %}<div class="prod-specs">{{ item.short_description }}</div>{% endif %}
+            <div class="badge-row">
+              {% if item.stock > 0 %}<span class="badge-stock in">✓ In Stock</span>{% else %}<span class="badge-stock out">Out of Stock</span>{% endif %}
+              {% if item.condition %}<span class="badge-condition">{{ item.get_condition_display }}</span>{% endif %}
+            </div>
+            <div class="price-container">
+              {% if item.discount_price %}
+                <div class="prod-price">KSh {{ item.discount_price|floatformat:0 }}</div>
+                <div class="prod-old-price">KSh {{ item.price|floatformat:0 }}</div>
+              {% else %}
+                <div class="prod-price">KSh {{ item.price|floatformat:0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="prod-actions">
+            <form action="{% url 'add_to_cart' item.id %}" method="post" class="js-add-to-cart-form" style="width:100%;">
+              {% csrf_token %}
+              <button class="btn-cart-add" type="submit" data-product-id="{{ item.id }}" data-product-name="{{ item.name|escapejs }}">
+                <span class="cart-loader" aria-hidden="true">
+                  <svg viewBox="0 0 26 22" fill="none">
+                    <g class="cart-body">
+                      <path d="M1 1h3l2.2 12.4a2 2 0 0 0 2 1.6h9.6a2 2 0 0 0 2-1.6L22 5.5H6.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                    <circle class="cart-wheel" cx="9.5" cy="19" r="1.8"/>
+                    <circle class="cart-wheel" cx="17.5" cy="19" r="1.8"/>
+                  </svg>
+                </span>
+                <svg class="btn-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+                </svg>
+                <span class="btn-label">Add to Cart</span>
+              </button>
+            </form>
+            <a class="btn-whatsapp-card" href="https://wa.me/254700000000?text=Hi%2C%20I%27m%20interested%20in%20{{ item.name|urlencode }}" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="currentColor"><path d="M16.004 3C9.377 3 3.999 8.377 3.999 15.003c0 2.34.63 4.53 1.727 6.417L3.5 28.5l7.27-2.19a12.94 12.94 0 005.234 1.096h.005c6.627 0 12.005-5.377 12.005-12.003C28.014 8.377 22.636 3 16.004 3zm5.373 16.463c-.294-.148-1.74-.859-2.01-.957-.27-.099-.467-.148-.663.148-.196.295-.76.957-.932 1.153-.172.196-.343.222-.638.074-.294-.148-1.243-.458-2.367-1.462-.875-.78-1.466-1.744-1.638-2.038-.172-.295-.018-.454.13-.601.133-.133.294-.345.442-.517.147-.172.196-.295.294-.492.098-.196.049-.369-.025-.517-.074-.148-.663-1.6-.909-2.192-.24-.575-.483-.497-.663-.507-.172-.008-.369-.01-.565-.01-.196 0-.517.074-.787.369-.27.295-1.03 1.006-1.03 2.454 0 1.448 1.055 2.847 1.202 3.043.147.196 2.077 3.174 5.033 4.45.703.303 1.252.484 1.68.62.706.225 1.348.193 1.856.117.566-.084 1.74-.712 1.985-1.4.245-.688.245-1.278.172-1.4-.074-.123-.27-.197-.564-.345z"/></svg>
+              Order on WhatsApp
+            </a>
+          </div>
+        </article>
+        {% empty %}
+        <p>No recommendations available yet.</p>
+        {% endfor %}
+      </div>
+      <button class="rec-arrow right" id="recArrowRight" aria-label="Scroll right">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ CTA BANNER ============ -->
+  <section class="section">
+    <div class="pdp-cta">
+      <div>
+        <h3>Need help choosing the right unit?</h3>
+        <p>Talk to our hardware specialists — free advice, no pressure.</p>
+      </div>
+      <div class="pdp-cta-actions">
+        <a class="btn btn-whatsapp" href="https://wa.me/254700000000" target="_blank" rel="noopener">Chat on WhatsApp</a>
+        <a class="btn btn-outline-light" href="{% url 'deals' %}">🔥 Deals</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PREV / NEXT NAV ============ -->
+  <div class="pdp-footnav">
+    {% if previous_product %}
+    <a href="{% url 'product_detail' previous_product.slug %}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+      Previous: {{ previous_product.name }}
+    </a>
+    {% else %}<span></span>{% endif %}
+
+    {% if product.category %}
+    <a class="to-cat" href="{% url 'category_products' product.category.slug %}">Back to {{ product.category.name }}</a>
+    {% endif %}
+
+    {% if next_product %}
+    <a href="{% url 'product_detail' next_product.slug %}">
+      Next: {{ next_product.name }}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    {% else %}<span></span>{% endif %}
+  </div>
+</section>
+
+<!-- Shared cart / wishlist / toast engine — same script the home page loads.
+     It powers every .js-add-to-cart-form on this page (the main "Add to
+     Cart" button above and every recommended-product card below), so both
+     pages behave identically. -->
+<script src="{% static 'js/shared-components.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  var CSRF_TOKEN = "{{ csrf_token }}";
+
+  /* =========================================================
+     GLOBAL: LIVE CART / WISHLIST BADGE UPDATER
+     Works no matter what markup base.html uses for the header
+     counters — it looks for any of the common selectors below,
+     updates every match found, and also fires a CustomEvent so
+     any other script (e.g. a separate header component) can
+     react without needing a page reload.
+  ========================================================= */
+  var CART_BADGE_SELECTORS = '.cart-count, .cart-badge, [data-cart-count]';
+  var WISHLIST_BADGE_SELECTORS = '.wishlist-count, .wishlist-badge, [data-wishlist-count]';
+
+  function setBadgeCount(selector, count, eventName) {
+    if (count === null || count === undefined) return;
+    var n = parseInt(count, 10);
+    if (isNaN(n)) return;
+    var nodes = document.querySelectorAll(selector);
+    nodes.forEach(function (el) {
+      el.textContent = n;
+      el.style.display = n > 0 ? '' : 'none';
+      el.classList.remove('badge-pulse');
+      void el.offsetWidth;
+      el.classList.add('badge-pulse');
+    });
+    document.dispatchEvent(new CustomEvent(eventName, { detail: { count: n } }));
+  }
+
+  function updateCartBadge(count) { setBadgeCount(CART_BADGE_SELECTORS, count, 'cart:updated'); }
+  function updateWishlistBadge(count) { setBadgeCount(WISHLIST_BADGE_SELECTORS, count, 'wishlist:updated'); }
+
+  function bumpBadge(selector, delta, eventName) {
+    var nodes = document.querySelectorAll(selector);
+    if (!nodes.length) return;
+    var current = parseInt(nodes[0].textContent, 10) || 0;
+    setBadgeCount(selector, Math.max(0, current + delta), eventName);
+  }
+
+  function getCsrfToken() {
+    var input = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (input) return input.value;
+    var match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+  }
+
+  function postForm(url, fields) {
+    var formData = new FormData();
+    Object.keys(fields || {}).forEach(function (key) { formData.append(key, fields[key]); });
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN || getCsrfToken() },
+      body: formData
+    }).then(function (response) { return response.json(); });
+  }
+
+  /* ---------- THEMED TOAST (identical markup/behaviour to the homepage) ---------- */
+  var ICON_SUCCESS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg>';
+  var ICON_HEART = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/></svg>';
+  var ICON_ERROR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+  var sckToastEl = null, sckHideTimer = null;
+
+  function ensureSckToast() {
+    if (sckToastEl) return sckToastEl;
+    sckToastEl = document.createElement('div');
+    sckToastEl.className = 'sck-toast-wrap';
+    sckToastEl.innerHTML =
+      '<span class="sck-toast-ic" data-role="ic"></span>' +
+      '<span class="sck-toast-body">' +
+        '<span class="sck-toast-title" data-role="title"></span>' +
+        '<span class="sck-toast-msg" data-role="msg"></span>' +
+      '</span>';
+    document.body.appendChild(sckToastEl);
+    return sckToastEl;
+  }
+
+  function sckToast(opts) {
+    opts = opts || {};
+    var el = ensureSckToast();
+    el.classList.remove('sck-toast-error');
+    if (opts.type === 'error') el.classList.add('sck-toast-error');
+    el.querySelector('[data-role="ic"]').innerHTML = opts.icon || ICON_SUCCESS;
+    el.querySelector('[data-role="title"]').textContent = opts.title || '';
+    el.querySelector('[data-role="msg"]').textContent = opts.msg || '';
+    clearTimeout(sckHideTimer);
+    requestAnimationFrame(function () { el.classList.add('show'); });
+    sckHideTimer = setTimeout(function () { el.classList.remove('show'); }, 3200);
+  }
+
+  function showToast(message, type) {
+    if (type === 'error') {
+      sckToast({ title: "Something slipped.", msg: message || 'Please try that again.', type: 'error', icon: ICON_ERROR });
+    } else {
+      sckToast({ title: 'Added to your bag!', msg: message, icon: ICON_SUCCESS });
+    }
+  }
+
+  /* ---------- SCROLL REVEAL ---------- */
+  var revealTargets = document.querySelectorAll('.section, .pdp-tabs, .pdp-feature-grid');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealTargets.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- GALLERY ---------- */
+  var mainImg = document.getElementById('galleryMainImg');
+  var thumbs = Array.prototype.slice.call(document.querySelectorAll('.gallery-thumb'));
+  var activeIndex = 0;
+
+  function setActive(index) {
+    if (!thumbs.length) return;
+    activeIndex = (index + thumbs.length) % thumbs.length;
+    thumbs.forEach(function (t) { t.classList.remove('active'); });
+    thumbs[activeIndex].classList.add('active');
+    var full = thumbs[activeIndex].getAttribute('data-full');
+    if (full) {
+      mainImg.style.opacity = 0;
+      setTimeout(function () { mainImg.src = full; mainImg.style.opacity = 1; }, 100);
+    }
+  }
+  thumbs.forEach(function (thumb, i) {
+    thumb.addEventListener('click', function () { setActive(i); });
+  });
+  var prevBtn = document.getElementById('galleryPrev');
+  var nextBtn = document.getElementById('galleryNext');
+  if (prevBtn) prevBtn.addEventListener('click', function (e) { e.stopPropagation(); setActive(activeIndex - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function (e) { e.stopPropagation(); setActive(activeIndex + 1); });
+
+  var galleryMain = document.getElementById('galleryMain');
+  var touchStartX = 0;
+  if (galleryMain) {
+    galleryMain.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    galleryMain.addEventListener('touchend', function (e) {
+      var delta = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(delta) > 40) { setActive(activeIndex + (delta < 0 ? 1 : -1)); }
+    });
+    galleryMain.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); setActive(activeIndex - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); setActive(activeIndex + 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openZoom(); }
+    });
+  }
+
+  /* ---------- ZOOM LIGHTBOX ---------- */
+  var zoomOverlay = document.getElementById('galleryZoomOverlay');
+  var zoomImg = document.getElementById('galleryZoomImg');
+  var zoomClose = document.getElementById('galleryZoomClose');
+
+  function openZoom() {
+    if (!zoomOverlay || !mainImg) return;
+    zoomImg.src = mainImg.src;
+    zoomImg.alt = mainImg.alt;
+    zoomOverlay.classList.add('open');
+    zoomClose.focus();
+  }
+  function closeZoom() {
+    if (!zoomOverlay) return;
+    zoomOverlay.classList.remove('open');
+    galleryMain.focus();
+  }
+  if (galleryMain) {
+    galleryMain.addEventListener('click', function (e) {
+      if (e.target.closest('.gallery-nav')) return;
+      openZoom();
+    });
+  }
+  if (zoomClose) zoomClose.addEventListener('click', closeZoom);
+  if (zoomOverlay) {
+    zoomOverlay.addEventListener('click', function (e) {
+      if (e.target === zoomOverlay) closeZoom();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && zoomOverlay.classList.contains('open')) closeZoom();
+    });
+  }
+
+  /* ---------- TABS ---------- */
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabBtns.forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var panel = document.getElementById('tab-' + btn.getAttribute('data-tab'));
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  /* ---------- QUANTITY STEPPER ---------- */
+  var qtyInput = document.getElementById('qtyInput');
+  var cartQuantityInput = document.getElementById('cartQuantityInput');
+  var maxStock = parseInt('{{ product.stock|default:99 }}', 10) || 99;
+
+  function syncCartQuantity() {
+    if (cartQuantityInput && qtyInput) cartQuantityInput.value = qtyInput.value;
+  }
+
+  document.getElementById('qtyMinus').addEventListener('click', function () {
+    var v = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
+    qtyInput.value = v;
+    syncCartQuantity();
+  });
+  document.getElementById('qtyPlus').addEventListener('click', function () {
+    var v = Math.min(maxStock, (parseInt(qtyInput.value, 10) || 1) + 1);
+    qtyInput.value = v;
+    syncCartQuantity();
+  });
+  qtyInput.addEventListener('blur', function () {
+    var v = parseInt(qtyInput.value, 10);
+    if (isNaN(v) || v < 1) v = 1;
+    if (v > maxStock) v = maxStock;
+    qtyInput.value = v;
+    syncCartQuantity();
+  });
+  syncCartQuantity();
+
+  /* ---------- VARIANT SELECTOR ---------- */
+  var variantSelect = document.getElementById('variantSelect');
+  var variantPreview = document.getElementById('variantPreview');
+  var productPriceEl = document.getElementById('productPrice');
+  var productOldPriceEl = document.getElementById('productOldPrice');
+  var saveBadgeEl = document.getElementById('saveBadge');
+  var productSkuEl = document.getElementById('productSku');
+  var stockHintEl = document.getElementById('stockHint');
+  var stockBadgeEl = document.getElementById('stockBadge');
+  var buyNowBtn = document.getElementById('buyNowBtn');
+  var whatsappLink = document.getElementById('whatsappLink');
+  var cartVariantInput = document.getElementById('cartVariantInput');
+  var buyNowBaseHref = buyNowBtn ? buyNowBtn.getAttribute('data-base-href') : '';
+
+  function formatKsh(value) {
+    var num = Number(value) || 0;
+    return 'KSh ' + num.toLocaleString();
+  }
+
+  function updateStockBadge(stock) {
+    if (!stockBadgeEl) return;
+    var badge = stockBadgeEl.querySelector('.badge-stock');
+    if (!badge) return;
+    var s = parseInt(stock, 10) || 0;
+    badge.classList.remove('in', 'low', 'out');
+    if (s > 5) {
+      badge.classList.add('in');
+      badge.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" style="vertical-align:-1px;margin-right:3px;"><path d="M20 6L9 17l-5-5"/></svg>In Stock';
+    } else if (s > 0) {
+      badge.classList.add('low');
+      badge.textContent = 'Only ' + s + ' left';
+    } else {
+      badge.classList.add('out');
+      badge.textContent = 'Out of Stock';
+    }
+  }
+
+  function stockTagHtml(stock) {
+    var s = parseInt(stock, 10) || 0;
+    if (s > 5) return '<span class="variant-selector__stock-tag in">In Stock</span>';
+    if (s > 0) return '<span class="variant-selector__stock-tag low">Only ' + s + ' left</span>';
+    return '<span class="variant-selector__stock-tag out">Out of Stock</span>';
+  }
+
+  function appendVariantParam(baseUrl, variantId) {
+    if (!baseUrl) return baseUrl;
+    var sep = baseUrl.indexOf('?') > -1 ? '&' : '?';
+    return variantId ? baseUrl + sep + 'variant_id=' + encodeURIComponent(variantId) : baseUrl;
+  }
+
+  function renderPreview(specText, stock) {
+    if (!variantPreview) return;
+    variantPreview.innerHTML = '';
+    var parts = (specText || '').split(',');
+    parts.forEach(function (part) {
+      var text = part.trim();
+      if (!text) return;
+      var chip = document.createElement('span');
+      chip.className = 'variant-selector__chip';
+      chip.textContent = text;
+      variantPreview.appendChild(chip);
+    });
+    if (stock !== null && stock !== undefined) {
+      variantPreview.insertAdjacentHTML('beforeend', stockTagHtml(stock));
+    }
+  }
+
+  function applyVariant(option) {
+    if (!option) return;
+
+    var price = option.getAttribute('data-price');
+    var stock = option.getAttribute('data-stock');
+    var sku = option.getAttribute('data-sku');
+    var image = option.getAttribute('data-image');
+    var name = option.getAttribute('data-name') || '';
+    var specText = option.getAttribute('data-spec-text') || name;
+    var variantId = option.value;
+    var isDefault = variantId === '';
+    var hasDiscount = option.getAttribute('data-has-discount') === '1';
+    var oldPrice = option.getAttribute('data-old-price');
+
+    if (productPriceEl && price) { productPriceEl.textContent = formatKsh(price); }
+
+    if (isDefault && hasDiscount && oldPrice) {
+      if (productOldPriceEl) { productOldPriceEl.style.display = ''; productOldPriceEl.textContent = formatKsh(oldPrice); }
+      if (saveBadgeEl) { saveBadgeEl.style.display = ''; }
+    } else {
+      if (productOldPriceEl) { productOldPriceEl.style.display = 'none'; }
+      if (saveBadgeEl) { saveBadgeEl.style.display = 'none'; }
+    }
+
+    if (productSkuEl && sku) { productSkuEl.textContent = sku; }
+    if (stockHintEl && stock !== null) { stockHintEl.textContent = stock + ' units available'; }
+    if (stock !== null) {
+      maxStock = parseInt(stock, 10) || 0;
+      updateStockBadge(stock);
+    }
+    if (image) {
+      var galleryImg = document.getElementById('galleryMainImg');
+      if (galleryImg) {
+        galleryImg.style.opacity = 0;
+        setTimeout(function () { galleryImg.src = image; galleryImg.style.opacity = 1; }, 100);
+      }
+    }
+
+    if (buyNowBtn) {
+      buyNowBtn.setAttribute('data-variant-id', isDefault ? '' : variantId);
+    }
+    if (cartVariantInput) {
+      cartVariantInput.value = isDefault ? '' : variantId;
+    }
+    if (whatsappLink) {
+      var productName = whatsappLink.getAttribute('data-product-name') || '';
+      var label = isDefault ? productName : (productName + ' (' + specText + ')');
+      var text = 'Hi, I\'m interested in ' + label + ' (' + formatKsh(price) + ')';
+      whatsappLink.href = 'https://wa.me/254700000000?text=' + encodeURIComponent(text);
+    }
+
+    renderPreview(isDefault ? '' : specText, stock);
+  }
+
+  if (variantSelect) {
+    variantSelect.addEventListener('change', function () {
+      applyVariant(variantSelect.options[variantSelect.selectedIndex]);
+    });
+    if (variantSelect.selectedIndex > 0) {
+      applyVariant(variantSelect.options[variantSelect.selectedIndex]);
+    }
+  }
+
+  /* ---------- BUY NOW ---------- */
+  if (buyNowBtn) {
+    buyNowBtn.addEventListener('click', function () {
+      var variantId = buyNowBtn.getAttribute('data-variant-id') || '';
+      var href = variantId ? appendVariantParam(buyNowBaseHref, variantId) : buyNowBaseHref;
+      var sep = href.indexOf('?') > -1 ? '&' : '?';
+      window.location.href = href + sep + 'buy_now=1';
+    });
+  }
+
+  /* ---------- DELIVERY CALCULATOR ---------- */
+  var rates = { 'nairobi-cbd': 200, 'nairobi-outer': 350, 'kiambu': 500, 'machakos': 600, 'upcountry': 900 };
+  var speedMultiplier = { standard: 1, express: 1.6 };
+  var calcBtn = document.getElementById('calcDeliveryBtn');
+  if (calcBtn) {
+    calcBtn.addEventListener('click', function () {
+      var county = document.getElementById('deliveryCounty').value;
+      var speed = document.getElementById('deliverySpeed').value;
+      var result = document.getElementById('deliveryResult');
+      if (!county) { alert('Please select your county / area first.'); return; }
+      var fee = Math.round((rates[county] || 700) * (speedMultiplier[speed] || 1));
+      document.getElementById('deliveryFeeVal').textContent = 'KSh ' + fee.toLocaleString();
+      result.classList.remove('show');
+      void result.offsetWidth;
+      result.classList.add('show');
+    });
+  }
+
+  /* ---------- RECOMMENDED PRODUCTS CAROUSEL: arrows + drag (no autoplay) ---------- */
+  var track = document.getElementById('recTrack');
+  if (track) {
+    var cardWidth = 266;
+    var arrowLeft = document.getElementById('recArrowLeft');
+    var arrowRight = document.getElementById('recArrowRight');
+    if (arrowLeft) arrowLeft.addEventListener('click', function () { track.scrollBy({ left: -cardWidth, behavior: 'smooth' }); });
+    if (arrowRight) arrowRight.addEventListener('click', function () { track.scrollBy({ left: cardWidth, behavior: 'smooth' }); });
+
+    var isDown = false, startX, scrollLeft;
+    track.addEventListener('mousedown', function (e) {
+      isDown = true;
+      track.classList.add('dragging');
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+    });
+    ['mouseleave', 'mouseup'].forEach(function (evt) {
+      track.addEventListener(evt, function () { isDown = false; track.classList.remove('dragging'); });
+    });
+    track.addEventListener('mousemove', function (e) {
+      if (!isDown) return;
+      e.preventDefault();
+      var x = e.pageX - track.offsetLeft;
+      var walk = (x - startX) * 1.2;
+      track.scrollLeft = scrollLeft - walk;
+    });
+  }
+
+  /* =========================================================
+     ADD TO CART — same behaviour as the home page.
+     Every ".js-add-to-cart-form" (the main PDP form + every
+     recommended-product card form) is powered by
+     shared-components.js exactly like the home page. As a
+     safety net (in case that script isn't present on this
+     page), we also wire a local handler here that no-ops if
+     shared-components.js has already attached its own listener
+     and prevented the default submit.
+  ========================================================= */
+  document.querySelectorAll('.js-add-to-cart-form').forEach(function (form) {
+    if (form.dataset.wired === '1') return;
+    form.dataset.wired = '1';
+    form.addEventListener('submit', function (e) {
+      if (e.defaultPrevented) return; // shared-components.js already handled it
+      e.preventDefault();
+      var btn = form.querySelector('.btn-cart-add');
+      if (!btn || btn.classList.contains('is-adding')) return;
+      var name = btn.dataset.productName || 'Item';
+      btn.classList.add('is-adding');
+
+      postForm(form.getAttribute('action'), Object.fromEntries(new FormData(form)))
+        .then(function (data) {
+          if (data.success !== false) {
+            btn.classList.remove('is-adding');
+            btn.classList.add('is-added');
+            sckToast({ title: 'Added to your bag!', msg: name + " — it's waiting for you at checkout.", icon: ICON_SUCCESS });
+            updateCartBadge(data.cart_count);
+            setTimeout(function () { btn.classList.remove('is-added'); }, 2000);
+          } else {
+            btn.classList.remove('is-adding');
+            sckToast({ title: 'Something slipped.', msg: data.message || 'Could not add item to cart', type: 'error', icon: ICON_ERROR });
+          }
+        })
+        .catch(function () {
+          btn.classList.remove('is-adding');
+          sckToast({ title: 'Something slipped.', msg: "Couldn't add to cart. Please try again.", type: 'error', icon: ICON_ERROR });
+        });
+    });
+  });
+
+  /* "Add Bundle to Cart" reuses the same postForm/showToast helpers */
+  var addBundleBtn = document.getElementById('addBundleBtn');
+  if (addBundleBtn) {
+    var bundleUrl = "{% url 'add_to_cart' product.id %}";
+    addBundleBtn.addEventListener('click', function () {
+      if (addBundleBtn.disabled) return;
+      addBundleBtn.disabled = true;
+      var originalHtml = addBundleBtn.innerHTML;
+      addBundleBtn.innerHTML = '<span class="spinner"></span>Adding...';
+
+      postForm(bundleUrl, { quantity: 1, variant_id: '' })
+        .then(function (data) {
+          if (data.success) {
+            showToast(data.message || 'Bundle added to cart', 'success');
+            updateCartBadge(data.cart_count);
+          } else {
+            showToast(data.message || 'Could not add bundle to cart', 'error');
+          }
+        })
+        .catch(function () {
+          showToast('Something went wrong. Please try again.', 'error');
+        })
+        .finally(function () {
+          addBundleBtn.disabled = false;
+          addBundleBtn.innerHTML = originalHtml;
+        });
+    });
+  }
+
+  /* =========================================================
+     WISHLIST TOGGLE — identical behaviour to the home page:
+     toggles the filled-heart "active" state immediately, shows
+     a toast, and updates the header wishlist badge live.
+     Applies to the main PDP wishlist button, every recommended
+     card's wishlist button, and the "frequently bought
+     together" wishlist button.
+  ========================================================= */
+  document.querySelectorAll('.js-wishlist-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (btn.dataset.loading === '1') return;
+      btn.dataset.loading = '1';
+
+      var url = btn.dataset.url;
+      var name = btn.dataset.productName || 'Item';
+
+      postForm(url, {})
+        .then(function (data) {
+          var added = (typeof data.added !== 'undefined') ? !!data.added : (data.status === 'added');
+          btn.classList.toggle('active', added);
+          btn.setAttribute('title', added ? 'Remove from Wishlist' : 'Add to Wishlist');
+
+          btn.classList.remove('is-wishing');
+          void btn.offsetWidth;
+          btn.classList.add('is-wishing');
+          setTimeout(function () { btn.classList.remove('is-wishing'); }, 420);
+
+          sckToast({
+            title: added ? 'Saved for later.' : 'Removed from wishlist.',
+            msg: added ? (name + ' is now on your wishlist.') : 'You can always add it back later.',
+            icon: ICON_HEART
+          });
+
+          if (data.wishlist_count !== undefined) {
+            updateWishlistBadge(data.wishlist_count);
+          } else {
+            bumpBadge(WISHLIST_BADGE_SELECTORS, added ? 1 : -1, 'wishlist:updated');
+          }
+        })
+        .catch(function () {
+          sckToast({ title: 'Something slipped.', msg: "Couldn't update wishlist. Please try again.", type: 'error', icon: ICON_ERROR });
+        })
+        .finally(function () {
+          btn.dataset.loading = '0';
+        });
+    });
+  });
+
+  /* =========================================================
+     COMPARE — identical behaviour to the home page: GET
+     /compare/add/<id>/ and toggle the active state on success.
+     Applies to the main PDP compare button and every
+     recommended card's compare button.
+  ========================================================= */
+  document.querySelectorAll('.compare-btn').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var productId = this.dataset.product;
+      if (!productId) return;
+
+      fetch('/compare/add/' + productId + '/', {
+        method: 'GET',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (data.added) {
+            button.classList.add('active');
+          } else {
+            button.classList.remove('active');
+          }
+        })
+        .catch(function () {});
+    });
+  });
+
+});
+</script>
+
+{% endblock %}

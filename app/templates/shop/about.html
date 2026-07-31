@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us — Smartcomputerske Technologies | Genuine Tech, Nairobi{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Scoped, page-only additions — namespaced "abt-" so nothing here can
+   collide with base.html's selectors. Everything else on this page
+   reuses components already defined in base.html (hero, spec-card,
+   cat-grid, why-grid, bulk-section, account-strip, logo-marquee, etc). */
+
+.abt-who-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:start;}
+.abt-who-grid p{color:var(--ink-soft);font-size:14.5px;line-height:1.75;margin:0 0 16px;}
+.abt-trust-list{list-style:none;margin:0;padding:0;}
+.abt-trust-list li{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line-soft);}
+.abt-trust-list li:first-child{padding-top:0;}
+.abt-trust-list li:last-child{border-bottom:none;}
+.abt-trust-mark{width:30px;height:30px;border-radius:9px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.abt-trust-list h4{font-size:14.5px;margin:0 0 3px;color:var(--ink);}
+.abt-trust-list p{margin:0;font-size:13px;color:var(--muted);line-height:1.55;}
+
+.abt-visit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);}
+.abt-visit-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;}
+.abt-visit-card .abt-visit-icon{width:38px;height:38px;border-radius:10px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:14px;}
+.abt-visit-card h4{font-size:15px;margin-bottom:12px;}
+.abt-visit-card .abt-big{font-size:14px;font-weight:600;color:var(--ink);line-height:1.6;}
+.abt-visit-card .abt-muted{color:var(--muted);font-size:12.5px;}
+.abt-maplink{display:inline-flex;align-items:center;gap:7px;margin-top:14px;color:var(--primary);font-weight:700;font-size:13px;}
+.abt-maplink:hover{color:var(--primary-dark);}
+.abt-hourrow{display:flex;justify-content:space-between;font-size:13.5px;padding:8px 0;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);}
+.abt-hourrow:last-child{border-bottom:none;}
+.abt-hourrow b{color:var(--ink);font-weight:700;}
+.abt-contact-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.abt-contact-row:last-child{margin-bottom:0;}
+.abt-contact-row .ic{width:30px;height:30px;border-radius:9px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px;}
+.abt-contact-row .abt-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.abt-contact-row a{color:var(--ink);font-weight:600;font-size:14px;}
+.abt-contact-row a:hover{color:var(--primary);}
+
+.bulk-tag.abt-hq{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+
+@media (max-width:1024px){
+  .abt-who-grid{grid-template-columns:1fr;}
+  .abt-visit-grid{grid-template-columns:1fr;}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <span class="hero-eyebrow"><span class="dot"></span> Nairobi, Kenya · IT Retail &amp; Services</span>
+      <h1>Genuine tech. <em>Straight answers.</em> Fair prices.</h1>
+      <p class="lede">Smartcomputerske Technologies supplies laptops, desktops, networking gear, security systems and business IT equipment from authorised brands — sold by a team that explains what you're buying before you buy it.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#offer">See what we stock</a>
+        <a class="btn btn-outline-light" href="https://share.google/RLowO2dmPO4QW3xys" target="_blank" rel="noopener">Get directions</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/254700000000" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Chat with us</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>20+</b><span>BRANDS STOCKED</span></div>
+        <div><b>18</b><span>PRODUCT CATEGORIES</span></div>
+        <div><b>47</b><span>COUNTIES DELIVERED TO</span></div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <span class="ribbon" style="top:-1px;left:18px;">PROFILE</span>
+      <span class="br-tl"></span><span class="br-br"></span>
+      <div class="spec-body">
+        <h3>Store profile</h3>
+        <div class="spec-row"><span class="k">Category</span><span class="v">Computers · electronics · IT services</span></div>
+        <div class="spec-row"><span class="k">Coverage</span><span class="v">Nationwide, all 47 counties</span></div>
+        <div class="spec-row"><span class="k">Sourcing</span><span class="v">Authorised distributors</span></div>
+        <div class="spec-row"><span class="k">Services</span><span class="v">Sales · repair · networking · CCTV</span></div>
+        <div class="spec-row"><span class="k">Payments</span><span class="v">M-Pesa · Visa · Bank transfer</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BRANDS ============ -->
+<div class="logo-marquee-section">
+  <div class="wrap logo-marquee-head">
+    <span class="eyebrow-sm">Brands we deal in</span>
+    <h2>Trusted, internationally recognised manufacturers</h2>
+  </div>
+  <div class="wrap logo-marquee-viewport">
+    <div class="logo-marquee-track">
+      <div class="logo-marquee-item"><span>HP</span></div>
+      <div class="logo-marquee-item"><span>Dell</span></div>
+      <div class="logo-marquee-item"><span>Lenovo</span></div>
+      <div class="logo-marquee-item"><span>Apple</span></div>
+      <div class="logo-marquee-item"><span>Asus</span></div>
+      <div class="logo-marquee-item"><span>Acer</span></div>
+      <div class="logo-marquee-item"><span>MSI</span></div>
+      <div class="logo-marquee-item"><span>Samsung</span></div>
+      <div class="logo-marquee-item"><span>Canon</span></div>
+      <div class="logo-marquee-item"><span>Epson</span></div>
+      <div class="logo-marquee-item"><span>Logitech</span></div>
+      <div class="logo-marquee-item"><span>TP-Link</span></div>
+      <div class="logo-marquee-item"><span>Hikvision</span></div>
+      <div class="logo-marquee-item"><span>Dahua</span></div>
+      <div class="logo-marquee-item"><span>Ubiquiti</span></div>
+      <div class="logo-marquee-item"><span>Cisco</span></div>
+      <div class="logo-marquee-item"><span>Kingston</span></div>
+      <div class="logo-marquee-item"><span>SanDisk</span></div>
+      <div class="logo-marquee-item"><span>Seagate</span></div>
+      <div class="logo-marquee-item"><span>Western Digital</span></div>
+      <!-- duplicated for a seamless loop -->
+      <div class="logo-marquee-item" aria-hidden="true"><span>HP</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Dell</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Lenovo</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Apple</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Asus</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Acer</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>MSI</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Samsung</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Canon</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Epson</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Logitech</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>TP-Link</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Hikvision</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Dahua</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Ubiquiti</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Cisco</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Kingston</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>SanDisk</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Seagate</span></div>
+      <div class="logo-marquee-item" aria-hidden="true"><span>Western Digital</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WHO WE ARE ============ -->
+<section class="section" id="who">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow-sm">Who we are</span>
+        <h2>Making quality technology accessible to every Kenyan</h2>
+      </div>
+      <p>Founded to become one of Kenya's most trusted computer and electronics suppliers.</p>
+    </div>
+
+    <div class="abt-who-grid">
+      <div>
+        <p>Smartcomputerske Technologies was founded with a straightforward goal: become one of Kenya's most trusted computer and electronics suppliers. Technology powers businesses, classrooms and homes, so we're selective about what reaches our shelves — every product is sourced for quality, reliability and value.</p>
+        <p>Our team spends as much time listening as selling. Before we recommend a laptop, a router or a full office fit-out, we ask what you actually need it to do — then match that to your budget, not the other way around.</p>
+      </div>
+      <ul class="abt-trust-list">
+        <li>
+          <span class="abt-trust-mark"><i class="fas fa-check"></i></span>
+          <div><h4>Authorised sourcing</h4><p>Bought through trusted manufacturers and authorised distributors — not grey-market imports.</p></div>
+        </li>
+        <li>
+          <span class="abt-trust-mark"><i class="fas fa-check"></i></span>
+          <div><h4>Advice before the sale</h4><p>Recommendations based on real use cases, not the highest-margin item on the shelf.</p></div>
+        </li>
+        <li>
+          <span class="abt-trust-mark"><i class="fas fa-check"></i></span>
+          <div><h4>Support after the sale</h4><p>Repairs, upgrades and technical consultation continue long after checkout.</p></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT WE OFFER ============ -->
+<section class="section" id="offer" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow-sm">What we offer</span>
+        <h2>A working inventory, updated continually</h2>
+      </div>
+      <p>Computers, peripherals, networking and security equipment for homes, offices and institutions.</p>
+    </div>
+
+    <div class="cat-grid">
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-laptop"></i></span><span>Laptops</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-desktop"></i></span><span>Desktop computers</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-gamepad"></i></span><span>Gaming laptops</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-tv"></i></span><span>Monitors</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-print"></i></span><span>Printers</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-keyboard"></i></span><span>Accessories</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-network-wired"></i></span><span>Networking equipment</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-wifi"></i></span><span>Routers &amp; switches</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-video"></i></span><span>CCTV &amp; security</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-hard-drive"></i></span><span>Storage devices</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-microchip"></i></span><span>Components</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-compact-disc"></i></span><span>Software solutions</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-building"></i></span><span>Office equipment</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-lightbulb"></i></span><span>Smart devices</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-mobile-alt"></i></span><span>Mobile accessories</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-battery-full"></i></span><span>Power backup</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-plug"></i></span><span>Cables &amp; adapters</span></div>
+      <div class="cat-card"><span class="cat-icon"><i class="fas fa-briefcase"></i></span><span>Business IT equipment</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY CHOOSE US ============ -->
+<section class="section" id="why">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow-sm">Why choose us</span>
+        <h2>Six commitments we hold on every order</h2>
+      </div>
+      <p>Whether it's one keyboard or a full office rollout.</p>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="icon-holder">01</div>
+        <h4>Genuine products</h4>
+        <p>Authentic hardware sourced from trusted manufacturers and authorised distributors — what the box says is what you get.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon-holder">02</div>
+        <h4>Competitive prices</h4>
+        <p>Fair pricing without cutting corners on quality — value that holds up after the sale, not just at checkout.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon-holder">03</div>
+        <h4>Expert advice</h4>
+        <p>A knowledgeable team that matches products to your actual needs, whether you're a student or a systems administrator.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon-holder">04</div>
+        <h4>Secure shopping</h4>
+        <p>A safe, secure online buying experience, from browsing to payment.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon-holder">05</div>
+        <h4>Nationwide delivery</h4>
+        <p>Safe, efficient delivery of technology products across Kenya's 47 counties.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon-holder">06</div>
+        <h4>Ongoing support</h4>
+        <p>Great service doesn't end at the sale — we stay reachable for setup help, repairs and questions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="section" id="services" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head amber">
+      <div>
+        <span class="eyebrow-sm">Beyond the shelf</span>
+        <h2>Sales are only part of it</h2>
+      </div>
+      <p>Our technicians also install, repair and maintain what we sell.</p>
+    </div>
+
+    <div class="search-chip-row">
+      <span class="search-chip">Computer sales</span>
+      <span class="search-chip">Laptop sales</span>
+      <span class="search-chip">Computer repairs</span>
+      <span class="search-chip">Laptop repairs</span>
+      <span class="search-chip">Hardware upgrades</span>
+      <span class="search-chip">Software installation</span>
+      <span class="search-chip">Networking solutions</span>
+      <span class="search-chip">CCTV installation</span>
+      <span class="search-chip">Business IT support</span>
+      <span class="search-chip">Office technology solutions</span>
+      <span class="search-chip">Data storage solutions</span>
+      <span class="search-chip">Custom computer builds</span>
+      <span class="search-chip">Bulk corporate supply</span>
+      <span class="search-chip">Institutional procurement</span>
+      <span class="search-chip">Technical consultation</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COVERAGE ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="bulk-section">
+      <div>
+        <h2>We deliver across Kenya</h2>
+        <p>Based in Nairobi, shipping nationwide — from major towns to the counties around them.</p>
+        <div class="bulk-tags">
+          <span class="bulk-tag abt-hq">Nairobi (HQ)</span>
+          <span class="bulk-tag">Mombasa</span>
+          <span class="bulk-tag">Kisumu</span>
+          <span class="bulk-tag">Nakuru</span>
+          <span class="bulk-tag">Eldoret</span>
+          <span class="bulk-tag">Thika</span>
+          <span class="bulk-tag">Kisii</span>
+          <span class="bulk-tag">Nyeri</span>
+          <span class="bulk-tag">Meru</span>
+          <span class="bulk-tag">Machakos</span>
+          <span class="bulk-tag">+ every other county</span>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <span class="br-tl"></span><span class="br-br"></span>
+        <div class="spec-body">
+          <h3>Delivery snapshot</h3>
+          <div class="spec-row"><span class="k">Within Nairobi</span><span class="v">Same day</span></div>
+          <div class="spec-row"><span class="k">Major towns</span><span class="v">1 – 2 days</span></div>
+          <div class="spec-row"><span class="k">Upcountry / rural</span><span class="v">2 – 4 days</span></div>
+          <div class="spec-row"><span class="k">Bulk / institutional</span><span class="v">Scheduled on request</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISIT / HOURS / CONTACT ============ -->
+<section class="section" id="visit">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow-sm">Visit &amp; contact</span>
+        <h2>Come see the products in person</h2>
+      </div>
+      <p>Or reach us directly — whichever's easier.</p>
+    </div>
+
+    <div class="abt-visit-grid">
+      <div class="abt-visit-card">
+        <span class="abt-visit-icon"><i class="fas fa-location-dot"></i></span>
+        <h4>Our location</h4>
+        <div class="abt-big">Shop No. H29, Superior Centre<br>Kenyatta Ave / Kimathi Street Junction<br>Nairobi, Kenya</div>
+        <a class="abt-maplink" href="https://share.google/RLowO2dmPO4QW3xys" target="_blank" rel="noopener">Open in Google Maps <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <div class="abt-visit-card">
+        <span class="abt-visit-icon"><i class="fas fa-clock"></i></span>
+        <h4>Business hours</h4>
+        <div class="abt-hourrow"><span>Monday – Saturday</span><b>8:30 AM – 6:00 PM</b></div>
+        <div class="abt-hourrow"><span>Sunday</span><b>Closed</b></div>
+      </div>
+
+      <div class="abt-visit-card">
+        <span class="abt-visit-icon"><i class="fas fa-phone"></i></span>
+        <h4>Get in touch</h4>
+        <div class="abt-contact-row">
+          <span class="ic"><i class="fas fa-phone"></i></span>
+          <div><div class="abt-label">Phone</div><a href="tel:0720635023">0720 635023</a></div>
+        </div>
+        <div class="abt-contact-row">
+          <span class="ic"><i class="fab fa-whatsapp"></i></span>
+          <div><div class="abt-label">WhatsApp</div><a href="https://wa.me/254700000000" target="_blank" rel="noopener">Message us</a></div>
+        </div>
+        <div class="abt-contact-row">
+          <span class="ic"><i class="fas fa-envelope"></i></span>
+          <div><div class="abt-label">Email</div><a href="mailto:sales@smartcomputerske.co.ke">sales@smartcomputerske.co.ke</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="section" style="padding-bottom:70px;">
+  <div class="wrap">
+    <div class="account-strip">
+      <div class="account-avatar"><i class="fas fa-shield-halved"></i></div>
+      <div>
+        <h4>Shop with confidence.</h4>
+        <p>Genuine products, trusted brands and a team that stands behind what it sells.</p>
+      </div>
+      <div class="account-actions">
+        <a class="chip-btn primary" href="#offer">See what we stock</a>
+        <a class="chip-btn" href="#visit">Talk to the team</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

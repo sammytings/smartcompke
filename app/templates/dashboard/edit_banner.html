@@ -1,0 +1,212 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Edit Banner{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>Edit Banner</h2>
+
+        <p>Update banner information.</p>
+
+    </div>
+
+    <a href="{% url 'dashboard_banners' %}" class="btn-secondary">
+
+        <i class="fas fa-arrow-left"></i>
+
+        Back to Banners
+
+    </a>
+
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    <div class="grid">
+
+        <!-- LEFT COLUMN -->
+
+        <div class="card">
+
+            <h3>Banner Details</h3>
+
+            <div class="form-group">
+                <label>Title</label>
+                {{ form.title }}
+            </div>
+
+            <div class="form-group">
+                <label>Subtitle</label>
+                {{ form.subtitle }}
+            </div>
+
+            <div class="form-group">
+                <label>Banner Type</label>
+                {{ form.banner_type }}
+            </div>
+
+            <div class="form-group category-field">
+                <label>Category</label>
+                {{ form.category }}
+            </div>
+
+            <div class="form-group brand-field">
+                <label>Brand</label>
+                {{ form.brand }}
+            </div>
+
+            <div class="form-group">
+                <label>Button Text</label>
+                {{ form.button_text }}
+            </div>
+
+            <div class="form-group">
+                <label>Button Link</label>
+                {{ form.button_link }}
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+
+        <div class="card">
+
+            <h3>Banner Image</h3>
+
+            <div class="image-preview">
+
+                {% if banner.image %}
+                    <img
+                        id="preview"
+                        src="{{ banner.image.url }}"
+                    >
+                {% else %}
+                    <img
+                        id="preview"
+                        src="{% static 'images/no-image.png' %}"
+                    >
+                {% endif %}
+
+            </div>
+
+            {{ form.image }}
+
+            <hr>
+
+            <h3>Appearance</h3>
+
+            <div class="form-group">
+                <label>Background Color</label>
+                {{ form.background_color }}
+            </div>
+
+            <div class="form-group">
+                <label>Text Color</label>
+                {{ form.text_color }}
+            </div>
+
+            <div class="form-group">
+                <label>Display Order</label>
+                {{ form.order }}
+            </div>
+
+            <div class="form-group">
+                <label>Start Date</label>
+                {{ form.start_date }}
+            </div>
+
+            <div class="form-group">
+                <label>End Date</label>
+                {{ form.end_date }}
+            </div>
+
+            <div class="form-group checkbox">
+
+                {{ form.active }}
+
+                <label>Banner Active</label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="save-area">
+
+        <button class="btn-primary">
+
+            <i class="fas fa-save"></i>
+
+            Update Banner
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+<script>
+
+const imageInput=document.querySelector("#id_image");
+
+const preview=document.querySelector("#preview");
+
+if(imageInput){
+
+imageInput.onchange=function(){
+
+if(this.files.length){
+
+preview.src=URL.createObjectURL(this.files[0]);
+
+}
+
+}
+
+}
+
+const bannerType=document.querySelector("#id_banner_type");
+
+const category=document.querySelector(".category-field");
+
+const brand=document.querySelector(".brand-field");
+
+function toggleFields(){
+
+category.style.display="none";
+
+brand.style.display="none";
+
+if(bannerType.value==="category"){
+
+category.style.display="block";
+
+}
+
+if(bannerType.value==="brand"){
+
+brand.style.display="block";
+
+}
+
+}
+
+toggleFields();
+
+bannerType.onchange=toggleFields;
+
+</script>
+
+{% endblock %}

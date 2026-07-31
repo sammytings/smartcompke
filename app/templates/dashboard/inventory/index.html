@@ -1,0 +1,583 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+
+<div class="inv">
+
+    <header class="inv__header">
+        <div class="inv__heading">
+            <span class="inv__eyebrow">Operations · Inventory</span>
+            <h1>Inventory Dashboard</h1>
+            <p>Monitor inventory across categories, brands, products and variants.</p>
+        </div>
+
+        <form method="get" class="inv__search">
+            <i class="fas fa-search"></i>
+            <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search SKU, product, brand…"
+            >
+            <button type="submit">Search</button>
+        </form>
+    </header>
+
+    <div class="inv__toolbar">
+        <a href="{% url 'dashboard_inventory_history' %}" class="btn btn--ghost">
+            <i class="fas fa-history"></i> History
+        </a>
+        <button type="button" class="btn btn--outline">
+            <i class="fas fa-file-excel"></i> Export Excel
+        </button>
+        <button type="button" class="btn btn--solid">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+    </div>
+
+    <section class="inv__kpis" aria-label="Inventory summary">
+
+        <div class="kpi kpi--neutral">
+            <span class="kpi__label"><i class="fas fa-th-large"></i> Categories</span>
+            <span class="kpi__value">{{ total_categories }}</span>
+        </div>
+
+        <div class="kpi kpi--neutral">
+            <span class="kpi__label"><i class="fas fa-tags"></i> Brands</span>
+            <span class="kpi__value">{{ total_brands }}</span>
+        </div>
+
+        <div class="kpi kpi--neutral">
+            <span class="kpi__label"><i class="fas fa-box"></i> Products</span>
+            <span class="kpi__value">{{ total_products }}</span>
+        </div>
+
+        <div class="kpi kpi--neutral">
+            <span class="kpi__label"><i class="fas fa-layer-group"></i> Variants</span>
+            <span class="kpi__value">{{ total_variants }}</span>
+        </div>
+
+        <div class="kpi kpi--amber">
+            <span class="kpi__label"><i class="fas fa-cubes"></i> Total Stock</span>
+            <span class="kpi__value">{{ total_stock|intcomma }}</span>
+        </div>
+
+        <div class="kpi kpi--teal">
+            <span class="kpi__label"><i class="fas fa-coins"></i> Inventory Value</span>
+            <span class="kpi__value">KES {{ inventory_value|floatformat:0|intcomma }}</span>
+        </div>
+
+        <div class="kpi kpi--mustard">
+            <span class="kpi__label"><i class="fas fa-exclamation-triangle"></i> Low Stock</span>
+            <span class="kpi__value">{{ low_stock }}</span>
+        </div>
+
+        <div class="kpi kpi--rust">
+            <span class="kpi__label"><i class="fas fa-times-circle"></i> Out Of Stock</span>
+            <span class="kpi__value">{{ out_of_stock }}</span>
+        </div>
+
+    </section>
+
+    <section class="inv__table-card">
+
+        <div class="inv__table-head">
+            <h2>Recent Inventory Transactions</h2>
+        </div>
+
+        <div class="inv__table-scroll">
+        <table class="inv__table">
+
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Action</th>
+                <th>Qty</th>
+                <th>Balance</th>
+                <th>Stock level</th>
+                <th>Reference</th>
+                <th>User</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for item in transactions %}
+            <tr class="{% if item.variant.stock == 0 %}is-critical{% elif item.variant.stock < 5 %}is-warning{% endif %}">
+
+                <td>{{ item.created_at|date:"d M Y" }}</td>
+
+                <td>{{ item.variant.product.name }}</td>
+
+                <td class="mono">{{ item.variant.sku }}</td>
+
+                <td>
+                    {% if item.transaction_type == "IN" %}
+                        <span class="tag tag--in">Stock in</span>
+                    {% elif item.transaction_type == "OUT" %}
+                        <span class="tag tag--out">Stock out</span>
+                    {% else %}
+                        <span class="tag tag--adjust">Adjustment</span>
+                    {% endif %}
+                </td>
+
+                <td class="mono">{{ item.quantity }}</td>
+
+                <td class="mono">{{ item.balance_after }}</td>
+
+                <td>
+                    {% if item.variant.stock == 0 %}
+                        <span class="tag tag--rust">Out of stock</span>
+                    {% elif item.variant.stock < 5 %}
+                        <span class="tag tag--mustard">Low stock</span>
+                    {% elif item.variant.stock < 15 %}
+                        <span class="tag tag--info">Running low</span>
+                    {% else %}
+                        <span class="tag tag--teal">Healthy</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ item.reference }}</td>
+
+                <td>{{ item.created_by }}</td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="inv__empty">
+                    No inventory transactions yet. Stock movements will appear here as they happen.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </div>
+
+    </section>
+
+    <nav class="inv__pagination" aria-label="Pagination">
+
+        {% if transactions.has_previous %}
+        <a href="?page={{ transactions.previous_page_number }}">&larr; Previous</a>
+        {% endif %}
+
+        <span>Page {{ transactions.number }} of {{ transactions.paginator.num_pages }}</span>
+
+        {% if transactions.has_next %}
+        <a href="?page={{ transactions.next_page_number }}">Next &rarr;</a>
+        {% endif %}
+
+    </nav>
+
+</div>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.inv{
+    --ink:#1B2124;
+    --ink-soft:#5B6570;
+    --paper:#F1F2EE;
+    --surface:#FFFFFF;
+    --line:#E3E4DF;
+    --amber:#C8891C;
+    --amber-soft:#FBF0DD;
+    --teal:#1B6E63;
+    --teal-soft:#DFEEEB;
+    --mustard:#B8871A;
+    --mustard-soft:#F7EDD8;
+    --rust:#B33F2D;
+    --rust-soft:#F8E3DE;
+
+    padding:36px 40px 56px;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+}
+
+.inv h1, .inv h2{
+    font-family:'Space Grotesk',sans-serif;
+    color:var(--ink);
+    margin:0;
+}
+
+.mono{
+    font-family:'IBM Plex Mono',monospace;
+}
+
+/* ---------- header ---------- */
+
+.inv__header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    padding-bottom:24px;
+    margin-bottom:20px;
+    border-bottom:1px solid var(--line);
+}
+
+.inv__eyebrow{
+    display:block;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:10px;
+}
+
+.inv__heading h1{
+    font-size:30px;
+    font-weight:700;
+    letter-spacing:-.01em;
+}
+
+.inv__heading p{
+    margin:8px 0 0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+    max-width:46ch;
+}
+
+.inv__search{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:6px 6px 6px 16px;
+    flex-shrink:0;
+}
+
+.inv__search i{
+    color:var(--ink-soft);
+    font-size:13px;
+}
+
+.inv__search input{
+    border:none;
+    outline:none;
+    width:260px;
+    font:14px 'Inter',sans-serif;
+    background:transparent;
+    color:var(--ink);
+}
+
+.inv__search input::placeholder{
+    color:#9AA1A7;
+}
+
+.inv__search button{
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    font:600 13px 'Space Grotesk',sans-serif;
+    padding:9px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:background .15s ease;
+}
+
+.inv__search button:hover{
+    background:#000;
+}
+
+/* ---------- toolbar ---------- */
+
+.inv__toolbar{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-bottom:28px;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font:600 13px 'Space Grotesk',sans-serif;
+    letter-spacing:.01em;
+    padding:10px 16px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+    text-decoration:none;
+    transition:transform .1s ease, background .15s ease, border-color .15s ease;
+}
+
+.btn:active{
+    transform:translateY(1px);
+}
+
+.btn--ghost{
+    color:var(--ink-soft);
+    border-color:var(--line);
+    background:transparent;
+}
+
+.btn--ghost:hover{
+    color:var(--ink);
+    border-color:#C7CAC4;
+}
+
+.btn--outline{
+    color:var(--amber);
+    border-color:var(--amber);
+    background:var(--surface);
+}
+
+.btn--outline:hover{
+    background:var(--amber-soft);
+}
+
+.btn--solid{
+    color:#fff;
+    background:var(--ink);
+}
+
+.btn--solid:hover{
+    background:#000;
+}
+
+/* ---------- kpis ---------- */
+
+.inv__kpis{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:32px;
+}
+
+.kpi{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 20px 18px;
+    overflow:hidden;
+}
+
+.kpi::before{
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0;
+    height:3px;
+    background:#D8DAD3;
+}
+
+.kpi--amber::before{ background:var(--amber); }
+.kpi--teal::before{ background:var(--teal); }
+.kpi--mustard::before{ background:var(--mustard); }
+.kpi--rust::before{ background:var(--rust); }
+
+.kpi__label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+}
+
+.kpi__label i{
+    font-size:12px;
+    opacity:.7;
+}
+
+.kpi__value{
+    display:block;
+    margin-top:12px;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:26px;
+    color:var(--ink);
+    letter-spacing:-.01em;
+}
+
+/* ---------- table card ---------- */
+
+.inv__table-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.inv__table-head{
+    padding:18px 22px;
+    border-bottom:1px solid var(--line);
+}
+
+.inv__table-head h2{
+    font-size:16px;
+    font-weight:600;
+}
+
+.inv__table-scroll{
+    overflow-x:auto;
+}
+
+.inv__table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    min-width:840px;
+}
+
+.inv__table thead th{
+    position:sticky;
+    top:0;
+    background:#FAFAF8;
+    text-align:left;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding:13px 18px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+}
+
+.inv__table tbody td{
+    padding:13px 18px;
+    border-bottom:1px solid var(--line);
+    color:var(--ink);
+    vertical-align:middle;
+    white-space:nowrap;
+}
+
+.inv__table tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.inv__table tbody tr:nth-child(even){
+    background:#FAFAF9;
+}
+
+.inv__table tbody tr.is-warning{
+    background:var(--mustard-soft);
+}
+
+.inv__table tbody tr.is-critical{
+    background:var(--rust-soft);
+}
+
+.inv__empty{
+    text-align:center;
+    color:var(--ink-soft);
+    padding:40px 18px !important;
+    white-space:normal !important;
+}
+
+/* ---------- tag chips ---------- */
+
+.tag{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 12px 5px 18px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    border-radius:3px 7px 7px 3px;
+    clip-path:polygon(9px 0,100% 0,100% 100%,9px 100%,0 50%);
+    white-space:nowrap;
+}
+
+.tag::before{
+    content:'';
+    position:absolute;
+    left:7px;
+    top:50%;
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:currentColor;
+    transform:translateY(-50%);
+    opacity:.75;
+}
+
+.tag--in{ background:var(--teal-soft); color:var(--teal); }
+.tag--out{ background:var(--rust-soft); color:var(--rust); }
+.tag--adjust{ background:var(--mustard-soft); color:var(--mustard); }
+.tag--teal{ background:var(--teal-soft); color:var(--teal); }
+.tag--mustard{ background:var(--mustard-soft); color:var(--mustard); }
+.tag--rust{ background:var(--rust-soft); color:var(--rust); }
+.tag--info{ background:#EAECE7; color:var(--ink-soft); }
+
+/* ---------- pagination ---------- */
+
+.inv__pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:22px;
+    padding-top:8px;
+    font-size:13.5px;
+}
+
+.inv__pagination span{
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+}
+
+.inv__pagination a{
+    color:var(--amber);
+    text-decoration:none;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+}
+
+.inv__pagination a:hover{
+    text-decoration:underline;
+}
+
+/* ---------- focus states ---------- */
+
+.inv a:focus-visible,
+.inv button:focus-visible,
+.inv input:focus-visible{
+    outline:2px solid var(--amber);
+    outline-offset:2px;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width:1100px){
+    .inv__kpis{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media (max-width:720px){
+    .inv{ padding:24px 18px 44px; }
+    .inv__header{ flex-direction:column; align-items:flex-start; }
+    .inv__search{ width:100%; }
+    .inv__search input{ width:100%; }
+    .inv__kpis{ grid-template-columns:1fr; }
+    .inv__toolbar{ flex-wrap:wrap; justify-content:flex-start; }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .btn{ transition:none; }
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Newsletter Subscribers{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <h2>Newsletter Subscribers</h2>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <h3>{{ total }}</h3>
+        <p>Total Subscribers</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>{{ active }}</h3>
+        <p>Active Subscribers</p>
+    </div>
+</div>
+
+<form method="get" class="mb-4">
+
+    <input
+        type="text"
+        name="q"
+        value="{{ search }}"
+        placeholder="Search email..."
+    >
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>Email</th>
+
+<th>Status</th>
+
+<th>Subscribed</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for subscriber in subscribers %}
+
+<tr>
+
+<td>{{ subscriber.email }}</td>
+
+<td>
+
+{% if subscriber.active %}
+
+<span class="badge bg-success">
+Active
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+Inactive
+</span>
+
+{% endif %}
+
+</td>
+
+<td>{{ subscriber.subscribed_at|date:"d M Y H:i" }}</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="3">
+
+No subscribers found.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

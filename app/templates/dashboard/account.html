@@ -1,0 +1,129 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<div class="account-settings">
+
+    <h1>
+        Account Settings
+    </h1>
+
+
+    <div class="profile-section">
+
+        <img 
+            src="{{ profile.profile_image.url }}"
+            width="120"
+            height="120"
+            alt="Profile Picture"
+        >
+
+        <h3>
+            {{ request.user.username }}
+        </h3>
+
+        <p>
+            Email: {{ request.user.email }}
+        </p>
+
+    </div>
+
+
+    <hr>
+
+
+    <h2>
+        Update Profile
+    </h2>
+
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+
+        <div>
+            <label>
+                Profile Picture
+            </label>
+
+            <input 
+                type="file"
+                name="profile_image"
+                accept="image/*"
+            >
+        </div>
+
+
+        <br>
+
+
+        <div>
+            <label>
+                Username
+            </label>
+
+            <input 
+                type="text"
+                name="username"
+                value="{{ request.user.username }}"
+                required
+            >
+        </div>
+
+
+        <br>
+
+
+        <div>
+            <label>
+                Email
+            </label>
+
+            <input 
+                type="email"
+                name="email"
+                value="{{ request.user.email }}"
+            >
+        </div>
+
+
+        <br>
+
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+
+    </form>
+
+
+    <hr>
+
+
+    <h2>
+        Change Password
+    </h2>
+
+
+    <form method="POST" action="{% url 'change_staff_password' %}">
+
+        {% csrf_token %}
+
+
+        {{ password_form.as_p }}
+
+
+        <button type="submit">
+            Change Password
+        </button>
+
+
+    </form>
+
+
+</div>
+
+
+{% endblock %}

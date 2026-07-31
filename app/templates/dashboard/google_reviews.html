@@ -1,0 +1,194 @@
+{% extends "dashboard/base.html" %}
+
+
+{% block content %}
+
+
+<div class="dashboard-header">
+
+<h2>
+Google Reviews
+</h2>
+
+
+<p>
+Manage customer reviews from Google
+</p>
+
+</div>
+
+
+
+<div class="reviews-table">
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+Customer
+</th>
+
+<th>
+Rating
+</th>
+
+
+<th>
+Review
+</th>
+
+
+<th>
+Status
+</th>
+
+
+<th>
+Actions
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+<tbody>
+
+
+{% for review in reviews %}
+
+
+<tr>
+
+
+<td>
+
+{{review.reviewer_name}}
+
+</td>
+
+
+
+<td>
+
+{% for star in "12345" %}
+
+{% if forloop.counter <= review.rating %}
+
+⭐
+
+{% endif %}
+
+{% endfor %}
+
+
+</td>
+
+
+
+<td>
+
+{{review.comment|truncatechars:100}}
+
+</td>
+
+
+
+
+<td>
+
+
+{% if review.is_visible %}
+
+<span class="badge success">
+Visible
+</span>
+
+
+{% else %}
+
+<span class="badge danger">
+Hidden
+</span>
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+<td>
+
+
+<a href="{% url 'toggle_google_review' review.id %}">
+
+{% if review.is_visible %}
+
+Hide
+
+{% else %}
+
+Show
+
+{% endif %}
+
+
+</a>
+
+
+
+<a 
+href="{% url 'delete_google_review' review.id %}"
+onclick="return confirm('Delete this review?')"
+>
+
+Delete
+
+</a>
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% empty %}
+
+
+<tr>
+
+<td colspan="5">
+
+No reviews yet
+
+</td>
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+{% endblock %}

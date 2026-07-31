@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order {{ order.order_id }} | SmartComputersKE{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Reuses the same .order-card / .status-pill / .order-stepper / .order-items
+   system as orders.html — kept identical so both pages look consistent. */
+.order-detail-page{background:var(--paper);padding:40px 0 80px;min-height:70vh;}
+.od-wrap{max-width:820px;margin:0 auto;padding:0 24px;}
+.od-back{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--graphite);font-size:13px;font-weight:600;margin-bottom:18px;
+  transition:color .15s;
+}
+.od-back:hover{color:var(--indigo);}
+
+.order-card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden;
+}
+.order-card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;padding:22px 28px;
+  border-bottom:1px solid var(--line-soft);
+}
+.order-card-head h3{font-size:18px;font-weight:700;color:var(--ink);display:flex;flex-direction:column;gap:6px;}
+.order-date{color:var(--graphite-soft);font-size:12.5px;font-weight:500;}
+
+.status-pill{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 15px;border-radius:99px;
+  font-size:11.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+}
+.status-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+.status-pill.pending{background:#FFF6E5;color:#B77400;}
+.status-pill.processing{background:var(--indigo-tint);color:var(--indigo);}
+.status-pill.shipped{background:#EAF3FF;color:var(--indigo-deep);}
+.status-pill.delivered{background:var(--success-tint);color:var(--success);}
+.status-pill.cancelled{background:var(--amber-tint);color:var(--amber-deep);}
+
+.order-stepper{display:flex;align-items:flex-start;justify-content:center;max-width:480px;margin:28px auto 4px;padding:0 20px;}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:0 0 96px;position:relative;}
+.step-icon{
+  width:42px;height:42px;border-radius:50%;background:var(--panel);border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;color:var(--graphite-soft);font-size:15px;
+  transition:.2s;position:relative;z-index:2;
+}
+.step-label{font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--graphite-soft);}
+.connector{flex:1;height:2px;background:var(--line);margin-top:20px;}
+.step.is-active .step-icon{border-color:var(--indigo);color:var(--indigo);box-shadow:0 0 0 5px var(--indigo-tint);}
+.step.is-active .step-label{color:var(--indigo);}
+.step.is-completed .step-icon{background:var(--indigo);border-color:var(--indigo);color:#fff;}
+.step.is-completed .step-label{color:var(--ink);}
+.connector.is-filled{background:var(--indigo);}
+
+.cancelled-banner{
+  margin:22px 28px 0;padding:12px 16px;background:var(--amber-tint);color:var(--amber-deep);
+  border-radius:10px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;
+}
+
+.od-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:26px 28px 6px;}
+.od-block h5{
+  font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--graphite-soft);margin-bottom:10px;
+}
+.od-block p{font-size:13.5px;color:var(--ink);margin:0 0 5px;line-height:1.5;}
+.od-block p strong{color:var(--graphite);font-weight:600;}
+.od-divider{border:none;border-top:1px solid var(--line);margin:8px 28px 0;}
+
+.order-items{padding:22px 28px 6px;}
+.order-item-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--line-soft);}
+.order-item-row:last-child{border-bottom:none;}
+.order-item-row img{width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line);flex-shrink:0;background:var(--line-soft);}
+.order-item-name{flex:1;font-size:13.5px;font-weight:600;color:var(--ink);}
+.order-item-qty{font-size:12px;font-weight:700;color:var(--graphite-soft);background:var(--line-soft);padding:4px 10px;border-radius:99px;flex-shrink:0;}
+.order-item-price{font-weight:800;color:var(--indigo);font-size:13.5px;flex-shrink:0;white-space:nowrap;}
+
+.od-summary{padding:20px 28px 6px;}
+.od-summary-row{display:flex;justify-content:space-between;font-size:13.5px;color:var(--graphite);padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.od-summary-row:last-child{border-bottom:none;}
+.od-summary-row.grand{font-weight:800;font-size:17px;color:var(--indigo);font-family:'Space Grotesk',sans-serif;padding-top:14px;}
+
+.order-card-foot{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;
+  padding:20px 28px;border-top:1px solid var(--line);background:var(--paper);
+}
+.btn-cancel-order{
+  display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--amber-deep);
+  border:1.5px solid var(--amber);padding:10px 18px;border-radius:9px;font-weight:700;
+  font-size:12.5px;transition:.15s;cursor:pointer;
+}
+.btn-cancel-order:hover{background:var(--amber);color:#fff;}
+
+@media(max-width:640px){
+  .od-grid-2{grid-template-columns:1fr;padding:20px 20px 4px;}
+  .order-card-head,.order-items,.order-card-foot,.od-summary{padding-left:20px;padding-right:20px;}
+  .step{flex-basis:76px;}
+  .step-label{font-size:9.5px;}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="order-detail-page">
+  <div class="od-wrap">
+
+    <a href="{% url 'orders' %}" class="od-back">← Back to My Orders</a>
+
+    <div class="order-card">
+
+      <div class="order-card-head">
+        <h3>
+          Order #{{ order.order_id }}
+          <span class="order-date">📅 {{ order.created_at|date:"d M Y, g:i A" }}</span>
+        </h3>
+        <span class="status-pill {{ order.status|lower }}">{{ order.status }}</span>
+      </div>
+
+      {% if order.status|lower == 'cancelled' %}
+        <div class="cancelled-banner">❌ This order was cancelled.</div>
+      {% else %}
+        <div class="order-stepper">
+          <div class="step {% if order.status|lower == 'shipped' or order.status|lower == 'delivered' %}is-completed{% elif order.status|lower == 'pending' or order.status|lower == 'processing' %}is-active{% endif %}">
+            <div class="step-icon">⚙️</div>
+            <div class="step-label">Processing</div>
+          </div>
+          <div class="connector {% if order.status|lower == 'shipped' or order.status|lower == 'delivered' %}is-filled{% endif %}"></div>
+
+          <div class="step {% if order.status|lower == 'delivered' %}is-completed{% elif order.status|lower == 'shipped' %}is-active{% endif %}">
+            <div class="step-icon">🚚</div>
+            <div class="step-label">Shipped</div>
+          </div>
+          <div class="connector {% if order.status|lower == 'delivered' %}is-filled{% endif %}"></div>
+
+          <div class="step {% if order.status|lower == 'delivered' %}is-active is-completed{% endif %}">
+            <div class="step-icon">📦</div>
+            <div class="step-label">Delivered</div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="od-grid-2">
+        <div class="od-block">
+          <h5>Customer</h5>
+          <p><strong>Name:</strong> {{ order.full_name }}</p>
+          <p><strong>Email:</strong> {{ order.email }}</p>
+          <p><strong>Phone:</strong> {{ order.phone }}</p>
+        </div>
+        <div class="od-block">
+          <h5>Delivery</h5>
+          <p>{{ order.address }}</p>
+          <p>{{ order.city }}</p>
+          <p>{{ order.county }}</p>
+        </div>
+      </div>
+
+      <hr class="od-divider">
+
+      <div class="order-items">
+        {% for item in order.items.all %}
+        <div class="order-item-row">
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+          <div class="order-item-name">{{ item.product.name }}</div>
+          <div class="order-item-qty">× {{ item.quantity }}</div>
+          <div class="order-item-price">KES {{ item.total }}</div>
+        </div>
+        {% empty %}
+        <p style="color:var(--graphite-soft);font-size:13px;">No items found.</p>
+        {% endfor %}
+      </div>
+
+      <div class="od-summary">
+        <div class="od-summary-row"><span>Subtotal</span><span>KES {{ order.subtotal }}</span></div>
+        <div class="od-summary-row"><span>Delivery Fee</span><span>KES {{ order.delivery_fee }}</span></div>
+        <div class="od-summary-row"><span>Payment Method</span><span>{{ order.get_payment_method_display }}</span></div>
+        <div class="od-summary-row"><span>Delivery Method</span><span>{{ order.get_delivery_method_display }}</span></div>
+        <div class="od-summary-row grand"><span>Total</span><span>KES {{ order.total_amount }}</span></div>
+      </div>
+
+      <div class="order-card-foot">
+        {% if order.status|lower == 'pending' or order.status|lower == 'processing' %}
+        <form method="post" action="{% url 'cancel_order' order.order_id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-cancel-order" onclick="return confirm('Cancel this order?');">
+            ⊗ Cancel Order
+          </button>
+        </form>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

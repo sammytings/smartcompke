@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Products{% endblock %}
+
+{% block content %}
+
+<div class="container" style="padding:40px 0;">
+
+    <h2>Product Comparison</h2>
+
+    {% if products %}
+
+    <table class="table table-bordered">
+
+        <tr>
+            <th>Image</th>
+            {% for product in products %}
+            <td>
+                <img src="{{ product.image.url }}" width="150">
+            </td>
+            {% endfor %}
+        </tr>
+
+        <tr>
+            <th>Name</th>
+            {% for product in products %}
+            <td>{{ product.name }}</td>
+            {% endfor %}
+        </tr>
+
+        <tr>
+            <th>Brand</th>
+            {% for product in products %}
+            <td>{{ product.brand }}</td>
+            {% endfor %}
+        </tr>
+
+        <tr>
+            <th>Price</th>
+            {% for product in products %}
+            <td>
+                {% if product.discount_price %}
+                    KSh {{ product.discount_price }}
+                {% else %}
+                    KSh {{ product.price }}
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+
+        <tr>
+            <th>Description</th>
+            {% for product in products %}
+            <td>{{ product.short_description }}</td>
+            {% endfor %}
+        </tr>
+
+    </table>
+
+    {% else %}
+
+    <h4>No products selected for comparison.</h4>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+TERMS & CONDITIONS PAGE
+Placeholder copy — replace bracketed sections with your actual legal terms
+before publishing. Keep the .lg-scope classes so it inherits the checkout
+page's visual language.
+{% endcomment %}
+
+{% block title %}Terms & Conditions{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  .lg-scope{
+    --lg-ink:#152420; --lg-ink-soft:#5C6B65; --lg-line:#E3E8E5; --lg-bg:#F6F8F7;
+    --lg-card:#FFFFFF; --lg-brand:#0E3B2E; --lg-brand-dark:#0A2C22; --lg-brand-soft:#E7F0EB;
+    --lg-gold:#B9924C; --lg-gold-soft:#F7EFDD;
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--lg-ink); background:var(--lg-bg);
+  }
+  .lg-scope h1,.lg-scope h2{ font-family:'Sora',sans-serif; letter-spacing:-.01em; }
+  .lg-scope a{ color:var(--lg-brand); }
+
+  .lg-topbar{ background:var(--lg-brand); }
+  .lg-topbar-inner{ max-width:860px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; gap:10px; color:#fff; font-weight:700; font-size:16px; }
+  .lg-brand-mark{ width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:#fff; }
+
+  .lg-hero{ max-width:860px; margin:0 auto; padding:36px 24px 8px; }
+  .lg-hero h1{ font-size:28px; font-weight:700; margin:0 0 8px; }
+  .lg-hero .lg-updated{ font-size:13px; color:var(--lg-ink-soft); display:flex; align-items:center; gap:6px; }
+
+  .lg-body{ max-width:860px; margin:0 auto; padding:20px 24px 60px; }
+  .lg-card{ background:var(--lg-card); border:1px solid var(--lg-line); border-radius:12px; box-shadow:0 1px 2px rgba(15,30,25,.04), 0 8px 24px -12px rgba(15,30,25,.12); padding:30px 32px; }
+
+  .lg-toc{ background:var(--lg-brand-soft); border-radius:10px; padding:16px 20px; margin-bottom:26px; }
+  .lg-toc h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--lg-brand); margin:0 0 10px; }
+  .lg-toc ol{ margin:0; padding-left:18px; columns:2; column-gap:20px; }
+  .lg-toc li{ font-size:13.5px; margin-bottom:6px; }
+  .lg-toc a{ text-decoration:none; }
+  .lg-toc a:hover{ text-decoration:underline; }
+  @media (max-width:600px){ .lg-toc ol{ columns:1; } }
+
+  .lg-section{ padding:20px 0; border-bottom:1px solid var(--lg-line); }
+  .lg-section:last-child{ border-bottom:none; padding-bottom:0; }
+  .lg-section h2{ font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; margin:0 0 10px; }
+  .lg-num{ width:24px; height:24px; border-radius:50%; background:var(--lg-brand-soft); color:var(--lg-brand); font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Manrope',sans-serif; flex:none; }
+  .lg-section p, .lg-section li{ font-size:14px; line-height:1.7; color:var(--lg-ink-soft); }
+  .lg-section ul{ margin:8px 0 0; padding-left:20px; }
+  .lg-section strong{ color:var(--lg-ink); }
+
+  .lg-callout{ display:flex; gap:10px; align-items:flex-start; background:var(--lg-gold-soft); border-radius:8px; padding:12px 14px; margin-top:12px; font-size:13px; color:#7A5E28; }
+  .lg-callout svg{ flex:none; margin-top:2px; }
+
+  .lg-contact{ margin-top:8px; font-size:14px; color:var(--lg-ink-soft); }
+  .lg-contact a{ font-weight:600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lg-scope">
+
+  <div class="lg-topbar">
+    <div class="lg-topbar-inner">
+      <span class="lg-brand-mark">{{ site_initials|default:"YS" }}</span>
+      {{ site_name|default:"Your Store" }}
+    </div>
+  </div>
+
+  <div class="lg-hero">
+    <h1>Terms &amp; Conditions</h1>
+    <div class="lg-updated">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Last updated: {{ terms_updated_date|default:"22 July 2026" }}
+    </div>
+  </div>
+
+  <div class="lg-body">
+    <div class="lg-card">
+
+      <div class="lg-toc">
+        <h4>On this page</h4>
+        <ol>
+          <li><a href="#acceptance">Acceptance of terms</a></li>
+          <li><a href="#orders">Orders &amp; pricing</a></li>
+          <li><a href="#delivery">Delivery &amp; extra charges</a></li>
+          <li><a href="#payments">Payments</a></li>
+          <li><a href="#returns">Returns &amp; refunds</a></li>
+          <li><a href="#accounts">Accounts &amp; conduct</a></li>
+          <li><a href="#liability">Limitation of liability</a></li>
+          <li><a href="#changes">Changes to these terms</a></li>
+          <li><a href="#law">Governing law</a></li>
+          <li><a href="#contact">Contact us</a></li>
+        </ol>
+      </div>
+
+      <div class="lg-section" id="acceptance">
+        <h2><span class="lg-num">1</span>Acceptance of terms</h2>
+        <p>By accessing or placing an order on {{ site_name|default:"Your Store" }}, you agree to be bound by these Terms &amp; Conditions and our Privacy Policy. If you do not agree, please do not use this site or complete a purchase.</p>
+      </div>
+
+      <div class="lg-section" id="orders">
+        <h2><span class="lg-num">2</span>Orders &amp; pricing</h2>
+        <p>All prices are listed in Kenya Shillings (KSh) and exclude VAT unless you select "Include VAT now" at checkout. We reserve the right to correct pricing errors and to refuse or cancel any order, including after payment has been accepted, if a product is unavailable or a price was displayed incorrectly.</p>
+        <p>An order is only confirmed once you receive an order confirmation email or SMS.</p>
+      </div>
+
+      <div class="lg-section" id="delivery">
+        <h2><span class="lg-num">3</span>Delivery &amp; extra charges</h2>
+        <p>Estimated delivery timelines are shown at checkout and begin once payment is confirmed. Delivery fees shown at checkout are estimates based on the delivery method you select.</p>
+        <div class="lg-callout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span><strong>Please note:</strong> additional charges may apply depending on your exact delivery location (e.g. distance from major towns) and the weight or size of your order. Where this applies, we will confirm any difference with you before dispatch.</span>
+        </div>
+        <p style="margin-top:12px;">Cash on delivery is currently only available for addresses within Nairobi County. All other counties must select M-Pesa or card payment.</p>
+      </div>
+
+      <div class="lg-section" id="payments">
+        <h2><span class="lg-num">4</span>Payments</h2>
+        <p>We accept M-Pesa, debit/credit cards, and cash on delivery (Nairobi County only). Card payments are processed securely by our payment partner; we do not store your full card details on our servers.</p>
+      </div>
+
+      <div class="lg-section" id="returns">
+        <h2><span class="lg-num">5</span>Returns &amp; refunds</h2>
+        <ul>
+          <li>Items may be returned within <strong>7 days</strong> of delivery if unused and in original packaging.</li>
+          <li>Refunds are issued to the original payment method within <strong>5–10 business days</strong> of an approved return.</li>
+          <li>Perishable, personalised, and clearance items are not eligible for return unless faulty.</li>
+        </ul>
+      </div>
+
+      <div class="lg-section" id="accounts">
+        <h2><span class="lg-num">6</span>Accounts &amp; conduct</h2>
+        <p>You are responsible for maintaining the confidentiality of your account details. You agree to provide accurate contact and delivery information, and not to use the site for any fraudulent or unlawful purpose.</p>
+      </div>
+
+      <div class="lg-section" id="liability">
+        <h2><span class="lg-num">7</span>Limitation of liability</h2>
+        <p>To the extent permitted by law, {{ site_name|default:"Your Store" }} is not liable for indirect or consequential losses arising from use of this site or delivery delays outside our reasonable control (e.g. weather, road closures, courier disruptions).</p>
+      </div>
+
+      <div class="lg-section" id="changes">
+        <h2><span class="lg-num">8</span>Changes to these terms</h2>
+        <p>We may update these Terms &amp; Conditions from time to time. Continued use of the site after changes are posted constitutes acceptance of the updated terms.</p>
+      </div>
+
+      <div class="lg-section" id="law">
+        <h2><span class="lg-num">9</span>Governing law</h2>
+        <p>These terms are governed by the laws of the Republic of Kenya, and any disputes shall be subject to the exclusive jurisdiction of the Kenyan courts.</p>
+      </div>
+
+      <div class="lg-section" id="contact">
+        <h2><span class="lg-num">10</span>Contact us</h2>
+        <p class="lg-contact">Questions about these terms? Reach us at <a href="mailto:{{ support_email|default:'support@yourstore.co.ke' }}">{{ support_email|default:"support@yourstore.co.ke" }}</a> or call <a href="tel:{{ support_phone|default:'0700000000' }}">{{ support_phone|default:"0700 000 000" }}</a>.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

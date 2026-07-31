@@ -1,0 +1,197 @@
+{% extends "dashboard/base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <div>
+        <h1>
+            Brands
+        </h1>
+
+        <p>
+            Manage product brands
+        </p>
+    </div>
+
+
+    <a href="{% url 'add_brand' %}" class="btn-primary">
+        + Add Brand
+    </a>
+
+</div>
+
+
+
+<div class="card">
+
+
+    <div class="table-tools">
+
+
+        <form method="GET" class="search-box">
+
+            <input 
+                type="text"
+                name="q"
+                value="{{query|default:''}}"
+                placeholder="Search brands..."
+            >
+
+            <button>
+                Search
+            </button>
+
+        </form>
+
+
+    </div>
+
+
+
+
+<table class="dashboard-table">
+
+
+<thead>
+
+<tr>
+
+<th>
+Logo
+</th>
+
+
+<th>
+Brand Name
+</th>
+
+
+<th>
+Products
+</th>
+
+
+<th>
+Actions
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+
+<tbody>
+
+
+{% for brand in brands %}
+
+
+<tr>
+
+
+<td>
+
+
+{% if brand.logo %}
+
+<img 
+src="{{brand.logo.url}}"
+class="brand-logo"
+>
+
+
+{% else %}
+
+<div class="no-logo">
+    N/A
+</div>
+
+{% endif %}
+
+
+</td>
+
+
+
+
+<td>
+
+<strong>
+{{brand.name}}
+</strong>
+
+</td>
+
+
+
+
+<td>
+
+{{brand.products.count}}
+
+</td>
+
+
+
+
+<td>
+
+
+<a 
+href="{% url 'edit_brand' brand.id %}"
+class="action-btn edit"
+>
+Edit
+</a>
+
+
+
+<a 
+href="{% url 'delete_brand' brand.id %}"
+class="action-btn delete"
+>
+Delete
+</a>
+
+
+</td>
+
+
+</tr>
+
+
+
+{% empty %}
+
+
+<tr>
+
+<td colspan="4">
+
+No brands found.
+
+</td>
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+{% endblock %}

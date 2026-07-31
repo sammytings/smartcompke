@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+
+font-family:Arial,sans-serif;
+
+background:#f5f5f5;
+
+margin:0;
+
+padding:40px;
+
+}
+
+.wrapper{
+
+max-width:700px;
+
+margin:auto;
+
+background:white;
+
+border-radius:10px;
+
+overflow:hidden;
+
+box-shadow:0 10px 30px rgba(0,0,0,.1);
+
+}
+
+.header{
+
+background:#0d6efd;
+
+color:white;
+
+padding:30px;
+
+text-align:center;
+
+}
+
+.header h1{
+
+margin:0;
+
+}
+
+.content{
+
+padding:30px;
+
+}
+
+.product{
+
+border:1px solid #eee;
+
+border-radius:8px;
+
+padding:15px;
+
+margin-bottom:20px;
+
+display:flex;
+
+gap:20px;
+
+}
+
+.product img{
+
+width:120px;
+
+height:120px;
+
+object-fit:cover;
+
+border-radius:8px;
+
+}
+
+.price{
+
+color:#198754;
+
+font-size:22px;
+
+font-weight:bold;
+
+}
+
+.old-price{
+
+text-decoration:line-through;
+
+color:#999;
+
+}
+
+.button{
+
+display:inline-block;
+
+background:#198754;
+
+padding:14px 28px;
+
+color:white;
+
+text-decoration:none;
+
+border-radius:8px;
+
+margin-top:25px;
+
+}
+
+.footer{
+
+background:#f7f7f7;
+
+padding:20px;
+
+text-align:center;
+
+font-size:13px;
+
+color:#666;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="header">
+
+<h1>🔥 New Deals Available</h1>
+
+<p>SmartComputersKe Technologies</p>
+
+</div>
+
+<div class="content">
+
+<h2>Hello {{ user.first_name|default:"Customer" }},</h2>
+
+<p>
+
+Great news!
+
+We've reduced prices on selected products for a limited time.
+
+</p>
+
+{% if campaign.message %}
+
+<p>
+
+{{ campaign.message }}
+
+</p>
+
+{% endif %}
+
+{% for product in products %}
+
+<div class="product">
+
+<div>
+
+<img src="{{ product.image.url }}">
+
+</div>
+
+<div>
+
+<h3>
+
+{{ product.name }}
+
+</h3>
+
+<p>
+
+{{ product.short_description }}
+
+</p>
+
+<p>
+
+<span class="old-price">
+
+KSh {{ product.price }}
+
+</span>
+
+</p>
+
+<p class="price">
+
+KSh {{ product.current_price }}
+
+</p>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+<a
+
+href="https://smartcomputerske.com"
+
+class="button"
+
+>
+
+Shop Now
+
+</a>
+
+</div>
+
+<div class="footer">
+
+Thank you for shopping with SmartComputersKe.
+
+</div>
+
+</div>
+
+</body>
+
+</html>

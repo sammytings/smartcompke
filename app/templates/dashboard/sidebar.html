@@ -1,0 +1,603 @@
+<!-- ============================================================
+     SmartComputersKE — Admin Sidebar
+     Flat, precise, blue/red admin theme. Mobile responsive.
+     All tags unchanged from your original file.
+============================================================= -->
+{%load static%}
+<div class="mobile-topbar" id="mobileTopbar">
+    <button class="hamburger" id="sidebarToggle" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <a href="{% url 'dashboard' %}" class="mobile-brand">
+        <img src="{% static 'images/logo.png' %}">
+        
+    </a>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="sidebar" id="sidebar">
+
+    <div class="logo">
+        <a href="{% url 'dashboard' %}">
+           <img src="{% static 'images/logo.png' %}">
+            
+        </a>
+        <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <ul class="sidebar-menu">
+
+        <li>
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="menu-title"><span>Catalog</span></li>
+
+        <li class="has-submenu">
+            <a href="{% url 'dashboard_products' %}" class="submenu-trigger {% if request.resolver_match.url_name == 'dashboard_products' %}active{% endif %}">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+                <i class="fas fa-chevron-down submenu-caret"></i>
+            </a>
+
+            <ul class="submenu">
+                <li><a href="{% url 'dashboard_products'%}">All Products</a></li>
+                <li>
+                    <a href="{% url 'dashboard_add_product' %}" class="submenu-cta">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
+                </li>
+                
+                
+            </ul>
+        </li>
+
+        <li>
+            <a href="{% url 'dashboard_categories' %}" class="{% if request.resolver_match.url_name == 'dashboard_categories' %}active{% endif %}">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+        </li>
+        <li class="menu-title">
+    Content
+</li>
+
+<li>
+    <a href="{% url 'dashboard_blog' %}">
+        <i class="fas fa-newspaper"></i>
+        Blog Articles
+    </a>
+</li>
+
+<li>
+    <a href="{% url 'dashboard_add_blog' %}">
+        <i class="fas fa-pen"></i>
+        Add Article
+    </a>
+</li>
+
+<li>
+    <a href="{% url 'dashboard_blog_categories' %}">
+        <i class="fas fa-folder-open"></i>
+        Blog Categories
+    </a>
+</li>
+
+<li>
+    <a href="{% url 'dashboard_blog_tags' %}">
+        <i class="fas fa-tags"></i>
+        Tags
+    </a>
+</li>
+
+       <li>
+    <a href="{% url 'dashboard_brands' %}">
+        <i class="fas fa-tags"></i>
+        <span>Brands</span>
+    </a>
+</li>
+        <li class="menu-title"><span>Sales</span></li>
+
+        <li class="{% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
+            <a href="{% url 'order_list' %}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+        </li>
+
+<li class="sidebar-item">
+
+    <a href="{% url 'dashboard_deals' %}">
+        <i class="fas fa-tags"></i>
+        Deals
+    </a>
+
+</li>
+
+
+<li class="sidebar-item">
+
+    <a href="{% url 'dashboard_add_deal' %}">
+        <i class="fas fa-plus-circle"></i>
+        Add Deal
+    </a>
+
+</li>
+        <li>
+            <a href="{% url 'import_product' %}" class="{% if request.resolver_match.url_name == 'import_product' %}active{% endif %}">
+                <i class="fas fa-cloud-download-alt"></i>
+                <span>Import Product</span>
+            </a>
+        </li>
+
+        
+
+        <li class="menu-title"><span>Customers</span></li>
+<li>
+
+    <a href="{% url 'dashboard_customers' %}">
+
+        <i class="fas fa-users"></i>
+
+        <span>
+
+            Customers
+
+        </span>
+
+    </a>
+
+</li>
+        <li>
+
+<a href="{% url 'dashboard_google_reviews' %}">
+
+<i class="fa fa-star"></i>
+
+Google Reviews
+
+</a>
+
+</li>
+<li>
+    <a href="{% url 'dashboard_newsletter' %}">
+        <i class="fas fa-envelope-open-text"></i>
+        <span>Newsletter</span>
+    </a>
+</li>
+
+
+
+        <li class="menu-title"><span>Inventory</span></li>
+<li class="nav-item">
+
+    <a href="{% url 'dashboard_inventory' %}"
+       class="nav-link">
+
+        <i class="fas fa-boxes"></i>
+
+        <span>
+            Inventory
+        </span>
+
+    </a>
+
+</li>
+        <li>
+            <a href="#">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Low Stock</span>
+                {% if low_stock %}
+                <span class="badge danger">{{ low_stock }}</span>
+                {% endif %}
+            </a>
+        </li>
+
+        <li class="menu-title"><span>Reports</span></li>
+<li>
+    <a href="{% url 'dashboard_analytics' %}">
+        <i class="fas fa-chart-line"></i>
+        Analytics
+    </a>
+</li>
+
+     
+
+        <li class="menu-title"><span>Website</span></li>
+
+        <li>
+            <a href="/">
+                <i class="fas fa-globe"></i>
+                <span>Visit Store</span>
+            </a>
+        </li>
+
+        <li>
+    <a href="{% url 'dashboard_banners' %}">
+        <i class="fas fa-images"></i>
+        Banners
+    </a>
+</li>
+
+<li>
+    <a href="{% url 'dashboard_add_banner' %}">
+        <i class="fas fa-plus-circle"></i>
+        Add Banner
+    </a>
+</li>
+
+  
+<li>
+    <a href="{% url 'dashboard_marketing' %}">
+        <i class="fas fa-bullhorn"></i>
+        <span>Marketing</span>
+    </a>
+</li>
+
+        <li class="menu-title"><span>Settings</span></li>
+
+        <li>
+            <a href="{%url 'staff_account'%}">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'logout' %}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+
+    </ul>
+
+</div>
+
+<style>
+/* ==============================================================
+   TOKENS — flat, no gradients, no glow.
+   Blue = structural (active/focus). Red = functional only
+   (alerts, destructive actions). Everything else is quiet.
+================================================================= */
+:root {
+    --sc-bg: #12151b;
+    --sc-bg-raised: #171b22;
+    --sc-hover: #1c2029;
+    --sc-border: rgba(255, 255, 255, 0.07);
+    --sc-text: #eef0f4;
+    --sc-text-muted: #838d9e;
+    --sc-text-faint: #4d5566;
+    --sc-blue: #3b73f0;
+    --sc-blue-soft: rgba(59, 115, 240, 0.12);
+    --sc-red: #e5484d;
+    --sc-red-soft: rgba(229, 72, 77, 0.12);
+    --sc-sidebar-w: 252px;
+    --sc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sc-sidebar-w);
+    height: 100vh;
+    background: var(--sc-bg);
+    border-right: 1px solid var(--sc-border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--sc-font);
+    scrollbar-width: thin;
+    scrollbar-color: var(--sc-hover) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--sc-hover); border-radius: 10px; }
+
+.sidebar .logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 20px;
+    border-bottom: 1px solid var(--sc-border);
+    flex-shrink: 0;
+}
+
+.sidebar .logo a,
+.mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+    color: var(--sc-text);
+}
+
+.mark {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: var(--sc-blue);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--sc-red);
+}
+
+.wordmark {
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.1px;
+}
+.wordmark em { font-style: normal; color: var(--sc-red); }
+
+.sidebar-close {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--sc-text-muted);
+    font-size: 17px;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 1;
+}
+
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 12px 24px;
+    flex: 1;
+}
+
+.menu-title {
+    padding: 18px 12px 7px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    color: var(--sc-text-faint);
+    text-transform: uppercase;
+}
+.menu-title:first-child { padding-top: 6px; }
+
+.sidebar-menu > li > a,
+.submenu-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 12px;
+    margin: 1px 0;
+    border-radius: 7px;
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: background 0.14s ease, color 0.14s ease;
+}
+
+.sidebar-menu > li > a i:first-child,
+.submenu-trigger i:first-child {
+    width: 17px;
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--sc-text-faint);
+    transition: color 0.14s ease;
+}
+
+.sidebar-menu > li > a span,
+.submenu-trigger span { flex: 1; white-space: nowrap; }
+
+.sidebar-menu > li > a:hover,
+.submenu-trigger:hover { background: var(--sc-hover); color: var(--sc-text); }
+.sidebar-menu > li > a:hover i:first-child,
+.submenu-trigger:hover i:first-child { color: var(--sc-text-muted); }
+
+.sidebar-menu > li > a.active,
+.sidebar-menu > li.active > a,
+.submenu-trigger.active {
+    background: var(--sc-blue-soft);
+    color: #fff;
+    box-shadow: inset 2px 0 0 var(--sc-blue);
+}
+.sidebar-menu > li > a.active i:first-child,
+.sidebar-menu > li.active > a i:first-child,
+.submenu-trigger.active i:first-child { color: var(--sc-blue); }
+
+.logout-link:hover { background: var(--sc-red-soft) !important; color: var(--sc-red) !important; }
+.logout-link:hover i:first-child { color: var(--sc-red) !important; }
+
+.badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1.5px 7px;
+    border-radius: 20px;
+    line-height: 1.6;
+    background: var(--sc-red);
+    color: #fff;
+}
+
+.has-submenu .submenu-caret {
+    font-size: 10px;
+    color: var(--sc-text-faint);
+    transition: transform 0.2s ease;
+    flex: none;
+}
+.has-submenu.open .submenu-caret { transform: rotate(180deg); }
+
+.submenu {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 30px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+.has-submenu.open .submenu { max-height: 220px; }
+
+.submenu li a {
+    display: block;
+    padding: 7px 10px;
+    margin: 1px 0;
+    border-radius: 6px;
+    font-size: 12.8px;
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    border-left: 1px solid var(--sc-border);
+    transition: color 0.14s ease, border-color 0.14s ease;
+}
+.submenu li a:hover { color: var(--sc-text); border-color: var(--sc-blue); }
+
+.submenu-cta { color: var(--sc-blue) !important; font-weight: 600; }
+.submenu-cta i { font-size: 10px; margin-right: 4px; }
+
+.mobile-topbar {
+    display: none;
+    position: sticky;
+    top: 0;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--sc-bg);
+    border-bottom: 1px solid var(--sc-border);
+    z-index: 999;
+}
+.mobile-brand { font-size: 14.5px; font-weight: 650; }
+
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    border-radius: 7px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-bg-raised);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.hamburger span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    margin: 0 auto;
+    background: var(--sc-text-muted);
+    border-radius: 2px;
+    transition: transform 0.22s ease, opacity 0.18s ease;
+}
+.hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 6, 10, 0.55);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+/* ==============================================================
+   RESPONSIVE
+   IMPORTANT: above 860px the sidebar is fixed, so your main
+   content wrapper needs matching left space or it will sit
+   underneath it — see the note after this file.
+================================================================= */
+@media (max-width: 1024px) {
+    :root { --sc-sidebar-w: 232px; }
+}
+
+@media (max-width: 860px) {
+    .mobile-topbar { display: flex; }
+    .sidebar-close { display: block; }
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: min(80vw, 288px);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 14px 0 32px -10px rgba(0, 0, 0, 0.45);
+    }
+    .sidebar-overlay.open { display: block; opacity: 1; }
+}
+
+@media (max-width: 380px) {
+    .sidebar { width: 86vw; }
+    .sidebar .logo { padding: 18px 16px; }
+    .mobile-topbar { padding: 11px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar, .sidebar-overlay, .hamburger span, .submenu, .submenu-caret {
+        transition: none !important;
+    }
+}
+</style>
+
+<script>
+(function () {
+    var sidebar = document.getElementById('sidebar');
+    var toggle = document.getElementById('sidebarToggle');
+    var closeBtn = document.getElementById('sidebarClose');
+    var overlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+
+    if (toggle) toggle.addEventListener('click', function () {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+
+    sidebar.querySelectorAll('.sidebar-menu a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 860) closeSidebar();
+        });
+    });
+
+    var submenuTrigger = sidebar.querySelector('.submenu-trigger');
+    if (submenuTrigger) {
+        submenuTrigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            submenuTrigger.closest('.has-submenu').classList.toggle('open');
+        });
+    }
+    var hasSubmenu = sidebar.querySelector('.has-submenu');
+    if (hasSubmenu && hasSubmenu.querySelector('.active')) {
+        hasSubmenu.classList.add('open');
+    }
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 860) closeSidebar();
+    });
+})();
+</script>

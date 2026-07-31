@@ -1,0 +1,425 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Brands | SmartControl{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <div class="page-header">
+
+        <div>
+            <h1>Brands</h1>
+            <p>Manage all brands available in your store.</p>
+        </div>
+
+        <a href="{% url 'add_brand' %}" class="btn-add">
+            <i class="fas fa-plus"></i>
+            Add Brand
+        </a>
+
+    </div>
+
+    <div class="toolbar">
+
+        <form method="GET">
+
+            <div class="search-box">
+
+                <i class="fas fa-search"></i>
+
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Search brands..."
+                    value="{{ request.GET.q }}"
+                >
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="table-card">
+
+        {% if brands %}
+
+        <table class="brand-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Logo</th>
+
+                <th>Brand</th>
+
+                <th>Slug</th>
+
+                <th>Products</th>
+
+                <th>Featured</th>
+
+                <th>Actions</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for brand in brands %}
+
+            <tr>
+
+                <td>
+
+                    {% if brand.logo %}
+
+                        <img
+                            src="{{ brand.logo.url }}"
+                            class="brand-logo"
+                        >
+
+                    {% else %}
+
+                        <div class="logo-placeholder">
+
+                            <i class="fas fa-tags"></i>
+
+                        </div>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <strong>{{ brand.name }}</strong>
+
+                </td>
+
+                <td>
+
+                    {{ brand.slug }}
+
+                </td>
+
+                <td>
+
+                    {{ brand.product_set.count }}
+
+                </td>
+
+                <td>
+
+                    {% if brand.featured %}
+
+                    <span class="badge success">
+
+                        Featured
+
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge">
+
+                        Normal
+
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <div class="actions">
+
+                        <a
+                            href="{% url 'edit_brand' brand.id %}"
+                            class="edit-btn"
+                        >
+
+                            <i class="fas fa-pen"></i>
+
+                        </a>
+
+                        <a
+                            href="{% url 'delete_brand' brand.id %}"
+                            class="delete-btn"
+                        >
+
+                            <i class="fas fa-trash"></i>
+
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <i class="fas fa-tags"></i>
+
+            <h2>No Brands Found</h2>
+
+            <p>
+
+                Start by adding your first brand.
+
+            </p>
+
+            <a href="{% url 'add_brand' %}" class="btn-add">
+
+                Add Brand
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<style>
+
+.dashboard-page{
+
+padding:30px;
+
+}
+
+.page-header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+
+}
+
+.page-header h1{
+
+font-size:32px;
+margin-bottom:5px;
+
+}
+
+.page-header p{
+
+color:#777;
+
+}
+
+.btn-add{
+
+background:#0d6efd;
+color:#fff;
+padding:12px 20px;
+border-radius:10px;
+text-decoration:none;
+font-weight:600;
+
+}
+
+.toolbar{
+
+margin-bottom:25px;
+
+}
+
+.search-box{
+
+display:flex;
+align-items:center;
+background:#fff;
+border:1px solid #ddd;
+border-radius:12px;
+padding:12px 16px;
+max-width:350px;
+
+}
+
+.search-box input{
+
+border:none;
+outline:none;
+width:100%;
+margin-left:10px;
+
+}
+
+.table-card{
+
+background:#fff;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,.05);
+
+}
+
+.brand-table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+.brand-table th{
+
+background:#0d6efd;
+color:#fff;
+padding:18px;
+
+text-align:left;
+
+}
+
+.brand-table td{
+
+padding:18px;
+border-bottom:1px solid #eee;
+
+}
+
+.brand-logo{
+
+width:70px;
+height:70px;
+object-fit:contain;
+
+}
+
+.logo-placeholder{
+
+width:70px;
+height:70px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#eef4ff;
+color:#0d6efd;
+border-radius:12px;
+font-size:26px;
+
+}
+
+.badge{
+
+padding:7px 14px;
+border-radius:30px;
+background:#eee;
+
+}
+
+.success{
+
+background:#d1fae5;
+color:#047857;
+
+}
+
+.actions{
+
+display:flex;
+gap:10px;
+
+}
+
+.edit-btn,
+.delete-btn{
+
+width:40px;
+height:40px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:10px;
+
+text-decoration:none;
+
+}
+
+.edit-btn{
+
+background:#eef4ff;
+color:#0d6efd;
+
+}
+
+.delete-btn{
+
+background:#ffe5e5;
+color:#dc2626;
+
+}
+
+.empty-state{
+
+padding:80px 20px;
+text-align:center;
+
+}
+
+.empty-state i{
+
+font-size:70px;
+color:#0d6efd;
+
+margin-bottom:20px;
+
+}
+
+.empty-state h2{
+
+margin-bottom:10px;
+
+}
+
+.empty-state p{
+
+color:#777;
+margin-bottom:25px;
+
+}
+
+@media(max-width:900px){
+
+.brand-table{
+
+display:block;
+overflow-x:auto;
+
+}
+
+.page-header{
+
+flex-direction:column;
+align-items:flex-start;
+gap:20px;
+
+}
+
+}
+
+</style>
+
+{% endblock %}

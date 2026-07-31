@@ -1,0 +1,346 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Products{% endblock %}
+
+{% block page_title %}
+Products
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2>Products</h2>
+        <p>Manage all products</p>
+    </div>
+
+    <a href="{% url 'dashboard_add_product' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        Add Product
+    </a>
+
+</div>
+
+<div class="card">
+
+<form
+    method="POST"
+    action="{% url 'dashboard_bulk_products' %}"
+    id="bulkForm">
+
+    {% csrf_token %}
+
+    <div class="table-header">
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+
+            <select
+                id="bulkAction"
+                name="action"
+                class="form-control"
+                style="width:240px;">
+
+                <option value="">Bulk Action</option>
+
+                <option value="new_arrivals_on">Add to New Arrivals</option>
+                <option value="new_arrivals_off">Remove from New Arrivals</option>
+
+                <option value="featured_on">Add to Featured Deals</option>
+                <option value="featured_off">Remove from Featured Deals</option>
+
+                <option value="activate">Activate</option>
+                <option value="deactivate">Deactivate</option>
+
+                <option value="stock">Update Stock</option>
+
+                <option value="delete">Delete</option>
+
+            </select>
+
+            <input
+                type="number"
+                min="0"
+                id="stockField"
+                name="stock"
+                class="form-control"
+                placeholder="New Stock"
+                style="width:140px;display:none;">
+
+            <button class="btn btn-primary">
+                <i class="fas fa-check"></i>
+                Apply
+            </button>
+
+        </div>
+
+        <input
+            type="text"
+            id="searchProduct"
+            class="form-control"
+            placeholder="Search Products..."
+            style="width:300px;">
+
+    </div>
+
+    <table>
+
+        <thead>
+
+        <tr>
+
+            <th width="40">
+                <input type="checkbox" id="checkAll">
+            </th>
+
+            <th>Image</th>
+
+            <th>Product</th>
+
+            <th>Category</th>
+
+            <th>Brand</th>
+
+            <th>Status</th>
+
+            <th>Homepage</th>
+
+            <th>Stock</th>
+
+            <th>Actions</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for product in products %}
+
+        {% with variant=product.default_variant %}
+
+        <tr>
+
+            <td>
+
+                <input
+                    type="checkbox"
+                    name="products"
+                    value="{{ product.id }}">
+
+            </td>
+
+            <td>
+
+                {% if product.image %}
+                    <img
+                        src="{{ product.image.url }}"
+                        width="65"
+                        height="65"
+                        style="object-fit:cover;border-radius:10px;">
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                <strong>{{ product.name }}</strong>
+
+                <br>
+
+                <small>{{ product.slug }}</small>
+
+            </td>
+
+            <td>{{ product.category }}</td>
+
+            <td>{{ product.brand }}</td>
+
+            <td>
+
+                {% if variant and variant.active %}
+                    <span class="badge-success">Active</span>
+                {% else %}
+                    <span class="badge-danger">Inactive</span>
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if product.new_arrival %}
+                    <span class="badge-success">
+                        New Arrival
+                    </span>
+                    <br>
+                {% endif %}
+
+                {% if product.featured %}
+                    <span class="badge-primary">
+                        Featured
+                    </span>
+                {% endif %}
+
+                {% if not product.new_arrival and not product.featured %}
+                    <span class="badge-secondary">
+                        None
+                    </span>
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if variant %}
+                    {{ variant.stock }}
+                {% else %}
+                    —
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                <div class="action-buttons">
+
+                    <a
+                        href="{% url 'dashboard_product_variants' product.id %}"
+                        class="btn btn-sm btn-info">
+
+                        <i class="fas fa-layer-group"></i>
+
+                        Variants
+
+                    </a>
+
+                    <a
+                        href="{% url 'dashboard_edit_product' product.id %}"
+                        class="action-btn edit">
+
+                        <i class="fas fa-edit"></i>
+
+                    </a>
+
+                    <a
+                        href="{% url 'dashboard_delete_product' product.id %}"
+                        class="action-btn delete">
+
+                        <i class="fas fa-trash"></i>
+
+                    </a>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+        {% endwith %}
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</form>
+
+</div>
+
+<script>
+
+const checkAll = document.getElementById("checkAll");
+
+checkAll.addEventListener("change", function () {
+
+    document
+        .querySelectorAll("input[name='products']")
+        .forEach(cb => cb.checked = this.checked);
+
+});
+
+const search = document.getElementById("searchProduct");
+
+search.addEventListener("keyup", function () {
+
+    const value = this.value.toLowerCase();
+
+    document.querySelectorAll("tbody tr").forEach(function (row) {
+
+        row.style.display =
+            row.innerText.toLowerCase().includes(value)
+            ? ""
+            : "none";
+
+    });
+
+});
+
+const bulkAction = document.getElementById("bulkAction");
+
+const stockField = document.getElementById("stockField");
+
+bulkAction.addEventListener("change", function () {
+
+    if (this.value === "stock") {
+
+        stockField.style.display = "block";
+
+    } else {
+
+        stockField.style.display = "none";
+
+        stockField.value = "";
+
+    }
+
+});
+
+document
+.getElementById("bulkForm")
+.addEventListener("submit", function (e) {
+
+    const selected =
+        document.querySelectorAll(
+            "input[name='products']:checked"
+        );
+
+    if (selected.length === 0) {
+
+        alert("Select at least one product.");
+
+        e.preventDefault();
+
+        return;
+
+    }
+
+    if (bulkAction.value === "") {
+
+        alert("Choose a bulk action.");
+
+        e.preventDefault();
+
+        return;
+
+    }
+
+    if (
+        bulkAction.value === "stock"
+        &&
+        stockField.value === ""
+    ) {
+
+        alert("Enter the new stock quantity.");
+
+        e.preventDefault();
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

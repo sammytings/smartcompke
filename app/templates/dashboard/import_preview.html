@@ -1,0 +1,614 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Import Preview{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="page-header mb-4">
+        <h2>
+            <i class="fas fa-eye text-primary"></i>
+            Product Import Preview
+        </h2>
+        <p class="text-muted">
+            Review the imported information before saving it to your store.
+        </p>
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            name="save_product"
+            class="btn btn-success float-end">
+
+            <i class="fas fa-save"></i>
+
+            Save Product
+
+        </button>
+
+        <a
+            href="{% url 'import_product' %}"
+            class="btn btn-secondary float-end me-2">
+
+            Cancel
+
+        </a>
+
+        <div class="row mt-5">
+
+            <!-- LEFT COLUMN -->
+
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body text-center">
+
+                        {% if product.images %}
+
+                            <img
+                                src="{{ product.images.0 }}"
+                                class="img-fluid rounded"
+                                style="max-height:300px; object-fit:contain;">
+
+                        {% else %}
+
+                            <img
+                                src="{% static 'images/no-image.png' %}"
+                                class="img-fluid">
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+
+            <div class="col-lg-8">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+
+                            <label>Product Name</label>
+
+                           <input
+    type="text"
+    class="form-control"
+    name="name"
+    value="{{ product.name }}">
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+
+                                <label>Brand</label>
+
+                                <select
+    class="form-select"
+    name="brand">
+
+    {% for brand in brands %}
+
+        <option
+            value="{{ brand.id }}"
+            {% if brand.name == product.brand %}selected{% endif %}>
+
+            {{ brand.name }}
+
+        </option>
+
+    {% endfor %}
+
+</select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label>Category</label>
+
+                                <select
+    class="form-select"
+    name="category">
+
+    <option value="">Choose Category</option>
+
+    {% for category in categories %}
+
+        <option
+            value="{{ category.id }}">
+
+            {{ category.name }}
+
+        </option>
+
+    {% endfor %}
+
+</select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-3">
+
+                            <div class="col-md-6">
+
+                                <label>Model</label>
+
+                                <input
+                                    class="form-control"
+                                    value="{{ product.model }}"
+                                    readonly>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label>Price</label>
+
+                                <input
+    type="number"
+    step="0.01"
+    class="form-control"
+    name="price"
+    value="{{ product.price }}">
+
+                            </div>
+                            <div class="row mt-3">
+
+    <div class="col-md-6">
+
+        <label>Stock</label>
+
+        <input
+            type="number"
+            class="form-control"
+            name="stock"
+            value="10">
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label>SKU</label>
+
+        <input
+            type="text"
+            class="form-control"
+            name="sku"
+            value="{{ product.sku }}">
+
+    </div>
+
+</div>
+
+                        </div>
+
+                        <div class="mt-3">
+
+                            <label>Description</label>
+<textarea
+    class="form-control"
+    rows="6"
+    name="description">{{ product.description }}</textarea>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Specifications -->
+
+        <div class="card shadow-sm mt-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    Specifications
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if product.specifications %}
+
+                    <table class="table table-striped">
+
+                        <tbody>
+
+                        {% for key,value in product.specifications.items %}
+
+                            <tr>
+
+                                <th width="35%">
+
+                                    {{ key }}
+
+                                </th>
+
+                                <td>
+
+                                    {{ value }}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                {% else %}
+
+                    <p class="text-muted">
+
+                        No specifications detected.
+
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+<style>/*==============================================================
+    IMPORT PREVIEW
+    Premium SmartComputers Dashboard Theme
+    Blue • Red • White
+==============================================================*/
+
+.container-fluid{
+    padding:30px;
+    animation:fadeIn .35s ease;
+}
+
+/*==============================================================*/
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:30px 35px;
+    border-radius:20px;
+    background:linear-gradient(135deg,#0f172a,#1d4ed8,#dc2626);
+    color:#fff;
+    margin-bottom:35px;
+    box-shadow:0 18px 45px rgba(15,23,42,.18);
+}
+
+.page-header h2{
+    margin:0;
+    font-size:32px;
+    font-weight:800;
+    letter-spacing:.3px;
+}
+
+.page-header p{
+    margin-top:8px;
+    opacity:.88;
+    font-size:15px;
+}
+
+.page-header i{
+    margin-right:12px;
+}
+
+/*==============================================================*/
+
+.card{
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 12px 35px rgba(15,23,42,.08);
+    transition:.35s;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 20px 45px rgba(15,23,42,.12);
+}
+
+.card-header{
+    border:none;
+    background:#f8fbff;
+    padding:18px 25px;
+    border-bottom:1px solid #edf2f7;
+}
+
+.card-header h5{
+    margin:0;
+    font-weight:700;
+    color:#1e293b;
+}
+
+.card-body{
+    padding:28px;
+}
+
+/*==============================================================*/
+/* PRODUCT IMAGE */
+/*==============================================================*/
+
+.card img{
+    border-radius:16px;
+    object-fit:contain;
+    width:100%;
+    background:#fff;
+    padding:15px;
+    border:1px solid #edf2f7;
+    transition:.35s;
+}
+
+.card img:hover{
+    transform:scale(1.03);
+}
+
+/*==============================================================*/
+/* BUTTONS */
+/*==============================================================*/
+
+.btn{
+    border-radius:12px;
+    padding:12px 22px;
+    font-weight:700;
+    transition:.3s;
+    border:none;
+    letter-spacing:.3px;
+}
+
+.btn-success{
+    background:linear-gradient(135deg,#16a34a,#15803d);
+    color:#fff;
+}
+
+.btn-success:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 30px rgba(22,163,74,.28);
+}
+
+.btn-secondary{
+    background:#64748b;
+    color:#fff;
+}
+
+.btn-secondary:hover{
+    background:#475569;
+    color:#fff;
+    transform:translateY(-3px);
+}
+
+/*==============================================================*/
+/* LABELS */
+/*==============================================================*/
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#334155;
+    font-weight:700;
+    font-size:14px;
+}
+
+/*==============================================================*/
+/* INPUTS */
+/*==============================================================*/
+
+.form-control,
+.form-select{
+    min-height:50px;
+    border-radius:12px;
+    border:1px solid #dbe4ee;
+    box-shadow:none;
+    transition:.3s;
+    font-size:15px;
+    background:#fff;
+}
+
+textarea.form-control{
+    min-height:170px;
+    resize:vertical;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+/*==============================================================*/
+/* SPECIFICATIONS TABLE */
+/*==============================================================*/
+
+.table{
+    margin:0;
+}
+
+.table tbody tr{
+    transition:.25s;
+}
+
+.table tbody tr:hover{
+    background:#f8fbff;
+}
+
+.table th{
+    background:#f9fafb;
+    color:#1e293b;
+    font-weight:700;
+    padding:16px;
+    border-color:#eef2f7;
+}
+
+.table td{
+    padding:16px;
+    color:#475569;
+    border-color:#eef2f7;
+}
+
+/*==============================================================*/
+/* SECTION SPACING */
+/*==============================================================*/
+
+.row>.col-lg-4,
+.row>.col-lg-8{
+    margin-bottom:25px;
+}
+
+.mt-3{
+    margin-top:24px!important;
+}
+
+.mt-4{
+    margin-top:32px!important;
+}
+
+.mt-5{
+    margin-top:40px!important;
+}
+
+/*==============================================================*/
+/* FLOAT BUTTON BAR */
+/*==============================================================*/
+
+.float-end{
+    margin-left:12px;
+}
+
+/*==============================================================*/
+/* READONLY FIELD */
+/*==============================================================*/
+
+input[readonly]{
+    background:#f8fafc;
+    color:#64748b;
+    font-weight:600;
+}
+
+/*==============================================================*/
+/* EMPTY STATE */
+/*==============================================================*/
+
+.text-muted{
+    color:#64748b!important;
+}
+
+/*==============================================================*/
+/* NICE SCROLLBAR */
+/*==============================================================*/
+
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-track{
+    background:#edf2f7;
+}
+
+::-webkit-scrollbar-thumb{
+    background:linear-gradient(#2563eb,#dc2626);
+    border-radius:30px;
+}
+
+/*==============================================================*/
+/* ANIMATION */
+/*==============================================================*/
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(18px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/*==============================================================*/
+/* RESPONSIVE */
+/*==============================================================*/
+
+@media(max-width:992px){
+
+.page-header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.page-header h2{
+    font-size:26px;
+}
+
+.float-end{
+    float:none!important;
+    width:100%;
+    margin:8px 0;
+}
+
+.btn{
+    width:100%;
+}
+
+.card-body{
+    padding:22px;
+}
+
+}
+
+@media(max-width:768px){
+
+.container-fluid{
+    padding:15px;
+}
+
+.page-header{
+    padding:24px;
+}
+
+.page-header h2{
+    font-size:22px;
+}
+
+.card{
+    border-radius:16px;
+}
+
+.card img{
+    max-height:260px!important;
+}
+
+}</style>
+{% endblock %}

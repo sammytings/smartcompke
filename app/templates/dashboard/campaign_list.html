@@ -1,0 +1,195 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>Deal Campaigns</h2>
+
+    <a href="{% url 'dashboard_add_deal' %}"
+       class="btn btn-primary">
+
+        <i class="fas fa-plus"></i>
+
+        New Campaign
+
+    </a>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="card">
+
+        <h3>{{ active_count }}</h3>
+
+        <p>Active</p>
+
+    </div>
+
+    <div class="card">
+
+        <h3>{{ scheduled_count }}</h3>
+
+        <p>Scheduled</p>
+
+    </div>
+
+    <div class="card">
+
+        <h3>{{ ended_count }}</h3>
+
+        <p>Ended</p>
+
+    </div>
+
+</div>
+
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>Banner</th>
+
+<th>Campaign</th>
+
+<th>Products</th>
+
+<th>Status</th>
+
+<th>Starts</th>
+
+<th>Ends</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for campaign in campaigns %}
+
+<tr>
+
+<td>
+
+{% if campaign.banner %}
+
+<img src="{{ campaign.banner.url }}"
+     width="100">
+
+{% endif %}
+
+</td>
+
+<td>
+
+<strong>{{ campaign.name }}</strong>
+
+<br>
+
+{{ campaign.description|truncatechars:50 }}
+
+</td>
+
+<td>
+
+{{ campaign.total_products }}
+
+</td>
+
+<td>
+
+{% if campaign.is_running %}
+
+<span class="badge bg-success">
+
+ACTIVE
+
+</span>
+
+{% elif campaign.start_date > now %}
+
+<span class="badge bg-warning">
+
+SCHEDULED
+
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+
+ENDED
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+{{ campaign.start_date|date:"d M Y" }}
+
+</td>
+
+<td>
+
+{{ campaign.end_date|date:"d M Y" }}
+
+</td>
+
+<td>
+
+<a class="btn btn-sm btn-info"
+href="{% url 'dashboard_campaign_products' campaign.id %}">
+
+Products
+
+</a>
+
+<a class="btn btn-sm btn-primary"
+href="{% url 'dashboard_edit_deal' campaign.id %}">
+
+Edit
+
+</a>
+
+<a class="btn btn-sm btn-danger"
+href="{% url 'dashboard_end_deal' campaign.id %}">
+
+End
+
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="7">
+
+No campaigns found.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

@@ -1,0 +1,848 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+CHECKOUT PAGE
+Assumes base.html exposes these blocks: title, extra_css, content, extra_js.
+Rename below if your base.html uses different block names.
+
+Notes for the dev picking this up:
+- County -> Sub-county is driven by the COUNTY_DATA map at the bottom of extra_js.
+  Swap in your own list/API if you already store this elsewhere.
+- Cash on delivery is restricted to Nairobi County only (see toggleCod()).
+- Phone numbers must start with 07 or 01 and be exactly 10 digits.
+- "Place order" stays disabled until both the Terms and the extra-charges
+  acknowledgement are checked.
+{% endcomment %}
+
+{% block title %}Secure Checkout{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  .co-scope{
+    --co-ink:#152420;
+    --co-ink-soft:#5C6B65;
+    --co-line:#E3E8E5;
+    --co-bg:#F6F8F7;
+    --co-card:#FFFFFF;
+    --co-brand:#0E3B2E;
+    --co-brand-dark:#0A2C22;
+    --co-brand-soft:#E7F0EB;
+    --co-gold:#B9924C;
+    --co-gold-soft:#F7EFDD;
+    --co-good:#1E8E5A;
+    --co-good-soft:#E7F6EE;
+    --co-bad:#C2453A;
+    --co-bad-soft:#FBEAE8;
+    --co-radius:12px;
+    --co-radius-sm:8px;
+    --co-shadow:0 1px 2px rgba(15,30,25,.04), 0 8px 24px -12px rgba(15,30,25,.12);
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--co-ink);
+    background:var(--co-bg);
+  }
+  .co-scope h1,.co-scope h2,.co-scope h4{ font-family:'Sora',sans-serif; letter-spacing:-.01em; }
+  .co-scope *{ box-sizing:border-box; }
+  .co-scope a{ color:var(--co-brand); }
+  .co-scope svg{ display:block; }
+
+  /* ---------- Topbar ---------- */
+  .co-topbar{ background:var(--co-brand); }
+  .co-topbar-inner{
+    max-width:1180px; margin:0 auto; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .co-brand{ display:flex; align-items:center; gap:10px; color:#fff; font-weight:700; font-size:16px; }
+  .co-brand-mark{
+    width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,.14);
+    display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif;
+    font-size:13px; font-weight:700; color:#fff;
+  }
+  .co-secure-tag{
+    display:flex; align-items:center; gap:6px; color:#DCE9E2; font-size:13px; font-weight:500;
+  }
+
+  /* ---------- Steps ---------- */
+  .co-steps{
+    max-width:1180px; margin:0 auto; padding:18px 24px 0;
+    display:flex; gap:28px;
+  }
+  .co-step{
+    display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:var(--co-ink-soft);
+    padding-bottom:14px; border-bottom:2px solid transparent;
+  }
+  .co-step-dot{
+    width:22px; height:22px; border-radius:50%; background:var(--co-line); color:#fff;
+    font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700;
+  }
+  .co-step.is-active{ color:var(--co-brand); border-color:var(--co-brand); }
+  .co-step.is-active .co-step-dot{ background:var(--co-brand); }
+
+  /* ---------- Layout ---------- */
+  .co-layout{
+    max-width:1180px; margin:0 auto; padding:24px; display:grid;
+    grid-template-columns:1fr 380px; gap:24px; align-items:start;
+  }
+  @media (max-width:900px){ .co-layout{ grid-template-columns:1fr; } }
+
+  .co-card{
+    background:var(--co-card); border:1px solid var(--co-line); border-radius:var(--co-radius);
+    box-shadow:var(--co-shadow); padding:22px 24px; margin-bottom:20px;
+  }
+  .co-card h2{
+    font-size:16px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;
+  }
+  .co-num{
+    width:24px; height:24px; border-radius:50%; background:var(--co-brand-soft); color:var(--co-brand);
+    font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Manrope',sans-serif;
+  }
+
+  .co-grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:520px){ .co-grid-2{ grid-template-columns:1fr; } }
+
+  .co-field{ margin-bottom:2px; }
+  .co-label{ display:block; font-size:13px; font-weight:600; color:var(--co-ink); margin-bottom:6px; }
+  .co-hint{ font-size:12px; color:var(--co-ink-soft); margin-top:5px; }
+  .co-input,.co-select,.co-textarea{
+    width:100%; border:1px solid var(--co-line); border-radius:var(--co-radius-sm);
+    padding:10px 12px; font-size:14px; font-family:inherit; color:var(--co-ink);
+    background:#fff; transition:border-color .15s, box-shadow .15s;
+  }
+  .co-input:focus,.co-select:focus,.co-textarea:focus{
+    outline:none; border-color:var(--co-brand); box-shadow:0 0 0 3px var(--co-brand-soft);
+  }
+  .co-input:disabled,.co-select:disabled{ background:#F3F4F4; color:var(--co-ink-soft); cursor:not-allowed; }
+  .co-textarea{ resize:vertical; }
+  .co-error{ display:none; font-size:12px; color:var(--co-bad); margin-top:5px; }
+  .co-field.has-error .co-input,
+  .co-field.has-error .co-select,
+  .co-field.has-error .co-textarea{ border-color:var(--co-bad); box-shadow:0 0 0 3px var(--co-bad-soft); }
+  .co-field.has-error .co-error{ display:block; }
+
+  /* ---------- Option cards (address / delivery / payment) ---------- */
+  .co-option{
+    display:flex; align-items:center; gap:12px; border:1px solid var(--co-line);
+    border-radius:var(--co-radius-sm); padding:13px 14px; margin-bottom:10px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .co-option:last-child{ margin-bottom:0; }
+  .co-option:hover{ border-color:#C7D2CC; }
+  .co-option.is-selected{ border-color:var(--co-brand); background:var(--co-brand-soft); }
+  .co-option input[type=radio]{ accent-color:var(--co-brand); width:17px; height:17px; flex:none; }
+  .co-option-title{ font-size:14px; font-weight:600; color:var(--co-ink); }
+  .co-option-sub{ font-size:12.5px; color:var(--co-ink-soft); margin-top:2px; }
+  .co-option-price{ margin-left:auto; font-size:13.5px; font-weight:700; color:var(--co-ink); }
+  .co-option-icon{
+    width:34px; height:34px; border-radius:8px; background:#fff; border:1px solid var(--co-line);
+    display:flex; align-items:center; justify-content:center; flex:none; color:var(--co-brand);
+  }
+  .co-option.is-disabled{ opacity:.5; cursor:not-allowed; background:#fff; }
+  .co-option.is-disabled:hover{ border-color:var(--co-line); }
+  .co-option-note{
+    display:flex; align-items:center; gap:6px; font-size:12px; color:var(--co-gold);
+    background:var(--co-gold-soft); border-radius:6px; padding:6px 9px; margin-top:8px;
+  }
+
+  .co-card-fields{ max-height:0; overflow:hidden; transition:max-height .2s ease; }
+  .co-card-fields.co-open{ max-height:260px; margin:2px 0 10px; }
+  .co-card-fields .co-field{ margin-bottom:12px; }
+
+  /* ---------- Summary ---------- */
+  .co-right{ position:sticky; top:20px; }
+  .co-summary h2{ font-size:16px; font-weight:700; margin:0 0 14px; }
+  .co-summary-items{ max-height:260px; overflow-y:auto; margin-bottom:14px; }
+  .co-item{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--co-line); }
+  .co-item:last-child{ border-bottom:none; }
+  .co-item img{ width:44px; height:44px; border-radius:8px; object-fit:cover; border:1px solid var(--co-line); flex:none; }
+  .co-item-name{ font-size:13.5px; font-weight:600; }
+  .co-item-meta{ font-size:12px; color:var(--co-ink-soft); margin-top:2px; }
+  .co-item-price{ margin-left:auto; font-size:13.5px; font-weight:600; }
+
+  .co-promo{ display:flex; gap:8px; margin-bottom:6px; }
+  .co-btn-apply{
+    flex:none; border:1px solid var(--co-brand); background:#fff; color:var(--co-brand);
+    border-radius:var(--co-radius-sm); padding:0 16px; font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .co-btn-apply:hover{ background:var(--co-brand-soft); }
+  .co-promo-msg{ font-size:12px; min-height:16px; margin-bottom:10px; }
+  .co-promo-msg.co-ok{ color:var(--co-good); }
+  .co-promo-msg.co-bad{ color:var(--co-bad); }
+
+  .co-vat-choice{ margin:14px 0 10px; padding-top:12px; border-top:1px solid var(--co-line); }
+  .co-vat-choice h4{ font-size:12.5px; font-weight:700; color:var(--co-ink-soft); text-transform:uppercase; letter-spacing:.04em; margin:0 0 8px; }
+  .co-radio-line{ display:flex; align-items:center; gap:8px; font-size:13.5px; padding:4px 0; cursor:pointer; }
+  .co-radio-line input{ accent-color:var(--co-brand); width:16px; height:16px; }
+
+  .co-totals-row{ display:flex; justify-content:space-between; font-size:13.5px; padding:6px 0; color:var(--co-ink-soft); }
+  .co-totals-row span:last-child{ color:var(--co-ink); font-weight:600; }
+  .co-grand{ border-top:1px solid var(--co-line); margin-top:6px; padding-top:12px; font-size:15px; }
+  .co-grand span{ color:var(--co-ink) !important; font-weight:800 !important; }
+
+  .co-terms{ display:flex; gap:10px; align-items:flex-start; font-size:12.5px; color:var(--co-ink-soft); margin:16px 0 8px; cursor:pointer; }
+  .co-terms input{ margin-top:2px; accent-color:var(--co-brand); width:16px; height:16px; flex:none; }
+  .co-terms.co-attn{ color:var(--co-bad); }
+
+  .co-place-btn{
+    width:100%; background:var(--co-brand); color:#fff; border:none; border-radius:var(--co-radius-sm);
+    padding:13px; font-size:14.5px; font-weight:700; font-family:inherit; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px;
+    transition:background .15s, opacity .15s;
+  }
+  .co-place-btn:hover:not(:disabled){ background:var(--co-brand-dark); }
+  .co-place-btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .co-spinner{
+    display:none; width:15px; height:15px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.4); border-top-color:#fff; animation:co-spin .7s linear infinite;
+  }
+  @keyframes co-spin{ to{ transform:rotate(360deg); } }
+
+  .co-trust-row{
+    display:flex; justify-content:space-between; margin-top:16px; padding-top:14px;
+    border-top:1px solid var(--co-line); gap:6px;
+  }
+  .co-trust-row span{
+    display:flex; align-items:center; gap:5px; font-size:11px; color:var(--co-ink-soft); font-weight:600;
+  }
+  .co-trust-row svg{ color:var(--co-brand); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="co-scope">
+
+  <div class="co-topbar">
+    <div class="co-topbar-inner">
+      <div class="co-brand">
+        <span class="co-brand-mark">{{ site_initials|default:"YS" }}</span>
+        {{ site_name|default:"Your Store" }}
+      </div>
+      <div class="co-secure-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Secure checkout
+      </div>
+    </div>
+  </div>
+
+  <div class="co-steps">
+    <div class="co-step is-active"><span class="co-step-dot">1</span> Delivery</div>
+    <div class="co-step"><span class="co-step-dot">2</span> Payment</div>
+    <div class="co-step"><span class="co-step-dot">3</span> Review &amp; place order</div>
+  </div>
+
+  <form method="post" action="{% url 'checkout' %}" id="co-form" novalidate>
+    {% csrf_token %}
+    <div class="co-layout">
+
+      {# -------------------- LEFT COLUMN -------------------- #}
+      <div class="co-left">
+
+        {# Contact info #}
+        <div class="co-card">
+          <h2><span class="co-num">1</span> Contact information</h2>
+          <div class="co-grid-2">
+            <div class="co-field">
+              <label class="co-label" for="id_email">Email address</label>
+              <input class="co-input" type="email" id="id_email" name="email"
+                     placeholder="you@example.com"
+                     value="{{ request.user.email|default:'' }}" required>
+              <div class="co-error">Enter a valid email address.</div>
+            </div>
+            <div class="co-field">
+              <label class="co-label" for="id_phone">Phone number</label>
+              <input class="co-input" type="tel" id="id_phone" name="phone"
+                     placeholder="07XXXXXXXX or 01XXXXXXXX"
+                     inputmode="numeric" maxlength="10" required>
+              <div class="co-error" id="co-phone-error">Enter a valid 10-digit number starting with 07 or 01.</div>
+            </div>
+          </div>
+        </div>
+
+        {# Delivery address #}
+        <div class="co-card">
+          <h2><span class="co-num">2</span> Delivery address</h2>
+
+          {% if saved_addresses %}
+            {% for addr in saved_addresses %}
+            <label class="co-option {% if forloop.first %}is-selected{% endif %}">
+              <input type="radio" name="address" value="{{ addr.id }}" {% if forloop.first %}checked{% endif %}>
+              <div>
+                <div class="co-option-title">{{ addr.full_name }}</div>
+                <div class="co-option-sub">{{ addr.line1 }}, {{ addr.city }} &middot; {{ addr.phone }}</div>
+              </div>
+            </label>
+            {% endfor %}
+            <label class="co-option">
+              <input type="radio" name="address" value="new">
+              <div class="co-option-title">+ Deliver to a new address</div>
+            </label>
+          {% endif %}
+
+          <div id="co-new-address" class="co-grid-2" style="margin-top:12px;">
+            <div class="co-field">
+              <label class="co-label" for="id_full_name">Full name</label>
+              <input class="co-input" type="text" id="id_full_name" name="full_name" required>
+              <div class="co-error">Full name is required.</div>
+            </div>
+            <div class="co-field">
+              <label class="co-label" for="id_county">County</label>
+              <select class="co-select" id="id_county" name="county" required>
+                <option value="">Select county</option>
+              </select>
+              <div class="co-error">Select your county.</div>
+            </div>
+            <div class="co-field">
+              <label class="co-label" for="id_subcounty">Sub-county</label>
+              <select class="co-select" id="id_subcounty" name="subcounty" required disabled>
+                <option value="">Select county first</option>
+              </select>
+              <div class="co-error">Select your sub-county.</div>
+            </div>
+            <div class="co-field">
+              <label class="co-label" for="id_city">Town / Area</label>
+              <input class="co-input" type="text" id="id_city" name="city" required>
+              <div class="co-error">Town / area is required.</div>
+            </div>
+            <div class="co-field" style="grid-column:1 / -1;">
+              <label class="co-label" for="id_address1">Street address</label>
+              <input class="co-input" type="text" id="id_address1" name="address1"
+                     placeholder="House no., street, estate" required>
+              <div class="co-error">Street address is required.</div>
+            </div>
+            <div class="co-field">
+              <label class="co-label" for="id_postcode">Postal code (optional)</label>
+              <input class="co-input" type="text" id="id_postcode" name="postcode">
+            </div>
+            <div class="co-field" style="grid-column:1 / -1;">
+              <label class="co-label" for="id_notes">Delivery notes (optional)</label>
+              <textarea class="co-textarea" id="id_notes" name="notes" rows="2"
+                        placeholder="Landmark, gate code, best time to deliver&hellip;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        {# Delivery method #}
+        <div class="co-card">
+          <h2><span class="co-num">3</span> Delivery method</h2>
+          <label class="co-option is-selected">
+            <input type="radio" name="delivery_method" value="standard" checked data-price="200">
+            <span class="co-option-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="14" height="12" rx="1"/><path d="M15 10h4l3 3v5h-7z"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/></svg>
+            </span>
+            <div>
+              <div class="co-option-title">Standard delivery</div>
+              <div class="co-option-sub">3–5 business days</div>
+            </div>
+            <div class="co-option-price">KSh 200</div>
+          </label>
+          <label class="co-option">
+            <input type="radio" name="delivery_method" value="express" data-price="600">
+            <span class="co-option-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg>
+            </span>
+            <div>
+              <div class="co-option-title">Express delivery</div>
+              <div class="co-option-sub">1–2 business days</div>
+            </div>
+            <div class="co-option-price">KSh 600</div>
+          </label>
+          <label class="co-option" id="co-pickup-option">
+            <input type="radio" name="delivery_method" value="pickup" data-price="0">
+            <span class="co-option-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </span>
+            <div>
+              <div class="co-option-title">Pickup station</div>
+              <div class="co-option-sub">Ready for collection in 2 days</div>
+            </div>
+            <div class="co-option-price">Free</div>
+          </label>
+          <div class="co-option-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Delivery charges may vary with your exact location and parcel weight. Any difference is confirmed before dispatch.
+          </div>
+        </div>
+
+        {# Payment #}
+        <div class="co-card">
+          <h2><span class="co-num">4</span> Payment method</h2>
+
+          <label class="co-option co-pay-option is-selected">
+            <input type="radio" name="payment_method" value="mpesa" checked>
+            <span class="co-option-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg>
+            </span>
+            <div>
+              <div class="co-option-title">M-Pesa</div>
+              <div class="co-option-sub">Pay via STK push to your phone</div>
+            </div>
+          </label>
+
+          <label class="co-option co-pay-option">
+            <input type="radio" name="payment_method" value="card">
+            <span class="co-option-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+            </span>
+            <div>
+              <div class="co-option-title">Debit / Credit card</div>
+              <div class="co-option-sub">Visa, Mastercard</div>
+            </div>
+          </label>
+
+          <div id="co-card-fields" class="co-card-fields">
+            <div class="co-field">
+              <label class="co-label" for="id_card_number">Card number</label>
+              <input class="co-input" type="text" id="id_card_number" name="card_number"
+                     placeholder="1234 5678 9012 3456" inputmode="numeric" maxlength="19">
+              <div class="co-error">Enter a valid card number.</div>
+            </div>
+            <div class="co-grid-2">
+              <div class="co-field">
+                <label class="co-label" for="id_card_expiry">Expiry (MM/YY)</label>
+                <input class="co-input" type="text" id="id_card_expiry" name="card_expiry" placeholder="MM/YY">
+                <div class="co-error">Enter a valid expiry date.</div>
+              </div>
+              <div class="co-field">
+                <label class="co-label" for="id_card_cvc">CVC</label>
+                <input class="co-input" type="text" id="id_card_cvc" name="card_cvc" placeholder="123" maxlength="4">
+                <div class="co-error">Enter a valid CVC.</div>
+              </div>
+            </div>
+          </div>
+
+          <label class="co-option co-pay-option" id="co-cod-option">
+            <input type="radio" name="payment_method" value="cod">
+            <span class="co-option-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <div>
+              <div class="co-option-title">Cash on delivery</div>
+              <div class="co-option-sub" id="co-cod-sub">Pay when your order arrives</div>
+            </div>
+          </label>
+          <div class="co-option-note" id="co-cod-note" style="display:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Cash on delivery is only available for addresses within Nairobi County.
+          </div>
+        </div>
+
+      </div>
+
+      {# -------------------- RIGHT COLUMN: ORDER SUMMARY -------------------- #}
+      <div class="co-right">
+        <div class="co-card co-summary">
+          <h2>Order summary</h2>
+
+          <div class="co-summary-items">
+            {% for item in cart_items %}
+            <div class="co-item">
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+              <div>
+                <div class="co-item-name">{{ item.product.name }}</div>
+                <div class="co-item-meta">Qty {{ item.quantity }}</div>
+              </div>
+              <div class="co-item-price">KSh {{ item.total_price }}</div>
+            </div>
+            {% empty %}
+            <div class="co-item"><div class="co-item-name">Your cart is empty.</div></div>
+            {% endfor %}
+          </div>
+
+          <div class="co-promo">
+            <input class="co-input" type="text" id="id_promo" name="promo_code" placeholder="Promo code">
+            <button type="button" class="co-btn-apply" id="co-apply-promo">Apply</button>
+          </div>
+          <div class="co-promo-msg" id="co-promo-msg"></div>
+
+          <div class="co-vat-choice">
+            <h4>VAT preference</h4>
+            <label class="co-radio-line">
+              <input type="radio" name="vat_option" value="exclusive" checked>
+              Exclude VAT (calculate later)
+            </label>
+            <label class="co-radio-line">
+              <input type="radio" name="vat_option" value="inclusive">
+              Include VAT now (+16%)
+            </label>
+          </div>
+
+          <div class="co-totals-row">
+            <span>Subtotal</span>
+            <span id="co-subtotal" data-value="{{ cart_subtotal|default:'0' }}">KSh {{ cart_subtotal|floatformat:2 }}</span>
+          </div>
+          <div class="co-totals-row">
+            <span>Delivery</span>
+            <span id="co-delivery-fee">KSh 200</span>
+          </div>
+          <div class="co-totals-row">
+            <span>VAT (16%)</span>
+            <span id="co-vat">KSh 0</span>
+          </div>
+          <div class="co-totals-row">
+            <span>Discount</span>
+            <span id="co-discount">- KSh 0</span>
+          </div>
+          <div class="co-totals-row co-grand">
+            <span>Total</span>
+            <span id="co-total" data-value="{{ cart_total|default:'0' }}">KSh {{ cart_total|floatformat:2 }}</span>
+          </div>
+
+          <label class="co-terms">
+            <input type="checkbox" id="id_terms" name="agree_terms" required>
+            <span>I agree to the <a href="{% url 'terms' %}" target="_blank">Terms &amp; Conditions</a>
+            and <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a>.</span>
+          </label>
+
+          <label class="co-terms">
+            <input type="checkbox" id="id_extra_charges" name="agree_extra_charges" required>
+            <span>I understand that extra charges may apply depending on my delivery location and the weight of my order.</span>
+          </label>
+
+          <button type="submit" class="co-place-btn" id="co-place-btn" disabled>
+            <span class="co-spinner" id="co-spinner"></span>
+            <span id="co-place-label">Place order</span>
+          </button>
+
+          <div class="co-trust-row">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Secure payment</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Easy returns</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="14" height="12" rx="1"/><path d="M15 10h4l3 3v5h-7z"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/></svg>Reliable delivery</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    //-----------------------------------------------------
+    // County -> Sub-county data
+    // Sub-counties are modelled on Kenya's constituencies.
+    // Replace / extend this map if your backend already
+    // provides an authoritative list.
+    //-----------------------------------------------------
+    const COUNTY_DATA = {
+        "Mombasa": ["Changamwe","Jomvu","Kisauni","Nyali","Likoni","Mvita"],
+        "Kwale": ["Msambweni","Lunga Lunga","Matuga","Kinango"],
+        "Kilifi": ["Kilifi North","Kilifi South","Kaloleni","Rabai","Ganze","Malindi","Magarini"],
+        "Tana River": ["Garsen","Galole","Bura"],
+        "Lamu": ["Lamu East","Lamu West"],
+        "Taita Taveta": ["Taveta","Wundanyi","Mwatate","Voi"],
+        "Garissa": ["Garissa Township","Balambala","Lagdera","Dadaab","Fafi","Ijara"],
+        "Wajir": ["Wajir North","Wajir East","Tarbaj","Wajir West","Eldas","Wajir South"],
+        "Mandera": ["Mandera West","Banisa","Mandera North","Mandera South","Mandera East","Lafey"],
+        "Marsabit": ["Moyale","North Horr","Saku","Laisamis"],
+        "Isiolo": ["Isiolo North","Isiolo South"],
+        "Meru": ["Igembe South","Igembe Central","Igembe North","Tigania West","Tigania East","North Imenti","Buuri","Central Imenti","South Imenti"],
+        "Tharaka-Nithi": ["Maara","Chuka/Igambang'ombe","Tharaka"],
+        "Embu": ["Manyatta","Runyenjes","Mbeere South","Mbeere North"],
+        "Kitui": ["Mwingi North","Mwingi West","Mwingi Central","Kitui West","Kitui Rural","Kitui Central","Kitui East","Kitui South"],
+        "Machakos": ["Masinga","Yatta","Kangundo","Matungulu","Kathiani","Mavoko","Machakos Town","Mwala"],
+        "Makueni": ["Mbooni","Kilome","Kaiti","Kibwezi West","Kibwezi East","Makueni"],
+        "Nyandarua": ["Kinangop","Kipipiri","Ol Kalou","Ol Jorok","Ndaragwa"],
+        "Nyeri": ["Tetu","Kieni","Mathira","Othaya","Mukurweini","Nyeri Town"],
+        "Kirinyaga": ["Mwea","Gichugu","Ndia","Kirinyaga Central"],
+        "Murang'a": ["Kangema","Mathioya","Kiharu","Kigumo","Maragwa","Kandara","Gatanga"],
+        "Kiambu": ["Gatundu South","Gatundu North","Juja","Thika Town","Ruiru","Githunguri","Kiambu","Kiambaa","Kabete","Kikuyu","Limuru","Lari"],
+        "Turkana": ["Turkana North","Turkana West","Turkana Central","Loima","Turkana South","Turkana East"],
+        "West Pokot": ["Kapenguria","Sigor","Kacheliba","Pokot South"],
+        "Samburu": ["Samburu West","Samburu North","Samburu East"],
+        "Trans Nzoia": ["Kwanza","Endebess","Saboti","Kiminini","Cherangany"],
+        "Uasin Gishu": ["Soy","Turbo","Moiben","Ainabkoi","Kapseret","Kesses"],
+        "Elgeyo-Marakwet": ["Marakwet East","Marakwet West","Keiyo North","Keiyo South"],
+        "Nandi": ["Tinderet","Aldai","Nandi Hills","Chesumei","Emgwen","Mosop"],
+        "Baringo": ["Tiaty","Baringo North","Baringo Central","Baringo South","Mogotio","Eldama Ravine"],
+        "Laikipia": ["Laikipia West","Laikipia East","Laikipia North"],
+        "Nakuru": ["Molo","Njoro","Naivasha","Gilgil","Kuresoi South","Kuresoi North","Subukia","Rongai","Bahati","Nakuru Town West","Nakuru Town East"],
+        "Narok": ["Kilgoris","Emurua Dikirr","Narok North","Narok East","Narok South","Narok West"],
+        "Kajiado": ["Kajiado North","Kajiado Central","Kajiado East","Kajiado West","Kajiado South"],
+        "Kericho": ["Kipkelion East","Kipkelion West","Ainamoi","Bureti","Belgut","Sigowet/Soin"],
+        "Bomet": ["Sotik","Chepalungu","Bomet East","Bomet Central","Konoin"],
+        "Kakamega": ["Lugari","Likuyani","Malava","Lurambi","Navakholo","Mumias West","Mumias East","Matungu","Butere","Khwisero","Shinyalu","Ikolomani"],
+        "Vihiga": ["Vihiga","Sabatia","Hamisi","Luanda","Emuhaya"],
+        "Bungoma": ["Mt Elgon","Sirisia","Kabuchai","Bumula","Kanduyi","Webuye East","Webuye West","Kimilili","Tongaren"],
+        "Busia": ["Teso North","Teso South","Nambale","Matayos","Butula","Funyula","Budalangi"],
+        "Siaya": ["Ugenya","Ugunja","Alego Usonga","Gem","Bondo","Rarieda"],
+        "Kisumu": ["Kisumu East","Kisumu West","Kisumu Central","Seme","Nyando","Muhoroni","Nyakach"],
+        "Homa Bay": ["Kasipul","Kabondo Kasipul","Karachuonyo","Rangwe","Homa Bay Town","Ndhiwa","Suba North","Suba South"],
+        "Migori": ["Rongo","Awendo","Suna East","Suna West","Uriri","Nyatike","Kuria West","Kuria East"],
+        "Kisii": ["Bonchari","South Mugirango","Bomachoge Borabu","Bobasi","Bomachoge Chache","Nyaribari Masaba","Nyaribari Chache","Kitutu Chache North","Kitutu Chache South"],
+        "Nyamira": ["Kitutu Masaba","West Mugirango","North Mugirango","Borabu"],
+        "Nairobi": ["Westlands","Dagoretti North","Dagoretti South","Langata","Kibra","Roysambu","Kasarani","Ruaraka","Embakasi South","Embakasi North","Embakasi Central","Embakasi East","Embakasi West","Makadara","Kamukunji","Starehe","Mathare"]
+    };
+
+    const COD_COUNTY = "Nairobi";
+
+    //-----------------------------------------------------
+    // Helpers
+    //-----------------------------------------------------
+
+    function formatMoney(value){
+        return "KSh " + Number(value).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function getSubtotal(){
+        return parseFloat(document.getElementById("co-subtotal").dataset.value) || 0;
+    }
+
+    function getDiscount(){
+        const txt = document.getElementById("co-discount").textContent;
+        return parseFloat(txt.replace(/[^\d.]/g, "")) || 0;
+    }
+
+    function setFieldError(field, hasError){
+        const wrapper = field.closest(".co-field");
+        if (wrapper) wrapper.classList.toggle("has-error", hasError);
+    }
+
+    //-----------------------------------------------------
+    // Populate county select
+    //-----------------------------------------------------
+
+    const countySelect = document.getElementById("id_county");
+    const subcountySelect = document.getElementById("id_subcounty");
+
+    Object.keys(COUNTY_DATA).sort().forEach(function(county){
+        const opt = document.createElement("option");
+        opt.value = county;
+        opt.textContent = county;
+        countySelect.appendChild(opt);
+    });
+
+    function populateSubcounties(county){
+        subcountySelect.innerHTML = "";
+        const list = COUNTY_DATA[county];
+
+        if (!list){
+            subcountySelect.disabled = true;
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "Select county first";
+            subcountySelect.appendChild(opt);
+            return;
+        }
+
+        subcountySelect.disabled = false;
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select sub-county";
+        subcountySelect.appendChild(placeholder);
+
+        list.forEach(function(sc){
+            const opt = document.createElement("option");
+            opt.value = sc;
+            opt.textContent = sc;
+            subcountySelect.appendChild(opt);
+        });
+    }
+
+    populateSubcounties("");
+
+    countySelect.addEventListener("change", function(){
+        populateSubcounties(this.value);
+        toggleCod();
+    });
+
+    //-----------------------------------------------------
+    // Option cards (address / delivery / payment)
+    //-----------------------------------------------------
+
+    document.querySelectorAll(".co-option").forEach(function(card){
+        const radio = card.querySelector("input[type=radio]");
+        if (!radio) return;
+
+        radio.addEventListener("change", function(){
+            document.querySelectorAll('input[name="' + radio.name + '"]').forEach(function(r){
+                const option = r.closest(".co-option");
+                if (option) option.classList.toggle("is-selected", r.checked);
+            });
+
+            if (radio.name === "delivery_method") updateTotals();
+            if (radio.name === "payment_method") toggleCardFields();
+            if (radio.name === "address") toggleNewAddress();
+        });
+    });
+
+    //-----------------------------------------------------
+    // Payment
+    //-----------------------------------------------------
+
+    function toggleCardFields(){
+        const selected = document.querySelector('input[name="payment_method"]:checked');
+        const show = selected && selected.value === "card";
+        document.getElementById("co-card-fields").classList.toggle("co-open", show);
+    }
+
+    toggleCardFields();
+
+    //-----------------------------------------------------
+    // Cash on delivery — Nairobi County only
+    //-----------------------------------------------------
+
+    function toggleCod(){
+        const codRadio = document.querySelector('input[name="payment_method"][value="cod"]');
+        const codOption = document.getElementById("co-cod-option");
+        const codNote = document.getElementById("co-cod-note");
+        const codSub = document.getElementById("co-cod-sub");
+        const county = countySelect.value;
+        const eligible = county === COD_COUNTY;
+
+        codRadio.disabled = !eligible;
+        codOption.classList.toggle("is-disabled", !eligible);
+        codNote.style.display = eligible ? "none" : "flex";
+        codSub.textContent = eligible
+            ? "Pay when your order arrives"
+            : "Available only within Nairobi County";
+
+        if (!eligible && codRadio.checked){
+            const mpesaRadio = document.querySelector('input[name="payment_method"][value="mpesa"]');
+            mpesaRadio.checked = true;
+            mpesaRadio.dispatchEvent(new Event("change"));
+        }
+    }
+
+    toggleCod();
+
+    //-----------------------------------------------------
+    // Address
+    //-----------------------------------------------------
+
+    function toggleNewAddress(){
+        const selected = document.querySelector('input[name="address"]:checked');
+        const block = document.getElementById("co-new-address");
+
+        if (!selected){
+            block.style.display = "grid";
+            return;
+        }
+
+        block.style.display = selected.value === "new" ? "grid" : "none";
+    }
+
+    toggleNewAddress();
+
+    //-----------------------------------------------------
+    // Phone validation (07XXXXXXXX or 01XXXXXXXX, 10 digits)
+    //-----------------------------------------------------
+
+    const phoneInput = document.getElementById("id_phone");
+    const PHONE_PATTERN = /^(07|01)\d{8}$/;
+
+    function validatePhone(){
+        const digitsOnly = phoneInput.value.replace(/\D/g, "");
+        phoneInput.value = digitsOnly.slice(0, 10);
+        const ok = PHONE_PATTERN.test(phoneInput.value);
+        setFieldError(phoneInput, phoneInput.value.length > 0 && !ok);
+        return ok;
+    }
+
+    phoneInput.addEventListener("input", validatePhone);
+    phoneInput.addEventListener("blur", validatePhone);
+
+    //-----------------------------------------------------
+    // VAT + totals
+    //-----------------------------------------------------
+
+    function updateTotals(){
+        const subtotal = getSubtotal();
+        const delivery = parseFloat(
+            document.querySelector('input[name="delivery_method"]:checked').dataset.price
+        ) || 0;
+        const discount = getDiscount();
+        const vatOption = document.querySelector('input[name="vat_option"]:checked').value;
+        const vat = vatOption === "inclusive" ? subtotal * 0.16 : 0;
+        const total = subtotal + delivery + vat - discount;
+
+        document.getElementById("co-delivery-fee").textContent = delivery === 0 ? "Free" : formatMoney(delivery);
+        document.getElementById("co-vat").textContent = formatMoney(vat);
+        document.getElementById("co-total").textContent = formatMoney(total);
+    }
+
+    document.querySelectorAll('input[name="vat_option"]').forEach(function(radio){
+        radio.addEventListener("change", updateTotals);
+    });
+
+    document.querySelectorAll('input[name="delivery_method"]').forEach(function(radio){
+        radio.addEventListener("change", updateTotals);
+    });
+
+    //-----------------------------------------------------
+    // Promo
+    //-----------------------------------------------------
+
+    document.getElementById("co-apply-promo").addEventListener("click", function(){
+        const code = document.getElementById("id_promo").value.trim();
+        const msg = document.getElementById("co-promo-msg");
+
+        if (!code){
+            msg.textContent = "Enter a promo code.";
+            msg.className = "co-promo-msg co-bad";
+            return;
+        }
+
+        msg.textContent = "Promo applied.";
+        msg.className = "co-promo-msg co-ok";
+        updateTotals();
+    });
+
+    //-----------------------------------------------------
+    // Place order button — gated on both checkboxes
+    //-----------------------------------------------------
+
+    const termsCheckbox = document.getElementById("id_terms");
+    const chargesCheckbox = document.getElementById("id_extra_charges");
+    const placeBtn = document.getElementById("co-place-btn");
+
+    function refreshPlaceBtn(){
+        placeBtn.disabled = !(termsCheckbox.checked && chargesCheckbox.checked);
+    }
+
+    termsCheckbox.addEventListener("change", refreshPlaceBtn);
+    chargesCheckbox.addEventListener("change", refreshPlaceBtn);
+    refreshPlaceBtn();
+
+    //-----------------------------------------------------
+    // Validation on submit
+    //-----------------------------------------------------
+
+    document.getElementById("co-form").addEventListener("submit", function(e){
+        let valid = true;
+
+        this.querySelectorAll("[required]").forEach(function(field){
+            if (field.offsetParent === null) return; // skip hidden fields
+            const ok = field.type === "checkbox" ? field.checked : field.value.trim() !== "";
+            setFieldError(field, !ok);
+            if (!ok) valid = false;
+        });
+
+        if (!validatePhone()) valid = false;
+
+        if (!valid){
+            e.preventDefault();
+            return;
+        }
+
+        document.getElementById("co-spinner").style.display = "inline-block";
+        document.getElementById("co-place-label").textContent = "Placing order...";
+        placeBtn.disabled = true;
+    });
+
+    //-----------------------------------------------------
+    // Initial calculation
+    //-----------------------------------------------------
+
+    updateTotals();
+
+});
+</script>
+{% endblock %}

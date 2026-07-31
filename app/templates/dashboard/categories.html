@@ -1,0 +1,255 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+
+<div class="cat-page">
+
+  <div class="page-header">
+    <div class="page-header-text">
+      <h2>Categories</h2>
+      <p class="page-header-sub">Organize your catalog into browsable categories.</p>
+    </div>
+
+    <a href="{% url 'dashboard_add_category' %}" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Add Category
+    </a>
+  </div>
+
+  <div class="card">
+
+    <div class="card-toolbar">
+      <div class="cat-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="catSearch" placeholder="Search categories...">
+      </div>
+      <span class="cat-count">{{ categories|length }} categor{{ categories|length|pluralize:"y,ies" }}</span>
+    </div>
+
+    <div class="table-scroll">
+      <table class="table" id="catTable">
+
+        <thead>
+          <tr>
+            <th class="col-icon">Icon</th>
+            <th>Name</th>
+            <th class="col-num">Products</th>
+            <th class="col-num">Specifications</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for category in categories %}
+          <tr class="cat-row" data-name="{{ category.name|lower }}">
+
+            <td class="col-icon">
+              {% if category.icon %}
+              <img src="{{ category.icon.url }}" width="45" class="cat-icon" alt="{{ category.name }}">
+              {% else %}
+              <div class="cat-icon-placeholder">{{ category.name|slice:":1"|upper }}</div>
+              {% endif %}
+            </td>
+
+            <td>
+              <strong class="cat-name">{{ category.name }}</strong>
+              <div class="cat-desc">{{ category.description|truncatewords:12 }}</div>
+            </td>
+
+            <td class="col-num">
+              <span class="count-badge">{{ category.products.count }}</span>
+            </td>
+
+            <td class="col-num">
+              <span class="count-badge count-badge-muted">{{ category.specifications.count }}</span>
+            </td>
+
+            <td class="col-actions">
+              <div class="row-actions">
+                <a href="{% url 'dashboard_edit_category' category.id %}" class="btn btn-sm btn-warning">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                  Edit
+                </a>
+
+                <a href="{% url 'dashboard_delete_category' category.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this category? This cannot be undone.');">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Delete
+                </a>
+              </div>
+            </td>
+
+          </tr>
+          {% empty %}
+
+          <tr>
+            <td colspan="5">
+              <div class="table-empty">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" class="table-empty-icon"><rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 7l3-4h12l3 4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                <p>No categories found</p>
+                <a href="{% url 'dashboard_add_category' %}" class="btn btn-primary btn-sm">Add your first category</a>
+              </div>
+            </td>
+          </tr>
+
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+    </div>
+
+    <p id="catNoResults" class="table-empty" style="display:none;">
+      <span>No categories match your search.</span>
+    </p>
+
+  </div>
+
+</div>
+
+<style>
+:root{
+  --admin-blue:#0B5ED7;
+  --admin-blue-dark:#084298;
+  --admin-blue-light:#E7F0FE;
+  --admin-ink:#1B2430;
+  --admin-muted:#6B7280;
+  --admin-border:#E5E9F0;
+  --admin-surface:#FFFFFF;
+  --admin-bg:#F5F8FC;
+  --admin-amber:#B45309;
+  --admin-amber-bg:#FEF3E2;
+  --admin-red:#B91C1C;
+  --admin-red-bg:#FDECEC;
+  --admin-radius-lg:16px;
+  --admin-radius-md:10px;
+  --admin-shadow-sm:0 1px 3px rgba(16,24,40,.06);
+  --admin-shadow-md:0 8px 24px rgba(16,24,40,.08);
+}
+
+.cat-page{ font-family:'Poppins', sans-serif; color:var(--admin-ink); }
+.cat-page *{ box-sizing:border-box; }
+
+.page-header{
+  display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+  gap:1rem; margin-bottom:1.5rem;
+}
+.page-header-text h2{ margin:0 0 .25rem; font-size:1.5rem; font-weight:700; color:var(--admin-ink); }
+.page-header-sub{ margin:0; font-size:.88rem; color:var(--admin-muted); }
+
+.btn{
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-family:inherit; font-size:.85rem; font-weight:600;
+  border-radius:999px; padding:.65rem 1.25rem; text-decoration:none;
+  border:1px solid transparent; cursor:pointer; transition:.15s ease;
+}
+.btn-primary{ background:var(--admin-blue); color:#fff; box-shadow:var(--admin-shadow-sm); }
+.btn-primary:hover{ background:var(--admin-blue-dark); color:#fff; transform:translateY(-1px); }
+.btn-sm{ padding:.4rem .85rem; font-size:.78rem; }
+
+.card{
+  background:var(--admin-surface); border:1px solid var(--admin-border);
+  border-radius:var(--admin-radius-lg); box-shadow:var(--admin-shadow-sm);
+  overflow:hidden;
+}
+
+.card-toolbar{
+  display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  padding:1.1rem 1.4rem; border-bottom:1px solid var(--admin-border);
+}
+.cat-search{
+  display:flex; align-items:center; gap:.5rem; flex:1 1 260px;
+  border:1px solid var(--admin-border); border-radius:999px; padding:.5rem 1rem; color:var(--admin-muted);
+  background:var(--admin-bg);
+}
+.cat-search input{ border:none; outline:none; background:transparent; flex:1; font-family:inherit; font-size:.85rem; }
+.cat-count{ font-size:.8rem; color:var(--admin-muted); font-weight:600; white-space:nowrap; }
+
+.table-scroll{ overflow-x:auto; }
+.table{ width:100%; border-collapse:collapse; font-size:.88rem; }
+.table thead th{
+  text-align:left; padding:.85rem 1.4rem; font-size:.72rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.05em; color:var(--admin-muted);
+  background:var(--admin-bg); border-bottom:1px solid var(--admin-border); white-space:nowrap;
+}
+.table tbody td{
+  padding:.9rem 1.4rem; border-bottom:1px solid var(--admin-border); vertical-align:middle;
+}
+.table tbody tr:last-child td{ border-bottom:none; }
+.table tbody tr:hover{ background:var(--admin-blue-light); }
+.col-icon{ width:64px; }
+.col-num{ text-align:center; white-space:nowrap; }
+.col-actions{ text-align:right; white-space:nowrap; }
+
+.cat-icon{
+  width:45px; height:45px; border-radius:10px; object-fit:cover;
+  border:1px solid var(--admin-border); background:var(--admin-bg); display:block;
+}
+.cat-icon-placeholder{
+  width:45px; height:45px; border-radius:10px; background:var(--admin-blue-light);
+  color:var(--admin-blue-dark); display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:1.1rem;
+}
+
+.cat-name{ display:block; font-size:.94rem; color:var(--admin-ink); }
+.cat-desc{ font-size:.8rem; color:var(--admin-muted); margin-top:.15rem; max-width:360px; }
+
+.count-badge{
+  display:inline-flex; align-items:center; justify-content:center; min-width:32px;
+  padding:.25rem .6rem; border-radius:999px; font-weight:700; font-size:.8rem;
+  background:var(--admin-blue-light); color:var(--admin-blue-dark);
+}
+.count-badge-muted{ background:var(--admin-bg); color:var(--admin-muted); }
+
+.row-actions{ display:inline-flex; gap:.5rem; }
+.btn-warning{ background:var(--admin-amber-bg); color:var(--admin-amber); }
+.btn-warning:hover{ background:var(--admin-amber); color:#fff; }
+.btn-danger{ background:var(--admin-red-bg); color:var(--admin-red); }
+.btn-danger:hover{ background:var(--admin-red); color:#fff; }
+
+.table-empty{
+  display:flex; flex-direction:column; align-items:center; gap:.75rem;
+  padding:3rem 1.5rem; text-align:center; color:var(--admin-muted); font-size:.88rem;
+}
+.table-empty-icon{ color:var(--admin-blue); opacity:.45; }
+
+@media (max-width:720px){
+  .table thead{ display:none; }
+  .table, .table tbody, .table tr, .table td{ display:block; width:100%; }
+  .table tbody tr{
+    border:1px solid var(--admin-border); border-radius:var(--admin-radius-md);
+    margin:0 1rem 1rem; padding:.9rem 1rem;
+  }
+  .table tbody tr:hover{ background:var(--admin-surface); }
+  .table tbody td{ border-bottom:none; padding:.35rem 0; }
+  .col-icon{ display:flex !important; align-items:center; gap:.75rem; }
+  .col-num{ text-align:left; }
+  .col-num::before{ content: attr(data-label) ": "; font-weight:600; color:var(--admin-muted); }
+  .col-actions{ text-align:left; margin-top:.5rem; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('catSearch');
+  const rows = Array.from(document.querySelectorAll('.cat-row'));
+  const noResults = document.getElementById('catNoResults');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const q = this.value.trim().toLowerCase();
+      let visibleCount = 0;
+      rows.forEach(row => {
+        const match = row.dataset.name.includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      noResults.style.display = (visibleCount === 0 && rows.length > 0) ? 'flex' : 'none';
+    });
+  }
+});
+</script>
+
+{% endblock %}

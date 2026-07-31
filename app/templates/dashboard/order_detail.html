@@ -1,0 +1,382 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Order {{ order.order_id }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>Order {{ order.order_id }}</h2>
+
+        <p>
+            Created on {{ order.created_at|date:"d M Y H:i" }}
+        </p>
+
+    </div>
+
+    <a href="{% url 'order_list' %}" class="btn-back">
+        <i class="fas fa-arrow-left"></i>
+        Back to Orders
+    </a>
+
+</div>
+
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="order-grid">
+
+    <!-- LEFT -->
+
+    <div>
+
+        <div class="card">
+
+            <h3>Customer Information</h3>
+
+            <table class="info-table">
+
+                <tr>
+                    <th>Name</th>
+                    <td>{{ order.full_name }}</td>
+                </tr>
+
+                <tr>
+                    <th>Email</th>
+                    <td>{{ order.email }}</td>
+                </tr>
+
+                <tr>
+                    <th>Phone</th>
+                    <td>{{ order.phone }}</td>
+                </tr>
+
+                <tr>
+                    <th>Address</th>
+                    <td>{{ order.address }}</td>
+                </tr>
+
+                <tr>
+                    <th>City</th>
+                    <td>{{ order.city }}</td>
+                </tr>
+
+                <tr>
+                    <th>County</th>
+                    <td>{{ order.county }}</td>
+                </tr>
+
+                <tr>
+                    <th>Postcode</th>
+                    <td>{{ order.postcode|default:"-" }}</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Products Ordered</h3>
+
+            <table class="product-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>Product</th>
+
+                    <th>Qty</th>
+
+                    <th>Price</th>
+
+                    <th>Total</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for item in order.items.all %}
+
+                <tr>
+
+                    <td>{{ item.product.name }}</td>
+
+                    <td>{{ item.quantity }}</td>
+
+                    <td>KSh {{ item.price }}</td>
+
+                    <td>KSh {{ item.total }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div>
+
+        <div class="card">
+
+            <h3>Order Summary</h3>
+
+            <table class="info-table">
+
+                <tr>
+                    <th>Payment</th>
+                    <td>{{ order.get_payment_method_display }}</td>
+                </tr>
+
+                <tr>
+                    <th>Delivery</th>
+                    <td>{{ order.get_delivery_method_display }}</td>
+                </tr>
+
+                <tr>
+                    <th>VAT Option</th>
+                    <td>{{ order.get_vat_option_display }}</td>
+                </tr>
+
+                <tr>
+                    <th>Subtotal</th>
+                    <td>KSh {{ order.subtotal }}</td>
+                </tr>
+
+                <tr>
+                    <th>Delivery Fee</th>
+                    <td>KSh {{ order.delivery_fee }}</td>
+                </tr>
+
+                <tr>
+                    <th>VAT</th>
+                    <td>KSh {{ order.vat_amount }}</td>
+                </tr>
+
+                <tr>
+                    <th>Total</th>
+                    <td class="total">
+                        KSh {{ order.grand_total }}
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Update Order</h3>
+
+            <label>Status</label>
+
+            <select
+                name="status"
+                id="status-select"
+                class="form-control">
+
+                {% for value,label in order.STATUS_CHOICES %}
+
+                <option
+                    value="{{ value }}"
+                    {% if order.status == value %}selected{% endif %}>
+
+                    {{ label }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Admin Notes</label>
+
+            <textarea
+                name="admin_notes"
+                rows="5"
+                class="form-control">{{ order.admin_notes }}</textarea>
+
+            <div id="cancel-box">
+
+                <label>Cancellation Reason</label>
+
+                <textarea
+                    name="cancellation_reason"
+                    rows="5"
+                    class="form-control">{{ order.cancellation_reason }}</textarea>
+
+            </div>
+
+            <button class="btn-save">
+
+                <i class="fas fa-save"></i>
+
+                Update Order
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</form>
+
+
+<style>
+
+.page-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+flex-wrap:wrap;
+gap:15px;
+}
+
+.page-header h2{
+font-size:30px;
+font-weight:700;
+}
+
+.btn-back{
+background:#2563eb;
+color:#fff;
+padding:12px 22px;
+border-radius:10px;
+text-decoration:none;
+}
+
+.order-grid{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:25px;
+}
+
+.card{
+background:#fff;
+padding:25px;
+border-radius:15px;
+box-shadow:0 5px 18px rgba(0,0,0,.08);
+margin-bottom:25px;
+}
+
+.card h3{
+margin-bottom:20px;
+font-size:20px;
+}
+
+.info-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.info-table th,
+.info-table td{
+padding:12px;
+border-bottom:1px solid #eee;
+text-align:left;
+}
+
+.product-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.product-table th{
+background:#0f172a;
+color:#fff;
+padding:12px;
+}
+
+.product-table td{
+padding:12px;
+border-bottom:1px solid #eee;
+}
+
+.form-control{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+margin-bottom:20px;
+}
+
+.btn-save{
+width:100%;
+padding:14px;
+border:none;
+background:#2563eb;
+color:#fff;
+border-radius:10px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+}
+
+.total{
+font-size:22px;
+font-weight:700;
+color:#16a34a;
+}
+
+#cancel-box{
+display:none;
+}
+
+@media(max-width:992px){
+
+.order-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+
+<script>
+
+const status=document.getElementById("status-select");
+
+const cancel=document.getElementById("cancel-box");
+
+function toggleCancel(){
+
+if(status.value==="cancelled"){
+
+cancel.style.display="block";
+
+}else{
+
+cancel.style.display="none";
+
+}
+
+}
+
+toggleCancel();
+
+status.onchange=toggleCancel;
+
+</script>
+
+{% endblock %}

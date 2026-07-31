@@ -1,0 +1,565 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Blog Articles{% endblock %}
+
+{% block page_title %}
+Blog
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2>Blog Articles</h2>
+        <p>Manage your articles, buying guides and news</p>
+    </div>
+
+    <a href="{% url 'dashboard_add_blog' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        New Article
+    </a>
+
+</div>
+
+
+<!-- Statistics -->
+
+<div class="dashboard-cards">
+
+    <div class="dashboard-card">
+
+        <div class="card-icon blue">
+            <i class="fas fa-newspaper"></i>
+        </div>
+
+        <div>
+
+            <h3>{{ total_posts }}</h3>
+
+            <span>Total Articles</span>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card">
+
+        <div class="card-icon green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <div>
+
+            <h3>{{ published_posts }}</h3>
+
+            <span>Published</span>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card">
+
+        <div class="card-icon orange">
+            <i class="fas fa-pencil-alt"></i>
+        </div>
+
+        <div>
+
+            <h3>{{ draft_posts }}</h3>
+
+            <span>Drafts</span>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card">
+
+        <div class="card-icon purple">
+            <i class="fas fa-eye"></i>
+        </div>
+
+        <div>
+
+            <h3>{{ total_views|intcomma }}</h3>
+
+            <span>Total Views</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="table-header">
+
+<div style="display:flex;gap:10px;">
+
+<select
+class="form-control"
+name="action"
+style="width:220px;">
+
+<option value="">Bulk Actions</option>
+
+<option value="publish">Publish</option>
+
+<option value="draft">Move to Draft</option>
+
+<option value="feature">Feature</option>
+
+<option value="delete">Delete</option>
+
+</select>
+
+<button class="btn btn-primary">
+
+Apply
+
+</button>
+
+</div>
+
+<input
+type="text"
+id="searchBlog"
+class="form-control"
+placeholder="Search Articles..."
+style="width:300px;">
+
+</div>
+
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+
+<input
+type="checkbox"
+id="checkAll">
+
+</th>
+
+<th>Cover</th>
+
+<th>Title</th>
+
+<th>Category</th>
+
+<th>Status</th>
+
+<th>Featured</th>
+
+<th>Views</th>
+
+<th>Published</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for article in posts %}
+
+<tr>
+
+<td>
+
+<input
+type="checkbox"
+name="articles"
+value="{{ article.id }}">
+
+</td>
+
+<td>
+
+{% if article.image %}
+
+<img
+src="{{ article.image.url }}"
+width="70"
+height="70"
+style="
+object-fit:cover;
+border-radius:10px;">
+
+{% else %}
+
+<img
+src="{% static 'images/no-image.png' %}"
+width="70"
+height="70"
+style="
+object-fit:cover;
+border-radius:10px;">
+
+{% endif %}
+
+</td>
+
+<td>
+
+<strong>
+
+{{ article.title }}
+
+</strong>
+
+<br>
+
+<small>
+
+{{ article.slug }}
+
+</small>
+
+</td>
+
+<td>
+
+{{ article.category }}
+
+</td>
+
+<td>
+
+{% if article.status == "published" %}
+
+<span class="badge-success">
+
+Published
+
+</span>
+
+{% else %}
+
+<span class="badge-warning">
+
+Draft
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+{% if article.featured %}
+
+<span class="badge-info">
+
+Featured
+
+</span>
+
+{% else %}
+
+—
+
+{% endif %}
+
+</td>
+
+<td>
+
+{{ article.views|intcomma }}
+
+</td>
+
+<td>
+
+{{ article.published_at|date:"d M Y" }}
+
+</td>
+
+<td>
+
+<div class="action-buttons">
+
+<a
+href="{{ article.get_absolute_url }}"
+target="_blank"
+class="action-btn">
+
+<i class="fas fa-eye"></i>
+
+</a>
+
+<a
+href="{% url 'dashboard_edit_blog' article.id %}"
+class="action-btn edit">
+
+<i class="fas fa-edit"></i>
+
+</a>
+
+<a
+href="{% url 'dashboard_delete_blog' article.id %}"
+class="action-btn delete">
+
+<i class="fas fa-trash"></i>
+
+</a>
+
+</div>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="9">
+
+<div class="empty-state">
+
+<i class="fas fa-newspaper"></i>
+
+<h3>
+
+No Blog Articles Yet
+
+</h3>
+
+<p>
+
+Start writing articles to improve SEO and attract customers from Google.
+
+</p>
+
+<a
+href="{% url 'dashboard_add_blog' %}"
+class="btn btn-primary">
+
+Write First Article
+
+</a>
+
+</div>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</form>
+
+</div>
+
+<style>
+
+.dashboard-cards{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+margin-bottom:25px;
+
+}
+
+.dashboard-card{
+
+background:#fff;
+
+border-radius:14px;
+
+padding:20px;
+
+display:flex;
+
+align-items:center;
+
+gap:18px;
+
+box-shadow:0 10px 30px rgba(0,0,0,.06);
+
+}
+
+.card-icon{
+
+width:60px;
+
+height:60px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+border-radius:12px;
+
+font-size:22px;
+
+color:#fff;
+
+}
+
+.blue{
+
+background:#2563eb;
+
+}
+
+.green{
+
+background:#16a34a;
+
+}
+
+.orange{
+
+background:#ea580c;
+
+}
+
+.purple{
+
+background:#7c3aed;
+
+}
+
+.dashboard-card h3{
+
+margin:0;
+
+font-size:26px;
+
+}
+
+.dashboard-card span{
+
+color:#777;
+
+font-size:14px;
+
+}
+
+.badge-warning{
+
+background:#fef3c7;
+
+color:#92400e;
+
+padding:5px 12px;
+
+border-radius:30px;
+
+font-size:12px;
+
+font-weight:600;
+
+}
+
+.badge-info{
+
+background:#dbeafe;
+
+color:#1d4ed8;
+
+padding:5px 12px;
+
+border-radius:30px;
+
+font-size:12px;
+
+font-weight:600;
+
+}
+
+.empty-state{
+
+padding:70px 20px;
+
+text-align:center;
+
+}
+
+.empty-state i{
+
+font-size:70px;
+
+color:#2563eb;
+
+margin-bottom:20px;
+
+}
+
+.empty-state h3{
+
+margin-bottom:10px;
+
+}
+
+.empty-state p{
+
+color:#666;
+
+margin-bottom:20px;
+
+}
+
+</style>
+
+<script>
+
+document.getElementById("checkAll").onclick=function(){
+
+document.querySelectorAll("input[name='articles']").forEach(function(cb){
+
+cb.checked=document.getElementById("checkAll").checked;
+
+});
+
+};
+
+document.getElementById("searchBlog").addEventListener("keyup",function(){
+
+let value=this.value.toLowerCase();
+
+document.querySelectorAll("tbody tr").forEach(function(row){
+
+row.style.display=row.innerText.toLowerCase().includes(value)
+
+? ""
+
+: "none";
+
+});
+
+});
+
+</script>
+
+{% endblock %}

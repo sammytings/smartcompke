@@ -1,0 +1,42 @@
+<svg viewBox="0 0 1600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="navyFade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B2545"/>
+      <stop offset="100%" stop-color="#0F3061"/>
+    </linearGradient>
+    <linearGradient id="blueChev" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E6FD9"/>
+      <stop offset="100%" stop-color="#2F8CFF"/>
+    </linearGradient>
+    <linearGradient id="redChev" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E8262F"/>
+      <stop offset="100%" stop-color="#FF4B4B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="600" fill="url(#navyFade)"/>
+
+  <!-- faint grid, technical texture -->
+  <g stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="100" x2="1600" y2="100"/>
+    <line x1="0" y1="200" x2="1600" y2="200"/>
+    <line x1="0" y1="300" x2="1600" y2="300"/>
+    <line x1="0" y1="400" x2="1600" y2="400"/>
+    <line x1="0" y1="500" x2="1600" y2="500"/>
+  </g>
+
+  <!-- large signature chevrons, echo of the logo's S/C cut, pushed to the right edge -->
+  <g transform="translate(1120,60) scale(1.85)">
+    <path d="M40 0 L180 0 L120 90 L20 90 Z" fill="url(#redChev)"/>
+    <path d="M0 60 L120 60 L180 150 L60 150 Z" fill="url(#blueChev)"/>
+    <path d="M40 150 L180 150 L120 240 L20 240 Z" fill="url(#redChev)" opacity="0.85"/>
+    <path d="M0 210 L120 210 L180 300 L60 300 Z" fill="url(#blueChev)" opacity="0.85"/>
+  </g>
+
+  <!-- thin diagonal accent line, minimalist wayfinding -->
+  <line x1="980" y1="0" x2="760" y2="600" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="2"/>
+
+  <!-- small red dot + blue dot, quiet punctuation -->
+  <circle cx="70" cy="60" r="5" fill="#E8262F"/>
+  <circle cx="95" cy="60" r="5" fill="#1E6FD9"/>
+</svg>

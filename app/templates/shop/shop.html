@@ -1,0 +1,587 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shop All Products — Smartcomputerske Technologies{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* =====================================================================
+     SHOP PAGE — restyled to match index.html's "sck-home" product-card
+     system: rounded card, contain-fit image, stacked spec chips, top-right
+     wishlist heart, navy Add-to-Cart with fly-icon loading + green
+     "Added" success state, full-width green WhatsApp button, and pill
+     pagination. Scoped under .shop-section so nothing else on the site
+     is affected.
+     ===================================================================== */
+  .shop-section{ background: var(--paper); }
+
+  .shop-section .prod-card{
+    position: relative;
+    background: #fff;
+    border: 1px solid #E8EDF5;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .26s ease, border-color .26s ease;
+  }
+  .shop-section .prod-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 20px 48px rgba(17,24,39,.11);
+    border-color: #C9DAFC;
+  }
+
+  .shop-section .prod-media{
+    position: relative;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    overflow: hidden;
+    background: #fff;
+  }
+  .shop-section .prod-media a{ display:block; width:100%; height:100%; }
+  .shop-section .prod-media img{
+    width: 100%; height: 100%;
+    object-fit: contain; object-position: center;
+    padding: 6px;
+    transition: transform .38s cubic-bezier(.2,.7,.3,1);
+  }
+  .shop-section .prod-card:hover .prod-media img{ transform: scale(1.06); }
+
+  .shop-section .prod-tag, .shop-section .brand-badge{
+    position: absolute; top: 10px; left: 10px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .03em;
+    padding: 5px 12px; border-radius: 999px; z-index: 4;
+    font-family: var(--font-display);
+  }
+  .shop-section .prod-tag{ background: linear-gradient(120deg,#0F8A5F,#0c6c49); color:#fff; }
+  .shop-section .prod-tag.blue-tag{ background: linear-gradient(120deg,var(--primary),var(--primary-dark)); }
+  .shop-section .prod-tag.promo-tag{ background: linear-gradient(120deg,var(--accent),var(--accent-dark)); }
+  .shop-section .brand-badge{ background: linear-gradient(120deg,var(--primary-dark),var(--navy)); color:#fff; text-transform:uppercase; }
+
+  .shop-section .product-tools{ position:absolute; top:10px; right:10px; z-index:5; display:flex; flex-direction:column; gap:8px; }
+  .shop-section .wish-toggle{
+    width: 32px; height: 32px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    background:#fff; border:none; color:#9aa3b4; cursor:pointer;
+    box-shadow: 0 4px 12px rgba(17,24,39,.16);
+    transition: transform .18s ease, color .18s ease, background .18s ease;
+  }
+  .shop-section .wish-toggle svg{ width:15px; height:15px; }
+  .shop-section .wish-toggle:hover{ transform: scale(1.08); color: var(--accent); }
+  .shop-section .wish-toggle.active{ color:#fff; background: var(--accent); }
+  .shop-section .wish-toggle.active svg{ fill: currentColor; }
+  .shop-section .wish-toggle.is-wishing{ animation: shop-wish-pulse .4s ease; }
+  @keyframes shop-wish-pulse{ 0%{transform:scale(1);} 50%{transform:scale(1.32);} 100%{transform:scale(1);} }
+
+  .shop-section .prod-body{ padding:14px 14px 6px; display:flex; flex-direction:column; gap:8px; flex:1; background:#fff; border-top:1px solid #EEF2F9; }
+  .shop-section .product-title-link{ text-decoration:none; color:inherit; }
+  .shop-section .product-title-link:hover .prod-name{ color: var(--primary); }
+  .shop-section .prod-brand{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color: var(--primary); }
+  .shop-section .prod-name{
+    font-size:14px; font-weight:600; color: var(--ink); line-height:1.35; transition:color .15s ease;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    min-height: calc(1.35em * 2);
+  }
+
+  .shop-section .prod-specs{ display:flex; flex-direction:column; gap:5px; margin-top:2px; }
+  .shop-section .prod-specs .spec-row{
+    display:flex; align-items:center; gap:7px;
+    background: var(--paper); border:1px solid var(--line);
+    border-radius:8px; padding:5px 9px;
+    font-size:11px; font-weight:600; color: var(--ink-soft);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .shop-section .prod-specs .spec-ic{ width:14px; height:14px; flex-shrink:0; color: var(--primary); display:flex; }
+  .shop-section .prod-specs .spec-ic svg{ width:100%; height:100%; }
+
+  .shop-section .badge-row{ display:flex; gap:6px; margin-top:1px; flex-wrap:wrap; }
+  .shop-section .badge-stock, .shop-section .badge-condition{ font-size:10px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .shop-section .badge-stock.in{ background: var(--success-tint); color: var(--success); }
+  .shop-section .badge-stock.low{ background:#FFF6E5; color:#B77400; }
+  .shop-section .badge-stock.out{ background: var(--accent-tint); color: var(--accent-dark); }
+  .shop-section .badge-condition{ background: var(--paper); color: var(--ink-soft); border:1px solid var(--line); }
+
+  .shop-section .prod-rating{ font-size:12px; color: var(--muted); display:flex; align-items:center; gap:5px; margin-top:1px; }
+  .shop-section .prod-rating .stars{ color: var(--accent); letter-spacing:1px; font-size:12px; }
+
+  .shop-section .price-container{ display:flex; align-items:center; gap:8px; margin-top:3px; flex-wrap:wrap; }
+  .shop-section .prod-price{ color: var(--primary-dark); font-size:19px; font-weight:800; font-family: var(--font-display); }
+  .shop-section .prod-old-price{ color:#9aa0aa; text-decoration:line-through; font-size:13px; }
+  .shop-section .prod-save{ font-size:11px; font-weight:700; color: var(--accent-dark); background: var(--accent-tint); padding:2px 7px; border-radius:6px; }
+  .shop-section .vat-note{ font-size:10.5px; color:#9198a3; margin-top:-1px; width:100%; }
+
+  .shop-section .prod-actions{ display:flex; flex-direction:column; gap:8px; padding:10px 14px 14px; margin-top:auto; background:#fff; }
+
+  .shop-section .btn-cart-add{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:9px;
+    padding:11px 16px; border-radius:10px; border:none;
+    background: var(--primary-dark); color:#fff;
+    font-size:13.5px; font-weight:700; cursor:pointer;
+    position:relative; overflow:hidden;
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+    letter-spacing:-0.01em;
+  }
+  .shop-section .btn-cart-add:hover:not(:disabled){ background: var(--navy); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(29,95,215,.32); }
+  .shop-section .btn-cart-add:disabled{ opacity:.55; cursor:not-allowed; }
+  .shop-section .btn-cart-add .btn-icon, .shop-section .btn-cart-add .btn-label{ transition: opacity .15s; }
+  .shop-section .btn-cart-add .cart-loader{ display:none; flex-shrink:0; }
+  .shop-section .btn-cart-add.is-loading{ pointer-events:none; }
+  .shop-section .btn-cart-add.is-loading .btn-label{ opacity:.35; }
+  .shop-section .btn-cart-add.is-loading .btn-icon{ animation: shop-cart-fly 1.1s cubic-bezier(.5,0,.3,1) infinite; }
+  @keyframes shop-cart-fly{
+    0%{ transform:translateX(0) scale(1); opacity:1; }
+    45%{ transform:translateX(70px) scale(.7); opacity:0; }
+    50%{ transform:translateX(-70px) scale(.7); opacity:0; }
+    100%{ transform:translateX(0) scale(1); opacity:1; }
+  }
+  .shop-section .btn-cart-add.is-added{ background: var(--success); pointer-events:none; }
+  .shop-section .btn-cart-add.is-added .btn-icon{ display:none; }
+  .shop-section .btn-cart-add.is-added .btn-label{ opacity:0; width:0; overflow:hidden; }
+  .shop-section .btn-cart-add.is-added .cart-loader{ display:flex; position:absolute; inset:0; align-items:center; justify-content:center; gap:8px; }
+  .shop-section .btn-cart-add.is-added .cart-loader::before{ content:"✓"; font-size:14px; font-weight:800; color:#fff; }
+  .shop-section .btn-cart-add.is-added .cart-loader::after{
+   
+    animation: shop-pop-in .22s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes shop-pop-in{ from{ opacity:0; transform:scale(.78);} to{ opacity:1; transform:scale(1);} }
+
+  .shop-section .btn-whatsapp-card{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 16px; border-radius:10px; border:none;
+    background:#25D366; color:#fff; font-size:12.5px; font-weight:700;
+    cursor:pointer; text-decoration:none;
+    transition: background .16s ease, transform .16s ease;
+    letter-spacing:-0.01em;
+  }
+  .shop-section .btn-whatsapp-card:hover{ background:#1ebe5a; transform: translateY(-1px); color:#fff; }
+  .shop-section .btn-whatsapp-card svg{ flex-shrink:0; }
+
+  /* ── pill pagination, matching index.html's sck-pagination look ── */
+  .shop-section .pagination{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:36px; }
+  .shop-section .pagination a, .shop-section .pagination span{
+    min-width:42px; height:42px; padding:0 16px; border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    background:#fff; border:none; color:#9aa3b4;
+    font-weight:700; font-size:13.5px; font-family: var(--font-body);
+    box-shadow: 0 2px 10px rgba(17,24,39,.07);
+    transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease;
+    text-decoration:none;
+  }
+  .shop-section .pagination a:hover{ color: var(--primary); box-shadow: 0 4px 14px rgba(17,24,39,.12); transform: translateY(-1px); }
+  .shop-section .pagination .current{ background: var(--ink); color:#fff; box-shadow: 0 0 0 6px rgba(30,64,175,.12), 0 8px 18px rgba(17,24,39,.2); }
+
+  /* ── themed toast, same look/feel as index.html ── */
+  .shop-toast-wrap{
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(24px);
+    z-index: 99999; display:flex; align-items:center; gap:12px;
+    max-width: min(92vw, 380px);
+    background: linear-gradient(135deg,#16307F,#0B1330);
+    color:#fff; padding:14px 20px 14px 16px; border-radius:16px;
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow: 0 24px 48px rgba(6,12,28,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
+    opacity:0; pointer-events:none;
+    transition: opacity .3s cubic-bezier(.2,.7,.3,1), transform .35s cubic-bezier(.2,.7,.3,1);
+  }
+  .shop-toast-wrap.show{ opacity:1; transform: translateX(-50%) translateY(0); pointer-events:auto; }
+  .shop-toast-wrap .st-ic{
+    flex-shrink:0; width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,.14); color: var(--accent);
+  }
+  .shop-toast-wrap.st-error .st-ic{ color:#ff9aa2; background: rgba(220,38,38,.22); }
+  .shop-toast-wrap .st-body{ display:flex; flex-direction:column; gap:1px; }
+  .shop-toast-wrap .st-title{ font-family: var(--font-display); font-weight:700; font-size:13.5px; letter-spacing:-0.01em; }
+  .shop-toast-wrap .st-msg{ font-size:12px; color:#c3cbe0; line-height:1.4; }
+  @media (max-width: 520px){ .shop-toast-wrap{ bottom:90px; padding:12px 16px 12px 14px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb wrap" aria-label="Breadcrumb">
+  <a href="{% url 'home' %}">Home</a>
+  <span class="sep">/</span>
+  <span class="current">Shop</span>
+</nav>
+
+<section class="section shop-section">
+  <div class="wrap">
+
+    <div class="shop-head">
+      <div>
+        <h1>Shop All Products</h1>
+        <p class="result-count">{{ result_count|default:products|length }} products found</p>
+      </div>
+      <div class="shop-controls">
+        <button class="filter-toggle-mobile" id="filterToggleMobile" type="button">
+          <i class="fas fa-sliders"></i> Filters
+        </button>
+        <select class="sort-select" name="sort" id="sortSelect">
+          <option value="featured">Sort: Featured</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="newest">Newest</option>
+          <option value="rating">Top Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="shop-layout">
+
+      <!-- ============ FILTERS SIDEBAR ============ -->
+      <aside class="filters-sidebar" id="filtersSidebar">
+        <div class="filters-head">
+          <h3>Filters</h3>
+          <button class="filters-clear" type="button">Clear all</button>
+        </div>
+
+        {% if request.GET %}
+        <div class="active-filter-chips">
+          {% for key, value in request.GET.items %}
+          <span class="active-chip">{{ value }}<button type="button" aria-label="Remove filter">×</button></span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="filter-group">
+          <button class="filter-toggle" type="button">
+            <span>Category</span><i class="fas fa-chevron-down chev"></i>
+          </button>
+          <div class="filter-body">
+            {% for category in categories %}
+            <label class="filter-check">
+              <input type="checkbox" name="category" value="{{ category.slug }}">
+              {{ category.name }} <span class="count">({{ category.product_count|default:0 }})</span>
+            </label>
+            {% empty %}
+            <label class="filter-check"><input type="checkbox"> Laptops <span class="count">(24)</span></label>
+            <label class="filter-check"><input type="checkbox"> Desktops <span class="count">(12)</span></label>
+            <label class="filter-check"><input type="checkbox"> Printers <span class="count">(9)</span></label>
+            <label class="filter-check"><input type="checkbox"> Phones <span class="count">(15)</span></label>
+            <label class="filter-check"><input type="checkbox"> Accessories <span class="count">(31)</span></label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <button class="filter-toggle" type="button">
+            <span>Brand</span><i class="fas fa-chevron-down chev"></i>
+          </button>
+          <div class="filter-body">
+            {% for brand in brands %}
+            <label class="filter-check">
+              <input type="checkbox" name="brand" value="{{ brand.id }}">
+              {{ brand.name }} <span class="count">({{ brand.product_count|default:0 }})</span>
+            </label>
+            {% empty %}
+            <label class="filter-check"><input type="checkbox"> HP <span class="count">(18)</span></label>
+            <label class="filter-check"><input type="checkbox"> Samsung <span class="count">(10)</span></label>
+            <label class="filter-check"><input type="checkbox"> Epson <span class="count">(7)</span></label>
+            <label class="filter-check"><input type="checkbox"> Dell <span class="count">(9)</span></label>
+            <label class="filter-check"><input type="checkbox"> Lenovo <span class="count">(6)</span></label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <button class="filter-toggle" type="button">
+            <span>Condition</span><i class="fas fa-chevron-down chev"></i>
+          </button>
+          <div class="filter-body">
+            {% for condition in conditions %}
+            <label class="filter-check">
+              <input type="checkbox" name="condition" value="{{ condition.id }}"> {{ condition.name }}
+            </label>
+            {% empty %}
+            <label class="filter-check"><input type="checkbox"> Brand New <span class="count">(58)</span></label>
+            <label class="filter-check"><input type="checkbox"> Refurbished <span class="count">(13)</span></label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <button class="filter-toggle" type="button">
+            <span>Price Range</span><i class="fas fa-chevron-down chev"></i>
+          </button>
+          <div class="filter-body">
+            <div class="price-range-inputs">
+              <input type="number" placeholder="Min KShs" name="price_min">
+              <span>–</span>
+              <input type="number" placeholder="Max KShs" name="price_max">
+            </div>
+            <input type="range" class="price-range-slider" min="0" max="300000" step="1000">
+          </div>
+        </div>
+
+        <button class="apply-filters-btn" type="submit">Apply Filters</button>
+      </aside>
+
+      <!-- ============ PRODUCT GRID ============ -->
+      <div>
+        <div class="prod-grid" id="shopProdGrid">
+          {% for product in products %}
+          <div class="prod-card">
+
+            <!-- ===== MEDIA (image, badge, wishlist heart) ===== -->
+            <div class="prod-media">
+              <a href="{% url 'product_detail' product.slug %}">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+              </a>
+
+              {% if product.is_new %}
+                <span class="prod-tag blue-tag">New</span>
+              {% elif product.old_price %}
+                <span class="prod-tag promo-tag">Sale</span>
+              {% elif product.brand %}
+                <span class="brand-badge">{{ product.brand.name }}</span>
+              {% endif %}
+
+              <div class="product-tools">
+                <button
+                  class="wish-toggle js-shop-wishlist {% if product.in_wishlist %}active{% endif %}"
+                  data-url="/wishlist/toggle/{{ product.id }}/"
+                  data-product-id="{{ product.id }}"
+                  data-product-name="{{ product.name }}"
+                  aria-label="Save {{ product.name }} to wishlist"
+                  type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- ===== BODY (title, specs, badges, rating, price) ===== -->
+            <div class="prod-body">
+              <a class="product-title-link" href="{% url 'product_detail' product.slug %}">
+                <span class="prod-brand">{{ product.brand.name }}</span>
+                <h3 class="prod-name">{{ product.name }}</h3>
+              </a>
+
+              {% if product.spec_list %}
+              <div class="prod-specs">
+                {% for spec in product.spec_list|slice:":3" %}
+                <div class="spec-row">
+                  <span class="spec-ic"><i class="fas fa-{{ spec.icon|default:'microchip' }}"></i></span>
+                  <span>{{ spec.label }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <div class="badge-row">
+                {% if product.stock_status == 'out' %}
+                  <span class="badge-stock out">Out of Stock</span>
+                {% elif product.stock_status == 'low' %}
+                  <span class="badge-stock low">Low Stock</span>
+                {% else %}
+                  <span class="badge-stock in">In Stock</span>
+                {% endif %}
+                {% if product.condition %}
+                  <span class="badge-condition">{{ product.condition.name }}</span>
+                {% endif %}
+              </div>
+
+              <div class="prod-rating">
+                <span class="stars">
+                  {% for i in "12345" %}★{% endfor %}
+                </span>
+                <span>({{ product.rating|default:"4.8" }})</span>
+              </div>
+
+              <div class="price-container">
+                <span class="prod-price">KSh {{ product.price|floatformat:0 }}</span>
+                {% if product.old_price %}
+                  <span class="prod-old-price">KSh {{ product.old_price|floatformat:0 }}</span>
+                {% endif %}
+                {% if product.discount_percent %}
+                  <span class="prod-save">-{{ product.discount_percent }}%</span>
+                {% endif %}
+              </div>
+              <div class="vat-note">✓ Includes 16% VAT</div>
+            </div>
+
+            <!-- ===== ACTIONS (Add to Cart + WhatsApp) ===== -->
+            <div class="prod-actions">
+              <button
+                class="btn-cart-add js-shop-add-cart"
+                data-product-id="{{ product.id }}"
+                data-product-name="{{ product.name }}"
+                {% if product.stock_status == 'out' %}disabled{% endif %}
+                type="button">
+                <span class="cart-loader" aria-hidden="true"></span>
+                <span class="btn-icon"><i class="fas fa-cart-shopping"></i></span>
+                <span class="btn-label">{% if product.stock_status == 'out' %}Out of Stock{% else %}Add to Cart{% endif %}</span>
+              </button>
+
+              <a
+                href="https://wa.me/254792758560?text={{ product.name|urlencode }}%20-%20is%20this%20available%3F"
+                target="_blank" rel="noopener"
+                class="btn-whatsapp-card">
+                <i class="fab fa-whatsapp"></i> Order on WhatsApp
+              </a>
+            </div>
+          </div>
+          {% empty %}
+          <p>No products match your filters right now.</p>
+          {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <div class="pagination">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous page">&larr; Prev</a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="current">{{ num }}</span>
+            {% else %}
+              <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" aria-label="Next page">Next &rarr;</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  /* Mobile "Filters" toggle */
+  (function () {
+    const toggle = document.getElementById('filterToggleMobile');
+    const sidebar = document.getElementById('filtersSidebar');
+    if (!toggle || !sidebar) return;
+    toggle.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+  })();
+
+  /* Collapsible filter groups */
+  document.querySelectorAll('.filter-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () { btn.closest('.filter-group').classList.toggle('collapsed'); });
+  });
+
+  /* Sort select */
+  const sortSelect = document.getElementById('sortSelect');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function () {
+      const url = new URL(window.location.href);
+      url.searchParams.set('sort', sortSelect.value);
+      window.location.href = url.toString();
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     THEMED TOAST — identical look/feel to the one on index.html
+     ══════════════════════════════════════════════════════════════ */
+  (function () {
+    var toastEl = null, hideTimer = null;
+    var ICON_SUCCESS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg>';
+    var ICON_HEART   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/></svg>';
+    var ICON_ERROR   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+
+    function ensureToast() {
+      if (toastEl) return toastEl;
+      toastEl = document.createElement('div');
+      toastEl.className = 'shop-toast-wrap';
+      toastEl.innerHTML = '<span class="st-ic" data-role="ic"></span><span class="st-body"><span class="st-title" data-role="title"></span><span class="st-msg" data-role="msg"></span></span>';
+      document.body.appendChild(toastEl);
+      return toastEl;
+    }
+
+    function shopToast(opts) {
+      opts = opts || {};
+      var el = ensureToast();
+      el.classList.toggle('st-error', opts.type === 'error');
+      el.querySelector('[data-role="ic"]').innerHTML = opts.icon || ICON_SUCCESS;
+      el.querySelector('[data-role="title"]').textContent = opts.title || '';
+      el.querySelector('[data-role="msg"]').textContent = opts.msg || '';
+      clearTimeout(hideTimer);
+      requestAnimationFrame(function () { el.classList.add('show'); });
+      hideTimer = setTimeout(function () { el.classList.remove('show'); }, 3200);
+    }
+
+    function getCsrf() {
+      var m = document.cookie.match(/csrftoken=([^;]+)/);
+      return m ? m[1] : '';
+    }
+
+    function setBadge(id, n) {
+      var el = document.getElementById(id);
+      if (el && n != null) el.textContent = n;
+    }
+
+    /* ── Add to Cart ── */
+    document.querySelectorAll('.js-shop-add-cart').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.disabled || btn.classList.contains('is-loading') || btn.classList.contains('is-added')) return;
+        btn.classList.add('is-loading');
+        var productId = btn.dataset.productId;
+        var productName = btn.dataset.productName || 'Item';
+
+        var body = new URLSearchParams();
+        body.append('quantity', 1);
+
+        fetch('/cart/add/' + productId + '/', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' },
+          body: body
+        })
+          .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+          .then(function (data) {
+            btn.classList.remove('is-loading');
+            btn.classList.add('is-added');
+            setBadge('cartCount', data.cart_count);
+            shopToast({ title: 'Added to your bag!', msg: productName + ' — ready whenever you want to check out.', icon: ICON_SUCCESS });
+            setTimeout(function () { btn.classList.remove('is-added'); }, 2000);
+          })
+          .catch(function () {
+            btn.classList.remove('is-loading');
+            shopToast({ title: 'Something slipped.', msg: "Couldn't add " + productName + ' to your cart.', type: 'error', icon: ICON_ERROR });
+          });
+      });
+    });
+
+    /* ── Wishlist ── */
+    document.querySelectorAll('.js-shop-wishlist').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (btn.dataset.loading === '1') return;
+        btn.dataset.loading = '1';
+        var url = btn.dataset.url;
+        var name = btn.dataset.productName || 'Item';
+
+        fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' }
+        })
+          .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+          .then(function (data) {
+            var added = !!data.added;
+            btn.classList.toggle('active', added);
+            btn.classList.remove('is-wishing');
+            void btn.offsetWidth;
+            btn.classList.add('is-wishing');
+            setTimeout(function () { btn.classList.remove('is-wishing'); }, 420);
+            setBadge('wishCount', data.wishlist_count);
+            shopToast({
+              title: added ? 'Saved for later.' : 'Removed from wishlist.',
+              msg: added ? name + ' is now on your wishlist.' : "You can always add it back later.",
+              icon: ICON_HEART
+            });
+          })
+          .catch(function () {
+            shopToast({ title: 'Something slipped.', msg: "Couldn't update your wishlist right now.", type: 'error', icon: ICON_ERROR });
+          })
+          .finally(function () { btn.dataset.loading = '0'; });
+      });
+    });
+  })();
+</script>
+{% endblock %}

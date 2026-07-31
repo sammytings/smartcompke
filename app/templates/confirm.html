@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Set New Password - SmartComputersKE{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="card">
+        {% if validlink %}
+            <h1>Set a new <span>password</span></h1>
+            <p class="card-subtitle">Choose a strong password you haven't used before.</p>
+
+            {% if form.non_field_errors %}
+                <div class="form-errors-top">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="card-subtitle" style="margin:6px 0 0; font-size:12px;">{{ field.help_text|safe }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">{{ field.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-blue btn-block">Reset Password</button>
+            </form>
+        {% else %}
+            <h1>Link <span>expired</span></h1>
+            <p class="card-subtitle">
+                This password reset link is invalid, possibly because it has already been used.
+                Please request a new one.
+            </p>
+            <a href="{% url 'password_reset' %}" class="btn btn-blue btn-block">Request New Link</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

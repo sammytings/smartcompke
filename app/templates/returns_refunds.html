@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Returns & Refunds | Smartcomputerske Technologies{% endblock %}
+
+{% block content %}
+
+<style>
+/* ============================================================
+   RETURNS & REFUNDS — page-specific styles only.
+   Deliberately reuses base.html's existing design tokens
+   (--primary, --ink, --muted, --line, --paper, --navy, --amber…)
+   and shared layout classes (.wrap, .section, .section-head,
+   .breadcrumb, .icon-holder) instead of redeclaring :root or a
+   parallel container system, so this page can never drift out of
+   sync with the rest of the site.
+   ============================================================ */
+
+.rr-hero{
+  background:var(--navy);
+  color:#fff;
+  padding:64px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.rr-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:99px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);
+  color:#8FB4FF;font-size:12px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;
+  margin-bottom:18px;
+}
+.rr-hero h1{color:#fff;font-size:36px;margin-bottom:14px;}
+.rr-hero p{color:#93A0B8;font-size:15px;line-height:1.75;max-width:680px;margin:0;}
+
+.rr-info-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-bottom:36px;
+}
+.rr-info-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px 22px;
+  transition:border-color .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease);
+}
+.rr-info-card:hover{
+  border-color:var(--line);
+  box-shadow:var(--shadow-sm);
+  transform:translateY(-2px);
+}
+.rr-info-card h3{font-size:15px;margin-bottom:8px;}
+.rr-info-card p{color:var(--muted);font-size:13.5px;line-height:1.65;margin:0;}
+
+.rr-layout{
+  display:grid;
+  grid-template-columns:2.1fr 1fr;
+  gap:26px;
+  align-items:start;
+}
+
+.rr-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:28px 30px;
+  margin-bottom:22px;
+}
+.rr-card h3{font-size:17px;margin-bottom:16px;}
+.rr-card p{color:var(--ink-soft);font-size:14px;line-height:1.75;}
+.rr-card ul{margin:0;padding-left:20px;color:var(--ink-soft);font-size:14px;line-height:1.9;}
+.rr-card ul li{margin-bottom:2px;}
+
+.rr-split{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+
+.rr-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.rr-table th{
+  background:var(--primary-tint);color:var(--primary);
+  text-align:left;font-weight:700;padding:12px 14px;
+  border-bottom:1px solid var(--line);
+}
+.rr-table td{padding:12px 14px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);}
+.rr-table tbody tr:hover{background:var(--paper);}
+.rr-table td:first-child{color:var(--ink);font-weight:600;}
+
+.rr-timeline{display:flex;flex-direction:column;gap:20px;margin-top:4px;}
+.rr-timeline-item{display:flex;gap:16px;}
+.rr-timeline-num{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:var(--primary);color:#fff;font-weight:700;font-size:13.5px;
+  display:flex;align-items:center;justify-content:center;
+}
+.rr-timeline-item h4{font-size:14.5px;margin-bottom:4px;}
+.rr-timeline-item p{margin:0;color:var(--muted);font-size:13.5px;}
+
+.rr-refund-box{
+  display:flex;gap:16px;align-items:flex-start;
+  background:var(--primary-tint);border-left:3px solid var(--primary);
+  border-radius:10px;padding:16px 18px;margin-top:16px;
+}
+.rr-refund-box .icon-holder{margin-bottom:0;flex-shrink:0;}
+.rr-refund-box strong{display:block;font-size:14px;color:var(--ink);margin-bottom:3px;}
+.rr-refund-box span{color:var(--ink-soft);font-size:13.5px;}
+
+.rr-notice{
+  background:var(--amber-tint);
+  border-left:3px solid var(--amber);
+}
+.rr-notice h3{color:#92400e;}
+.rr-notice p{color:#78350f;margin:0;}
+
+.rr-sidebar-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;
+  position:sticky;
+  top:calc(var(--nav-total-h, 116px) + 20px);
+  margin-bottom:20px;
+}
+.rr-sidebar-card h3{font-size:15px;margin-bottom:14px;}
+.rr-sidebar-card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;}
+.rr-sidebar-card ul li{font-size:13.5px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
+.rr-sidebar-card ul li i{color:var(--success);font-size:12px;}
+
+.rr-contact-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line-soft);font-size:13px;color:var(--ink-soft);}
+.rr-contact-row:first-of-type{border-top:none;}
+.rr-contact-row i{width:16px;color:var(--primary);}
+
+@media (max-width:900px){
+  .rr-layout{grid-template-columns:1fr;}
+  .rr-sidebar-card{position:static;}
+  .rr-info-grid{grid-template-columns:repeat(2,1fr);}
+  .rr-split{grid-template-columns:1fr;}
+}
+@media (max-width:600px){
+  .rr-hero{padding:44px 0;}
+  .rr-hero h1{font-size:27px;}
+  .rr-info-grid{grid-template-columns:1fr;}
+  .rr-card{padding:22px 20px;}
+}
+</style>
+
+<div class="wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">Home</a>
+    <span class="sep">/</span>
+    <span class="current">Returns &amp; Refunds</span>
+  </nav>
+</div>
+
+<section class="rr-hero">
+  <div class="wrap">
+    <span class="rr-badge"><i class="fas fa-rotate-left"></i> Returns &amp; Refund Policy</span>
+    <h1>Returns &amp; Refunds</h1>
+    <p>
+      At Smartcomputerske Technologies, customer satisfaction is our priority. We supply genuine
+      laptops, desktops, printers, accessories and networking equipment across Kenya — if you
+      receive the wrong item, a damaged product, or something with a manufacturer defect, we'll
+      work quickly to put it right.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+
+    <div class="section-head">
+      <div>
+        <span class="eyebrow-sm">Know before you buy</span>
+        <h2>Our Return Policy</h2>
+        <p>The most common situations we handle, and how each one is resolved.</p>
+      </div>
+    </div>
+
+    <div class="rr-info-grid">
+      <div class="rr-info-card">
+        <h3>Wrong Item Delivered</h3>
+        <p>If we accidentally deliver the wrong product, we'll replace it at no additional cost.</p>
+      </div>
+      <div class="rr-info-card">
+        <h3>Damaged During Delivery</h3>
+        <p>Report transport damage immediately so we can arrange a replacement or inspection.</p>
+      </div>
+      <div class="rr-info-card">
+        <h3>Manufacturer Defects</h3>
+        <p>Faults caused by a manufacturing defect are handled through our warranty procedure.</p>
+      </div>
+      <div class="rr-info-card">
+        <h3>Proof of Purchase</h3>
+        <p>A valid invoice or receipt is required before any return, replacement or refund.</p>
+      </div>
+    </div>
+
+    <div class="rr-layout">
+      <div class="rr-main">
+
+        <div class="rr-card">
+          <div class="rr-split">
+            <div>
+              <h3>Eligible for Return</h3>
+              <ul>
+                <li>Product received damaged during delivery</li>
+                <li>Wrong product supplied</li>
+                <li>Manufacturer defect found on first use</li>
+                <li>Missing accessories from the package</li>
+                <li>Product significantly different from your order</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Not Eligible for Return</h3>
+              <ul>
+                <li>Products physically damaged after delivery</li>
+                <li>Software licenses and activation keys</li>
+                <li>Products missing original packaging</li>
+                <li>Products modified by unauthorized technicians</li>
+                <li>Opened consumables (e.g. printer ink or toner)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="rr-card">
+          <h3>Eligibility at a Glance</h3>
+          <table class="rr-table">
+            <thead>
+              <tr>
+                <th>Situation</th>
+                <th>Eligible?</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wrong item supplied</td>
+                <td>Yes</td>
+                <td>Replacement provided.</td>
+              </tr>
+              <tr>
+                <td>Factory defect</td>
+                <td>Yes</td>
+                <td>Warranty process applies.</td>
+              </tr>
+              <tr>
+                <td>Damaged in shipping</td>
+                <td>Yes</td>
+                <td>Report immediately after delivery.</td>
+              </tr>
+              <tr>
+                <td>Change of mind</td>
+                <td>Depends</td>
+                <td>Item must be unopened and unused.</td>
+              </tr>
+              <tr>
+                <td>Used products</td>
+                <td>No</td>
+                <td>Cannot be returned unless defective.</td>
+              </tr>
+              <tr>
+                <td>Software already activated</td>
+                <td>No</td>
+                <td>Digital licenses cannot be refunded.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="rr-card">
+          <h3>Return Process</h3>
+          <div class="rr-timeline">
+            <div class="rr-timeline-item">
+              <div class="rr-timeline-num">1</div>
+              <div>
+                <h4>Report the Issue</h4>
+                <p>Notify us within 48 hours of receiving your order.</p>
+              </div>
+            </div>
+            <div class="rr-timeline-item">
+              <div class="rr-timeline-num">2</div>
+              <div>
+                <h4>Inspection</h4>
+                <p>Our technicians verify the reported issue.</p>
+              </div>
+            </div>
+            <div class="rr-timeline-item">
+              <div class="rr-timeline-num">3</div>
+              <div>
+                <h4>Resolution</h4>
+                <p>Replacement, repair, or refund, depending on the outcome.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rr-refund-box">
+            <div class="icon-holder"><i class="fas fa-money-check-dollar"></i></div>
+            <div>
+              <strong>Refund Timeline</strong>
+              <span>Once approved, most refunds are processed within 3–7 business days using the original payment method where possible.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rr-card rr-notice">
+          <h3>Important Notice</h3>
+          <p>
+            Please inspect your order immediately after delivery. Any missing, incorrect, or
+            damaged products should be reported as soon as possible so we can resolve it promptly.
+          </p>
+        </div>
+
+      </div>
+
+      <aside>
+        <div class="rr-sidebar-card">
+          <h3>Quick Facts</h3>
+          <ul>
+            <li><i class="fas fa-check"></i> Genuine products</li>
+            <li><i class="fas fa-check"></i> Manufacturer warranty</li>
+            <li><i class="fas fa-check"></i> Fast return processing</li>
+            <li><i class="fas fa-check"></i> Professional technical support</li>
+            <li><i class="fas fa-check"></i> Nationwide delivery</li>
+          </ul>
+        </div>
+
+        <div class="rr-sidebar-card">
+          <h3>Need Assistance?</h3>
+          <div class="rr-contact-row"><i class="fas fa-phone"></i> 0720 635023</div>
+          <div class="rr-contact-row"><i class="fas fa-envelope"></i> sales@smartcomputerske.co.ke</div>
+          <div class="rr-contact-row"><i class="fas fa-location-dot"></i> Superior Centre, Nairobi</div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h2>Delete Product</h2>
+
+    <p>
+        Are you sure you want to delete
+        <strong>{{ product.name }}</strong>?
+    </p>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <button class="btn btn-danger">
+            Delete Product
+        </button>
+
+        <a href="{% url 'dashboard_products' %}" class="btn btn-outline">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,267 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Processing Order...</title>
+
+<style>
+
+:root{
+  --navy:#123a66;
+  --navy-dark:#0b2544;
+  --red:#c8272c;
+  --red-dark:#a11e22;
+  --bg:#eef1f7;
+  --card:#ffffff;
+  --border:#dde3ee;
+  --text-dark:#111827;
+  --text-muted:#6b7280;
+  --track:#e6e9f2;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+body{
+  background:#fff;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/*===========================*/
+
+.page-loader-box{
+  width:380px;
+  max-width:90vw;
+  padding:20px;
+  text-align:center;
+}
+
+/*===========================*/
+
+.sc-loader-stage{
+  position:relative;
+  width:130px;
+  height:100px;
+  margin:auto;
+  margin-bottom:28px;
+}
+
+.sc-loader-shelf{
+  position:absolute;
+  left:5px;
+  right:5px;
+  bottom:10px;
+  height:2px;
+  background:var(--border);
+}
+
+/*===========================*/
+
+.sc-loader-bag{
+  position:absolute;
+  left:50%;
+  bottom:10px;
+  width:56px;
+  margin-left:-28px;
+  animation:bagMove 1.8s infinite ease-in-out;
+}
+
+.sc-loader-bag svg{
+  width:100%;
+}
+
+/*===========================*/
+
+.sc-loader-parcel{
+  position:absolute;
+  left:50%;
+  top:-8px;
+  width:14px;
+  height:14px;
+  margin-left:-7px;
+  border-radius:2px;
+  opacity:0;
+  animation:parcelDrop 1.8s infinite;
+}
+
+.sc-loader-parcel::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:#fff;
+  transform:translateX(-50%);
+}
+
+.sc-loader-parcel:nth-child(1){
+  background:var(--navy);
+  animation-delay:0s;
+}
+
+.sc-loader-parcel:nth-child(2){
+  background:var(--red);
+  animation-delay:.6s;
+}
+
+.sc-loader-parcel:nth-child(3){
+  background:var(--navy-dark);
+  animation-delay:1.2s;
+}
+
+@keyframes bagMove{
+  0%,100%{ transform:rotate(-5deg); }
+  50%{ transform:rotate(5deg); }
+}
+
+@keyframes parcelDrop{
+  0%{ opacity:0; transform:translateY(0); }
+  10%{ opacity:1; }
+  60%{ opacity:1; transform:translateY(48px) rotate(20deg); }
+  70%{ opacity:0; }
+  100%{ opacity:0; transform:translateY(0); }
+}
+
+/*===========================*/
+
+h2{
+  font-size:22px;
+  font-weight:700;
+  color:var(--text-dark);
+  margin-bottom:8px;
+  letter-spacing:-0.2px;
+}
+
+p{
+  font-size:14px;
+  color:var(--text-muted);
+  margin-bottom:26px;
+  line-height:1.5;
+}
+
+/*===========================*/
+
+.progress{
+  width:100%;
+  height:8px;
+  background:var(--track);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0;
+  background:var(--navy);
+  border-radius:4px;
+  animation:load 5s linear forwards;
+}
+
+@keyframes load{
+  100%{ width:100%; }
+}
+
+/*===========================*/
+
+.status{
+  font-weight:600;
+  font-size:14px;
+  color:var(--navy);
+  margin-top:10px;
+  min-height:18px;
+}
+
+.small{
+  margin-top:14px;
+  font-size:12px;
+  color:var(--text-muted);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="page-loader-box">
+
+<div class="sc-loader-stage">
+
+<div class="sc-loader-parcel"></div>
+<div class="sc-loader-parcel"></div>
+<div class="sc-loader-parcel"></div>
+
+<div class="sc-loader-bag">
+<svg viewBox="0 0 58 52">
+<path d="M14 18h30l4 30a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4l4-30z" fill="#123a66"/>
+<path d="M20 18v-4a9 9 0 0 1 18 0v4"
+fill="none"
+stroke="#0b2544"
+stroke-width="3"
+stroke-linecap="round"/>
+<rect x="10" y="17" width="38" height="6" rx="2" fill="#c8272c"/>
+</svg>
+</div>
+
+<div class="sc-loader-shelf"></div>
+
+</div>
+
+<h2 id="title">Processing your order</h2>
+
+<p id="message">Please wait while we verify your payment and reserve your items.</p>
+
+<div class="progress">
+<div class="progress-bar"></div>
+</div>
+
+<div class="status" id="status">Packing your order...</div>
+
+<div class="small">Do not close this page</div>
+
+</div>
+
+<script>
+
+const messages=[
+  "Checking stock...",
+  "Reserving your products...",
+  "Preparing your invoice...",
+  "Confirming payment...",
+  "Generating your order..."
+];
+
+let i=0;
+
+setInterval(function(){
+  document.getElementById("status").innerHTML=messages[i];
+  i++;
+  if(i>=messages.length){
+    i=0;
+  }
+},1000);
+
+/*
+After backend finishes creating the order,
+replace ORDER_SUCCESS_URL with the Django URL.
+*/
+
+setTimeout(function () {
+    window.location.href = "{% url 'order_receipt' order.order_id %}";
+}, 5000);
+</script>
+
+</body>
+</html>

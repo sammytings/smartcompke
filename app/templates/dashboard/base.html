@@ -1,0 +1,576 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartComputersKE Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="dashboard-wrapper" id="dashboardWrapper">
+
+    <!-- ================= Sidebar (always dark — brand chrome) ================= -->
+    {% include "dashboard/sidebar.html" %}
+
+    <!-- mobile drawer backdrop -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ================= Main ================= -->
+    <div class="dashboard-main">
+
+        <!-- ================= Navbar (always dark — brand chrome) ================= -->
+        <header class="dashboard-navbar">
+            <div class="navbar-left">
+                <button id="navMenuToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+            </div>
+
+            <div class="navbar-center">
+                <form class="dashboard-search" role="search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="q" id="dashboardSearchInput" placeholder="Search products, orders, customers...">
+                    <kbd class="search-kbd">/</kbd>
+                </form>
+            </div>
+
+            <div class="navbar-right">
+                <button class="icon-btn" id="themeToggle" aria-label="Toggle content theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="navbar-divider"></div>
+                <div class="profile-menu" id="profileMenu">
+                    <img src="{% static 'images/logo.png' %}"
+                         class="profile-image"
+                         alt=""
+                         onerror="this.replaceWith(window.__scAvatarFallback())">
+                    <div>
+                        <h5>{{ request.user.get_full_name|default:request.user.username }}</h5>
+                        <small>Administrator</small>
+                    </div>
+                    <i class="fas fa-chevron-down caret"></i>
+
+                    <div class="profile-dropdown">
+                        <a href=""><i class="fas fa-user"></i> My Profile</a>
+                        <a href=""><i class="fas fa-gear"></i> Settings</a>
+                        <hr>
+                        <a href="{% url 'logout' %}" class="danger"><i class="fas fa-arrow-right-from-bracket"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= Everything below is the light content zone ================= -->
+
+        <section class="breadcrumb">
+            <a href="{% url 'dashboard_home' %}">Dashboard</a>
+            {% block breadcrumb %}{% endblock %}
+        </section>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+                <button class="alert-close" aria-label="Dismiss">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <main class="dashboard-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="dashboard-footer">
+            <div>© {% now "Y" %} <strong>SmartComputersKE</strong></div>
+            <div>Custom Admin Dashboard v1.0</div>
+        </footer>
+
+    </div>
+</div>
+
+<style>
+/* ==============================================================
+   TWO ZONES:
+   1) Chrome (sidebar + navbar) — always dark. This is brand
+      identity, not a "theme", so it doesn't flip.
+   2) Content (breadcrumb / alerts / main / footer) — light by
+      default (white + soft gray), with an optional dark variant
+      via the moon/sun toggle, persisted per-user.
+================================================================= */
+:root {
+    /* chrome tokens — dark, fixed */
+    --sc-bg: #12151b;
+    --sc-bg-raised: #171b22;
+    --sc-hover: #1c2029;
+    --sc-border: rgba(255, 255, 255, 0.07);
+    --sc-text: #eef0f4;
+    --sc-text-muted: #838d9e;
+    --sc-text-faint: #4d5566;
+    --sc-blue: #3b73f0;
+    --sc-blue-soft: rgba(59, 115, 240, 0.12);
+    --sc-red: #e5484d;
+    --sc-red-soft: rgba(229, 72, 77, 0.12);
+    --sc-sidebar-w: 252px;
+    --sc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+
+    /* content tokens — light by default */
+    --sc-page-bg: #f6f7fb;
+    --sc-page-card: #ffffff;
+    --sc-page-border: #e7e9f0;
+    --sc-page-text: #1b1f27;
+    --sc-page-muted: #667085;
+    --sc-page-faint: #9aa2b1;
+}
+
+/* dark content variant, toggled via body.dark-content */
+body.dark-content {
+    --sc-page-bg: #12151b;
+    --sc-page-card: #171b22;
+    --sc-page-border: rgba(255, 255, 255, 0.07);
+    --sc-page-text: #eef0f4;
+    --sc-page-muted: #838d9e;
+    --sc-page-faint: #4d5566;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--sc-page-bg);
+    color: var(--sc-page-text);
+    font-family: var(--sc-font);
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dashboard-wrapper { min-height: 100vh; }
+
+.dashboard-main {
+    margin-left: var(--sc-sidebar-w);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--sc-page-bg);
+    transition: margin-left 0.2s ease;
+}
+
+/* ---------------- Navbar (dark chrome) ---------------- */
+
+.dashboard-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 26px;
+    background: var(--sc-bg-raised);
+    border-bottom: 1px solid var(--sc-border);
+    font-family: var(--sc-font);
+}
+
+.navbar-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+
+.navbar-left #navMenuToggle {
+    display: none;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-bg);
+    color: var(--sc-text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.14s ease, color 0.14s ease;
+}
+.navbar-left #navMenuToggle:hover { background: var(--sc-hover); color: var(--sc-text); }
+
+.navbar-left h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    letter-spacing: -0.2px;
+    color: var(--sc-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.navbar-center { flex: 1; display: flex; justify-content: center; min-width: 0; }
+
+.dashboard-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    max-width: 380px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 9px;
+    background: var(--sc-bg);
+    border: 1px solid var(--sc-border);
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.dashboard-search i:first-child { font-size: 13px; color: var(--sc-text-faint); flex-shrink: 0; }
+.dashboard-search input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--sc-text);
+    font-size: 13.5px;
+    font-family: inherit;
+}
+.dashboard-search input::placeholder { color: var(--sc-text-faint); }
+.dashboard-search:focus-within { border-color: var(--sc-blue); box-shadow: 0 0 0 3px var(--sc-blue-soft); }
+
+.search-kbd {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--sc-text-faint);
+    background: var(--sc-hover);
+    border: 1px solid var(--sc-border);
+    border-radius: 4px;
+    padding: 1.5px 6px;
+    line-height: 1.5;
+}
+.dashboard-search:focus-within .search-kbd { display: none; }
+
+.navbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.icon-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-bg);
+    color: var(--sc-text-muted);
+    font-size: 14.5px;
+    cursor: pointer;
+    transition: background 0.14s ease, color 0.14s ease;
+}
+.icon-btn:hover { background: var(--sc-hover); color: var(--sc-text); }
+.icon-btn:focus-visible { outline: 2px solid var(--sc-blue); outline-offset: 2px; }
+
+.navbar-divider { width: 1px; height: 24px; background: var(--sc-border); margin: 0 2px; }
+
+/* ---------------- Profile (sits in dark navbar) ---------------- */
+
+.profile-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px 5px 5px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease;
+}
+.profile-menu:hover,
+.profile-menu.open { background: var(--sc-bg); border-color: var(--sc-border); }
+
+.profile-image,
+.avatar-fallback {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    object-fit: cover;
+    border-bottom: 2px solid var(--sc-red);
+}
+.avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sc-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.profile-menu h5 {
+    margin: 0;
+    font-size: 13.2px;
+    font-weight: 620;
+    color: var(--sc-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+}
+.profile-menu small { font-size: 11px; color: var(--sc-text-faint); }
+
+.profile-menu .caret {
+    font-size: 10px;
+    color: var(--sc-text-faint);
+    margin-left: 2px;
+    transition: transform 0.16s ease;
+}
+.profile-menu.open .caret { transform: rotate(180deg); }
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 210px;
+    background: var(--sc-bg-raised);
+    border: 1px solid var(--sc-border);
+    border-radius: 11px;
+    box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5);
+    padding: 7px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+    z-index: 950;
+}
+.profile-menu.open .profile-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.profile-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.profile-dropdown a i { width: 15px; text-align: center; font-size: 12.5px; color: var(--sc-text-faint); }
+.profile-dropdown a:hover { background: var(--sc-hover); color: var(--sc-text); }
+.profile-dropdown a.danger:hover { background: var(--sc-red-soft); color: var(--sc-red); }
+.profile-dropdown a.danger:hover i { color: var(--sc-red); }
+.profile-dropdown hr { border: none; height: 1px; background: var(--sc-border); margin: 6px 4px; }
+
+/* ---------------- Breadcrumb (light content zone) ---------------- */
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 16px 26px 6px;
+    font-size: 12.5px;
+    color: var(--sc-page-faint);
+}
+.breadcrumb a { color: var(--sc-page-faint); text-decoration: none; transition: color 0.14s ease; }
+.breadcrumb a:hover { color: var(--sc-blue); }
+.breadcrumb a:not(:first-child)::before { content: "\203A"; margin-right: 6px; color: var(--sc-page-faint); }
+.breadcrumb a:first-child { color: var(--sc-page-muted); font-weight: 600; }
+
+/* ---------------- Alerts (light content zone) ---------------- */
+
+.messages { padding: 10px 26px 0; display: flex; flex-direction: column; gap: 10px; }
+
+.alert {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 16px;
+    border-radius: 9px;
+    background: var(--sc-page-card);
+    border: 1px solid var(--sc-page-border);
+    border-left: 3px solid var(--sc-blue);
+    color: var(--sc-page-text);
+    font-size: 13.5px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.alert.error, .alert.danger, .alert.warning { border-left-color: var(--sc-red); }
+
+.alert-close {
+    background: transparent;
+    border: none;
+    color: var(--sc-page-faint);
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+    flex-shrink: 0;
+    transition: color 0.14s ease;
+}
+.alert-close:hover { color: var(--sc-page-text); }
+
+/* ---------------- Content (light zone) ---------------- */
+
+.dashboard-content { flex: 1; padding: 20px 26px 40px; color: var(--sc-page-text); }
+
+/* ---------------- Footer (light zone) ---------------- */
+
+.dashboard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 26px;
+    border-top: 1px solid var(--sc-page-border);
+    font-size: 12px;
+    color: var(--sc-page-faint);
+}
+.dashboard-footer strong { color: var(--sc-page-muted); font-weight: 600; }
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 6, 10, 0.55);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.sidebar-overlay.open { display: block; opacity: 1; }
+
+.mobile-topbar { display: none !important; }
+
+/* ==============================================================
+   RESPONSIVE
+================================================================= */
+@media (max-width: 1024px) {
+    :root { --sc-sidebar-w: 232px; }
+    .navbar-center { display: none; }
+    .profile-menu h5, .profile-menu small { display: none; }
+    .profile-menu .caret { display: none; }
+}
+
+@media (max-width: 860px) {
+    .dashboard-main { margin-left: 0; }
+    .navbar-left #navMenuToggle { display: flex; }
+    .dashboard-navbar { padding: 0 16px; }
+    .breadcrumb, .messages, .dashboard-content, .dashboard-footer { padding-left: 16px; padding-right: 16px; }
+}
+
+@media (max-width: 480px) {
+    .dashboard-navbar { height: 58px; }
+    .navbar-left h2 { font-size: 16px; }
+    .icon-btn { width: 34px; height: 34px; font-size: 13.5px; }
+    .profile-image, .avatar-fallback { width: 30px; height: 30px; }
+    .dashboard-footer { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body, .dashboard-main, .icon-btn, .profile-menu, .profile-dropdown,
+    .dashboard-search, .sidebar-overlay, .navbar-left #navMenuToggle {
+        transition: none !important;
+    }
+}
+</style>
+
+<script>
+window.__scAvatarFallback = function () {
+    const el = document.createElement("div");
+    el.className = "avatar-fallback";
+    const name = "{{ request.user.get_full_name|default:request.user.username|escapejs }}";
+    el.textContent = (name.trim().charAt(0) || "A").toUpperCase();
+    return el;
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ---------- Sidebar toggle (mobile) ---------- */
+    const navMenuToggle = document.getElementById("navMenuToggle");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+
+    function openSidebar() {
+        sidebar?.classList.add("open");
+        overlay?.classList.add("open");
+        document.body.style.overflow = "hidden";
+    }
+    function closeSidebar() {
+        sidebar?.classList.remove("open");
+        overlay?.classList.remove("open");
+        document.body.style.overflow = "";
+    }
+
+    if (navMenuToggle) {
+        navMenuToggle.addEventListener("click", function () {
+            sidebar?.classList.contains("open") ? closeSidebar() : openSidebar();
+        });
+    }
+    if (overlay) overlay.addEventListener("click", closeSidebar);
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 860) closeSidebar();
+    });
+
+    /* ---------- Profile dropdown ---------- */
+    const profileMenu = document.getElementById("profileMenu");
+    if (profileMenu) {
+        profileMenu.addEventListener("click", function (e) {
+            e.stopPropagation();
+            profileMenu.classList.toggle("open");
+        });
+        document.addEventListener("click", function () {
+            profileMenu.classList.remove("open");
+        });
+    }
+
+    /* ---------- "/" focuses search, Escape blurs it ---------- */
+    const searchInput = document.getElementById("dashboardSearchInput");
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+            e.preventDefault();
+            searchInput?.focus();
+        }
+        if (e.key === "Escape") searchInput?.blur();
+    });
+
+    /* ---------- Dismissible alerts ---------- */
+    document.querySelectorAll(".alert-close").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const alertEl = btn.closest(".alert");
+            alertEl.style.transition = "opacity .18s ease";
+            alertEl.style.opacity = "0";
+            setTimeout(function () { alertEl.remove(); }, 180);
+        });
+    });
+
+    /* ---------- Content light/dark toggle ----------
+       Chrome (sidebar/navbar) stays dark always — this only
+       flips the content zone below it. ---------- */
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = themeToggle?.querySelector("i");
+
+    function applyContentTheme(mode) {
+        document.body.classList.toggle("dark-content", mode === "dark");
+        if (themeIcon) themeIcon.className = mode === "dark" ? "fas fa-sun" : "fas fa-moon";
+    }
+
+    applyContentTheme(localStorage.getItem("sc-content-theme") || "light");
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", function () {
+            const next = document.body.classList.contains("dark-content") ? "light" : "dark";
+            applyContentTheme(next);
+            localStorage.setItem("sc-content-theme", next);
+        });
+    }
+
+});
+</script>
+
+<script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

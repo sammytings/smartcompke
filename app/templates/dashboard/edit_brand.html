@@ -1,0 +1,57 @@
+{% extends "dashboard/base.html" %}
+
+
+
+{% block content %}
+
+
+
+<div class="dashboard-header">
+
+
+<h1>
+Edit Brand
+</h1>
+
+
+
+<a href="{% url 'dashboard_brands' %}" class="btn-secondary">
+Back
+</a>
+
+
+</div>
+
+
+
+
+<div class="form-card">
+
+
+<form method="POST" enctype="multipart/form-data">
+
+
+{% csrf_token %}
+
+
+
+{{form.as_p}}
+
+
+
+<button class="btn-primary">
+
+Update Brand
+
+</button>
+
+
+</form>
+
+
+
+</div>
+
+
+
+{% endblock %}

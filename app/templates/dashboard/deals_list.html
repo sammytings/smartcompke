@@ -1,0 +1,238 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>Deals Management</h2>
+
+    <a href="{% url 'dashboard_add_deal' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        New Deal
+    </a>
+
+</div>
+
+
+<div class="deal-stats">
+
+    <div class="card">
+        <h3>{{ active_count }}</h3>
+        <p>Active Deals</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ upcoming_count }}</h3>
+        <p>Upcoming</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ expired_count }}</h3>
+        <p>Expired</p>
+    </div>
+
+</div>
+
+
+<form method="get" class="filters">
+
+    <input
+        type="text"
+        name="q"
+        value="{{ search }}"
+        placeholder="Search products..."
+    >
+
+    <select name="status">
+
+        <option value="">All Deals</option>
+
+        <option value="active"
+            {% if status == "active" %}selected{% endif %}>
+            Active
+        </option>
+
+        <option value="expired"
+            {% if status == "expired" %}selected{% endif %}>
+            Expired
+        </option>
+
+        <option value="upcoming"
+            {% if status == "upcoming" %}selected{% endif %}>
+            Upcoming
+        </option>
+
+        <option value="inactive"
+            {% if status == "inactive" %}selected{% endif %}>
+            Inactive
+        </option>
+
+    </select>
+
+    <button class="btn btn-dark">
+        Filter
+    </button>
+
+</form>
+
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>Image</th>
+
+<th>Product</th>
+
+<th>Old Price</th>
+
+<th>Deal Price</th>
+
+<th>Discount</th>
+
+<th>Ends</th>
+
+<th>Status</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for deal in deals %}
+
+<tr>
+
+<td>
+
+{% if deal.image %}
+<img src="{{ deal.image.url }}" width="70">
+{% elif deal.product.image %}
+<img src="{{ deal.product.image.url }}" width="70">
+{% endif %}
+
+</td>
+
+<td>
+
+<strong>{{ deal.product.name }}</strong>
+
+<br>
+
+<small>{{ deal.variant_name }}</small>
+
+</td>
+
+<td>
+
+KSh {{ deal.price|floatformat:0|intcomma }}
+
+</td>
+
+<td>
+
+<strong>
+
+KSh {{ deal.discount_price|floatformat:0|intcomma }}
+
+</strong>
+
+</td>
+
+<td>
+
+{{ deal.discount_percent }}%
+
+</td>
+
+<td>
+
+{{ deal.discount_end|date:"d M Y H:i" }}
+
+</td>
+
+<td>
+
+<td>
+
+{% if deal.discount_active %}
+
+<span class="badge badge-success">
+Active
+</span>
+
+{% elif deal.discount_start > now %}
+
+<span class="badge badge-warning">
+Upcoming
+</span>
+
+{% elif deal.discount_end < now %}
+
+<span class="badge badge-danger">
+Expired
+</span>
+
+{% else %}
+
+<span class="badge badge-secondary">
+No Deal
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<a href="{% url 'dashboard_edit_deal' deal.id %}">
+
+Edit
+
+</a>
+
+|
+
+<a href="{% url 'dashboard_end_deal' deal.id %}">
+
+End
+
+</a>
+
+|
+
+<a href="{% url 'dashboard_extend_deal' deal.id %}">
+
+Extend
+
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="8">
+
+No deals found.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

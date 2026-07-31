@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5 text-center">
+
+<i class="fas fa-circle-check text-success fa-4x mb-4"></i>
+
+<h2>Quote Request Submitted</h2>
+
+<p>
+Thank you for contacting SmartComputersKe Technologies.
+</p>
+
+<p>
+Our sales team has received your request and will contact you shortly.
+</p>
+
+<a href="{% url 'shop' %}" class="btn btn-primary">
+Continue Shopping
+</a>
+
+</div>
+
+{% endblock %}

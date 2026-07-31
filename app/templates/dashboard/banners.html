@@ -1,0 +1,361 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Banner Management{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2>Banner Management</h2>
+        <p>Manage homepage, deals, category and promotional banners.</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'dashboard_add_banner' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            Add Banner
+        </a>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-header">
+
+        <form method="GET" class="search-form">
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Search banners..."
+                value="{{ request.GET.q }}"
+            >
+
+            <button>
+                <i class="fas fa-search"></i>
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>Image</th>
+
+                <th>Title</th>
+
+                <th>Type</th>
+
+                <th>Category</th>
+
+                <th>Brand</th>
+
+                <th>Status</th>
+
+                <th>Order</th>
+
+                <th>Actions</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for banner in banners %}
+
+            <tr>
+
+                <td>
+
+                    {% if banner.image %}
+
+                    <img
+                        src="{{ banner.image.url }}"
+                        class="banner-thumb"
+                    >
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <strong>{{ banner.title }}</strong>
+
+                    <br>
+
+                    <small>{{ banner.subtitle }}</small>
+
+                </td>
+
+                <td>
+
+                    <span class="badge blue">
+
+                        {{ banner.get_banner_type_display }}
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    {{ banner.category|default:"-" }}
+
+                </td>
+
+                <td>
+
+                    {{ banner.brand|default:"-" }}
+
+                </td>
+
+                <td>
+
+                    {% if banner.active %}
+
+                        <span class="badge green">
+
+                            Active
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge red">
+
+                            Disabled
+
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {{ banner.order }}
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{% url 'dashboard_edit_banner' banner.id %}"
+                        class="action-btn edit"
+                    >
+
+                        <i class="fas fa-edit"></i>
+
+                    </a>
+
+                    <a
+                        href="{% url 'dashboard_delete_banner' banner.id %}"
+                        class="action-btn delete"
+                    >
+
+                        <i class="fas fa-trash"></i>
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="8">
+
+                    <div class="empty">
+
+                        <i class="fas fa-images fa-3x"></i>
+
+                        <h3>No banners found</h3>
+
+                        <p>Create your first banner.</p>
+
+                        <a
+                            href="{% url 'dashboard_add_banner' %}"
+                            class="btn-primary"
+                        >
+
+                            Add Banner
+
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% if banners.has_other_pages %}
+
+<div class="pagination">
+
+    {% if banners.has_previous %}
+
+    <a href="?page={{ banners.previous_page_number }}">Previous</a>
+
+    {% endif %}
+
+    <span>
+
+        Page {{ banners.number }} of {{ banners.paginator.num_pages }}
+
+    </span>
+
+    {% if banners.has_next %}
+
+    <a href="?page={{ banners.next_page_number }}">Next</a>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+<style>.page-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+flex-wrap:wrap;
+gap:20px;
+}
+
+.card{
+background:#fff;
+border-radius:12px;
+padding:20px;
+box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.table-responsive{
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#f8f9fa;
+padding:15px;
+text-align:left;
+font-weight:600;
+}
+
+td{
+padding:15px;
+border-bottom:1px solid #eee;
+}
+
+.banner-thumb{
+width:120px;
+height:60px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.badge{
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+}
+
+.blue{
+background:#eaf2ff;
+color:#2563eb;
+}
+
+.green{
+background:#dcfce7;
+color:#15803d;
+}
+
+.red{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.action-btn{
+width:36px;
+height:36px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+border-radius:8px;
+text-decoration:none;
+margin-right:5px;
+}
+
+.edit{
+background:#2563eb;
+color:#fff;
+}
+
+.delete{
+background:#ef4444;
+color:#fff;
+}
+
+.btn-primary{
+background:#2563eb;
+padding:10px 18px;
+border-radius:8px;
+color:#fff;
+text-decoration:none;
+}
+
+.search-form{
+display:flex;
+max-width:350px;
+}
+
+.search-form input{
+flex:1;
+padding:10px;
+border:1px solid #ddd;
+border-radius:8px 0 0 8px;
+}
+
+.search-form button{
+padding:10px 15px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:0 8px 8px 0;
+cursor:pointer;
+}
+
+.empty{
+padding:60px;
+text-align:center;
+}</style>
+
+{% endblock %}

@@ -1,0 +1,1105 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}
+{{ page_title }}
+{% endblock %}
+
+{% block page_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>{{ page_title }}</h2>
+
+        <p>
+            Create SEO-optimized articles to attract customers from Google.
+        </p>
+
+    </div>
+
+    <a href="{% url 'dashboard_blog' %}" class="btn btn-light">
+
+        <i class="fas fa-arrow-left"></i>
+
+        Back to Articles
+
+    </a>
+
+</div>
+
+
+
+<form
+method="POST"
+enctype="multipart/form-data"
+class="blog-form">
+
+{% csrf_token %}
+
+
+
+<div class="editor-layout">
+
+
+
+    <!-- ==========================================================
+        MAIN CONTENT
+    =========================================================== -->
+
+    <div class="editor-main">
+
+
+
+
+        <div class="card section-card">
+
+            <h3>
+
+                <i class="fas fa-image"></i>
+
+                Cover Image
+
+            </h3>
+
+            <div class="image-upload-area">
+
+                <div id="previewContainer">
+
+                    {% if form.instance.image %}
+
+                    <img
+                    id="previewImage"
+                    src="{{ form.instance.image.url }}">
+
+                    {% else %}
+
+                    <img
+                    id="previewImage"
+                    style="display:none;">
+
+                    {% endif %}
+
+                </div>
+
+                {{ form.image }}
+
+                <p>
+
+                    Upload a high quality landscape image.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+
+
+        <div class="card section-card">
+
+            <h3>
+
+                <i class="fas fa-heading"></i>
+
+                Article Details
+
+            </h3>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Title
+
+                </label>
+
+                {{ form.title }}
+
+            </div>
+
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Slug
+
+                </label>
+
+                <input
+                id="slugPreview"
+                class="form-control"
+                readonly>
+
+            </div>
+
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Short Excerpt
+
+                </label>
+
+                {{ form.excerpt }}
+
+                <small>
+
+                    This appears on blog cards and Google search results.
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+
+
+
+        <div class="card section-card">
+
+            <h3>
+
+                <i class="fas fa-file-alt"></i>
+
+                Article Content
+
+            </h3>
+
+            <div class="editor-wrapper">
+
+{{ form.content }}
+
+</div>
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- ==========================================================
+        SIDEBAR
+    =========================================================== -->
+
+    <aside class="editor-sidebar">
+
+
+
+        <div class="card sidebar-card">
+
+            <h3>
+
+                Publish
+
+            </h3>
+
+            <div class="form-group">
+
+                <label>
+
+                    Status
+
+                </label>
+
+                {{ form.status }}
+
+            </div>
+
+            <div class="form-check">
+
+                {{ form.featured }}
+
+                <label>
+
+                    Featured Article
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+
+
+
+        <div class="card sidebar-card">
+
+            <h3>
+
+                Category
+
+            </h3>
+
+            {{ form.category }}
+
+        </div>
+
+
+
+
+
+        <div class="card sidebar-card">
+
+            <h3>
+
+                Tags
+
+            </h3>
+
+            {{ form.tags }}
+
+        </div>
+
+
+
+
+
+        <div class="card sidebar-card">
+
+            <h3>
+
+                Related Products
+
+            </h3>
+
+            {{ form.related_products }}
+
+        </div>
+
+
+
+
+
+        <div class="card sidebar-card">
+
+            <h3>
+
+                SEO
+
+            </h3>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    SEO Title
+
+                </label>
+
+                {{ form.meta_title }}
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Meta Description
+
+                </label>
+
+                {{ form.meta_description }}
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Keywords
+
+                </label>
+
+                {{ form.meta_keywords }}
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Canonical URL
+
+                </label>
+
+                {{ form.canonical_url }}
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="card sidebar-card">
+
+            <h3>
+
+                Publish
+
+            </h3>
+
+            <div class="button-group">
+
+                <button
+                type="submit"
+                name="draft"
+                class="btn btn-light">
+
+                    Save Draft
+
+                </button>
+
+                <button
+                type="submit"
+                class="btn btn-primary">
+
+                    <i class="fas fa-paper-plane"></i>
+
+                    Publish
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+    </aside>
+
+
+
+
+</div>
+
+</form>
+<style>
+    .ck-editor{
+
+border-radius:12px;
+
+overflow:hidden;
+
+}
+
+.ck-editor__editable{
+
+min-height:650px;
+
+font-size:16px;
+
+line-height:1.8;
+
+padding:20px;
+
+}
+
+.ck-toolbar{
+
+border-radius:12px 12px 0 0;
+
+}
+
+/* ==========================================================
+   BLOG EDITOR
+========================================================== */
+
+.blog-form{
+    margin-top:20px;
+}
+
+.editor-layout{
+
+    display:grid;
+
+    grid-template-columns:minmax(0,2fr) 380px;
+
+    gap:25px;
+
+    align-items:start;
+
+}
+
+.editor-main{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+}
+
+.editor-sidebar{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+    position:sticky;
+
+    top:90px;
+
+}
+
+
+/* ==========================================================
+   CARDS
+========================================================== */
+
+.section-card,
+.sidebar-card{
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:24px;
+
+    box-shadow:0 8px 30px rgba(15,23,42,.06);
+
+    border:1px solid #eef2f7;
+
+    transition:.25s;
+
+}
+
+.section-card:hover,
+.sidebar-card:hover{
+
+    box-shadow:0 12px 40px rgba(15,23,42,.10);
+
+}
+
+.section-card h3,
+.sidebar-card h3{
+
+    margin:0 0 20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:18px;
+
+    color:#111827;
+
+}
+
+.section-card h3 i,
+.sidebar-card h3 i{
+
+    color:#2563eb;
+
+}
+
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.form-group{
+
+    margin-bottom:22px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#374151;
+
+}
+
+.form-group small{
+
+    display:block;
+
+    margin-top:6px;
+
+    color:#6b7280;
+
+    font-size:13px;
+
+}
+
+.blog-form input[type=text],
+.blog-form input[type=url],
+.blog-form textarea,
+.blog-form select{
+
+    width:100%;
+
+    border:1px solid #dbe3ec;
+
+    border-radius:10px;
+
+    padding:12px 14px;
+
+    font-size:15px;
+
+    transition:.25s;
+
+    background:#fff;
+
+}
+
+.blog-form textarea{
+
+    min-height:130px;
+
+    resize:vertical;
+
+}
+
+.blog-form input:focus,
+.blog-form textarea:focus,
+.blog-form select:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
+
+}
+
+
+/* ==========================================================
+   IMAGE UPLOAD
+========================================================== */
+
+.image-upload-area{
+
+    border:2px dashed #cbd5e1;
+
+    border-radius:14px;
+
+    padding:25px;
+
+    text-align:center;
+
+    background:#f8fafc;
+
+    transition:.25s;
+
+}
+
+.image-upload-area:hover{
+
+    border-color:#2563eb;
+
+    background:#eff6ff;
+
+}
+
+.image-upload-area input[type=file]{
+
+    margin:18px auto;
+
+    display:block;
+
+}
+
+#previewContainer{
+
+    width:100%;
+
+}
+
+#previewImage{
+
+    width:100%;
+
+    max-height:320px;
+
+    object-fit:cover;
+
+    border-radius:12px;
+
+    display:block;
+
+    margin-bottom:18px;
+
+}
+
+
+/* ==========================================================
+   CHECKBOX
+========================================================== */
+
+.form-check{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.form-check input{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+
+/* ==========================================================
+   MULTISELECT
+========================================================== */
+
+select[multiple]{
+
+    min-height:160px;
+
+}
+
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.button-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.button-group .btn{
+
+    width:100%;
+
+    justify-content:center;
+
+}
+
+
+/* ==========================================================
+   SEO
+========================================================== */
+
+.sidebar-card .form-group:last-child{
+
+    margin-bottom:0;
+
+}
+
+
+/* ==========================================================
+   ARTICLE CONTENT
+========================================================== */
+
+#id_content{
+
+    min-height:500px;
+
+}
+
+
+/* ==========================================================
+   PLACEHOLDERS
+========================================================== */
+
+::placeholder{
+
+    color:#9ca3af;
+
+}
+
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media(max-width:1200px){
+
+.editor-layout{
+
+grid-template-columns:1fr;
+
+}
+
+.editor-sidebar{
+
+position:static;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.section-card,
+.sidebar-card{
+
+padding:18px;
+
+}
+
+.page-header{
+
+flex-direction:column;
+
+gap:15px;
+
+align-items:flex-start;
+
+}
+
+.button-group{
+
+flex-direction:column;
+
+}
+
+}
+
+</style>
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    /* ==========================================================
+       IMAGE PREVIEW
+    ========================================================== */
+
+    const imageInput = document.getElementById("id_image");
+    const previewImage = document.getElementById("previewImage");
+
+    if(imageInput){
+
+        imageInput.addEventListener("change", function(e){
+
+            const file = e.target.files[0];
+
+            if(!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function(event){
+
+                previewImage.src = event.target.result;
+                previewImage.style.display = "block";
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+    }
+
+
+
+    /* ==========================================================
+       AUTO SLUG
+    ========================================================== */
+
+    const title = document.getElementById("id_title");
+    const slug = document.getElementById("slugPreview");
+
+    function generateSlug(text){
+
+        return text.toLowerCase()
+
+            .trim()
+
+            .replace(/[^\w\s-]/g,"")
+
+            .replace(/\s+/g,"-")
+
+            .replace(/-+/g,"-");
+
+    }
+
+    if(title){
+
+        title.addEventListener("keyup",function(){
+
+            slug.value = generateSlug(this.value);
+
+        });
+
+    }
+
+
+
+    /* ==========================================================
+       EXCERPT CHARACTER COUNT
+    ========================================================== */
+
+    const excerpt = document.getElementById("id_excerpt");
+
+    if(excerpt){
+
+        const counter=document.createElement("small");
+
+        counter.style.display="block";
+        counter.style.marginTop="8px";
+        counter.style.color="#6b7280";
+
+        excerpt.parentNode.appendChild(counter);
+
+        function updateCounter(){
+
+            counter.innerHTML=
+            excerpt.value.length+" characters";
+
+        }
+
+        updateCounter();
+
+        excerpt.addEventListener("input",updateCounter);
+
+    }
+
+
+
+    /* ==========================================================
+       META DESCRIPTION COUNTER
+    ========================================================== */
+
+    const meta=document.getElementById("id_meta_description");
+
+    if(meta){
+
+        const info=document.createElement("small");
+
+        info.style.display="block";
+        info.style.marginTop="8px";
+
+        meta.parentNode.appendChild(info);
+
+        function updateMeta(){
+
+            let len=meta.value.length;
+
+            info.innerHTML=len+"/160 characters";
+
+            if(len<120){
+
+                info.style.color="#ea580c";
+
+            }
+
+            else if(len<=160){
+
+                info.style.color="#16a34a";
+
+            }
+
+            else{
+
+                info.style.color="#dc2626";
+
+            }
+
+        }
+
+        updateMeta();
+
+        meta.addEventListener("input",updateMeta);
+
+    }
+
+
+
+    /* ==========================================================
+       AUTO SEO TITLE
+    ========================================================== */
+
+    const metaTitle=document.getElementById("id_meta_title");
+
+    if(title && metaTitle){
+
+        title.addEventListener("keyup",function(){
+
+            if(metaTitle.value===""){
+
+                metaTitle.value=this.value;
+
+            }
+
+        });
+
+    }
+
+
+
+    /* ==========================================================
+       AUTO META DESCRIPTION
+    ========================================================== */
+
+    if(excerpt && meta){
+
+        excerpt.addEventListener("keyup",function(){
+
+            if(meta.value===""){
+
+                meta.value=this.value;
+
+                meta.dispatchEvent(new Event("input"));
+
+            }
+
+        });
+
+    }
+
+
+
+    /* ==========================================================
+       GOOGLE PREVIEW
+    ========================================================== */
+
+    const seoCard=document.querySelector(".sidebar-card:last-of-type");
+
+    if(seoCard){
+
+        const preview=document.createElement("div");
+
+        preview.style.marginTop="20px";
+        preview.style.padding="15px";
+        preview.style.border="1px solid #e5e7eb";
+        preview.style.borderRadius="10px";
+        preview.style.background="#fafafa";
+
+        preview.innerHTML=`
+
+            <div id="seoTitle"
+            style="
+            color:#1a0dab;
+            font-size:20px;
+            margin-bottom:5px;">
+            Example SEO Title
+            </div>
+
+            <div
+            style="
+            color:#188038;
+            font-size:14px;
+            margin-bottom:8px;">
+            www.smartcomputerske.com/blog/
+            </div>
+
+            <div id="seoDesc"
+            style="
+            color:#4b5563;
+            font-size:14px;">
+            Your meta description will appear here.
+            </div>
+
+        `;
+
+        seoCard.appendChild(preview);
+
+        const seoTitle=document.getElementById("seoTitle");
+        const seoDesc=document.getElementById("seoDesc");
+
+        function refreshPreview(){
+
+            seoTitle.innerHTML=
+                metaTitle.value ||
+                title.value ||
+                "Article Title";
+
+            seoDesc.innerHTML=
+                meta.value ||
+                "Your article description will appear here.";
+
+        }
+
+        refreshPreview();
+
+        title.addEventListener("input",refreshPreview);
+        metaTitle.addEventListener("input",refreshPreview);
+        meta.addEventListener("input",refreshPreview);
+
+    }
+
+
+
+    /* ==========================================================
+       UNSAVED CHANGES WARNING
+    ========================================================== */
+
+    let changed=false;
+
+    document.querySelectorAll("input, textarea, select").forEach(function(el){
+
+        el.addEventListener("change",function(){
+
+            changed=true;
+
+        });
+
+    });
+
+    window.addEventListener("beforeunload",function(e){
+
+        if(changed){
+
+            e.preventDefault();
+
+            e.returnValue="";
+
+        }
+
+    });
+
+    document.querySelector("form").addEventListener("submit",function(){
+
+        changed=false;
+
+    });
+
+});
+
+</script>
+{% endblock %}

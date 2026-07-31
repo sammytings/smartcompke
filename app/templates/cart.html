@@ -1,0 +1,1402 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Your Cart — Smartcomputerske Technologies{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<link rel="stylesheet" href="{% static 'css/shared-components.css' %}">
+<style>
+
+.sc-cart-page { padding: 28px 0 72px; }
+
+.sc-cart-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 26px;
+}
+.sc-cart-head h1 { font-size: 24px; margin-bottom: 4px; }
+.sc-cart-head .sc-sub { color: var(--muted); font-size: 13.5px; }
+
+/* ── TWO-COLUMN LAYOUT ──────────────────────────────────────────── */
+.sc-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 1040px) {
+  .sc-grid { grid-template-columns: 1fr; }
+  .sc-summary { position: static !important; }
+}
+
+/* ── CARD SHELL ─────────────────────────────────────────────────── */
+.sc-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ── ITEMS TOOLBAR ──────────────────────────────────────────────── */
+.sc-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  padding: 13px 20px;
+  background: var(--line-soft);
+  border-bottom: 1px solid var(--line);
+}
+.sc-select-all {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer;
+}
+.sc-select-all input { width: 15px; height: 15px; accent-color: var(--primary); }
+.sc-clear {
+  background: none; border: none; font-size: 12.5px; font-weight: 700;
+  color: var(--accent); cursor: pointer; padding: 0; transition: opacity .15s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.sc-clear:hover { opacity: .75; }
+.sc-clear:disabled { opacity: .5; cursor: not-allowed; }
+.sc-clear .sc-clear-spin {
+  width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid currentColor; border-top-color: transparent;
+  animation: sc-spin .7s linear infinite; display: none;
+}
+.sc-clear.sc-btn-loading .sc-clear-spin { display: inline-block; }
+
+/* ── CART ROW ───────────────────────────────────────────────────── */
+.sc-row {
+  display: grid;
+  grid-template-columns: 18px 78px 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line-soft);
+  transition: background .15s var(--ease), opacity .3s ease, transform .3s ease, max-height .35s ease;
+}
+.sc-row:last-child { border-bottom: none; }
+.sc-row:hover { background: #F9FAFB; }
+
+.sc-row.sc-removing {
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+}
+
+.sc-chk { width: 15px; height: 15px; accent-color: var(--primary); flex-shrink: 0; }
+
+.sc-img {
+  width: 78px; height: 78px; border-radius: 10px;
+  object-fit: cover; border: 1px solid var(--line);
+  background: var(--line-soft);
+  flex-shrink: 0;
+}
+
+.sc-info { min-width: 0; }
+.sc-info .sc-brand {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--primary); margin-bottom: 3px;
+}
+.sc-info .sc-name {
+  font-weight: 700; font-size: 14px; line-height: 1.35;
+  margin-bottom: 5px; color: var(--ink);
+}
+.sc-info .sc-name a { color: inherit; text-decoration: none; transition: color .14s; }
+.sc-info .sc-name a:hover { color: var(--primary); }
+.sc-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.sc-actions {
+  display: flex; gap: 16px; font-size: 12px; font-weight: 600;
+}
+.sc-actions button {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--muted); transition: color .14s; display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+}
+.sc-actions .sc-save:hover { color: var(--primary); }
+.sc-actions .sc-remove:hover { color: var(--accent); }
+.sc-actions button i { font-size: 11.5px; }
+/* loading state for action buttons */
+.sc-actions button.sc-btn-loading { pointer-events: none; opacity: .6; }
+.sc-actions button.sc-btn-loading i { display: none; }
+.sc-actions button.sc-btn-loading::before {
+  content: '';
+  display: inline-block; width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid currentColor; border-top-color: transparent;
+  animation: sc-spin .7s linear infinite; margin-right: 5px;
+}
+@keyframes sc-spin { to { transform: rotate(360deg); } }
+
+/* qty stepper */
+.sc-qty {
+  display: flex; align-items: center;
+  border: 1px solid var(--line); border-radius: 9px; overflow: hidden;
+}
+.sc-qty button {
+  width: 30px; height: 32px; border: none; background: var(--line-soft);
+  color: var(--ink); font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: background .14s;
+}
+.sc-qty button:hover { background: var(--line); }
+.sc-qty input {
+  width: 36px; height: 32px; border: none;
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  text-align: center; font-size: 13px; font-weight: 700; color: var(--ink);
+}
+.sc-qty input:focus { outline: none; }
+
+/* price column */
+.sc-price { text-align: right; min-width: 96px; }
+.sc-price .sc-unit { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+.sc-price .sc-subtotal {
+  font-family: var(--font-display); font-size: 15.5px;
+  font-weight: 800; color: var(--ink);
+}
+
+.sc-low-stock {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #FFF6E5; color: #B77400; font-size: 10.5px; font-weight: 700;
+  padding: 3px 8px; border-radius: 6px;
+}
+
+/* ── EMPTY CART ─────────────────────────────────────────────────── */
+.sc-empty {
+  text-align: center; padding: 64px 24px;
+  background: var(--panel); border: 1.5px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+.sc-empty-ico {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--primary-tint); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; margin: 0 auto 20px;
+}
+.sc-empty h3 { font-size: 20px; margin-bottom: 9px; }
+.sc-empty p { color: var(--muted); font-size: 14px; max-width: 340px; margin: 0 auto 22px; }
+.sc-empty-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: 10px; background: var(--primary);
+  color: #fff; font-weight: 700; font-size: 14px; text-decoration: none;
+  transition: background .15s;
+}
+.sc-empty-btn:hover { background: var(--primary-dark); }
+
+/* ── SAVED FOR LATER ────────────────────────────────────────────── */
+.sc-saved-section { margin-top: 18px; }
+
+.sc-saved-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--line);
+  background: var(--line-soft);
+}
+.sc-saved-head h3 { font-size: 14.5px; margin: 0; }
+.sc-saved-head .sc-saved-meta { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+
+/* saved rows reuse .sc-row */
+.sc-saved-row { grid-template-columns: 10px 78px 1fr auto; }
+
+/* ── SUMMARY PANEL ──────────────────────────────────────────────── */
+.sc-summary {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: 22px;
+  position: sticky; top: 90px;
+}
+.sc-summary h3 { font-size: 15.5px; margin-bottom: 16px; }
+
+.sc-sum-line {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 13.5px; color: var(--ink-soft); padding: 7px 0;
+}
+.sc-sum-line .sc-muted { font-size: 11.5px; color: var(--muted); }
+.sc-sum-line.sc-total {
+  font-size: 17px; font-weight: 800; color: var(--ink);
+  border-top: 1px solid var(--line); margin-top: 8px; padding-top: 14px;
+}
+
+/* free shipping bar */
+.sc-ship-bar {
+  margin: 2px 0 14px; padding: 12px 14px;
+  background: var(--primary-tint); border-radius: 10px;
+}
+.sc-ship-msg { font-size: 12px; font-weight: 600; color: var(--primary-dark); margin-bottom: 8px; }
+.sc-ship-msg b { font-family: var(--font-display); }
+.sc-ship-track { height: 5px; border-radius: 99px; background: #D7E9FE; overflow: hidden; }
+.sc-ship-fill { display: block; height: 100%; background: var(--primary); border-radius: 99px; transition: width .35s ease; }
+
+/* promo */
+.sc-promo-row { display: flex; gap: 8px; margin: 12px 0; }
+.sc-promo-row input {
+  flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 9px;
+  padding: 10px 12px; font-size: 13px; font-family: inherit; color: var(--ink);
+  transition: border-color .15s;
+}
+.sc-promo-row input:focus { outline: none; border-color: var(--primary); }
+.sc-promo-row button {
+  background: var(--primary); color: #fff; border: none; border-radius: 9px;
+  padding: 0 18px; font-weight: 700; font-size: 12.5px;
+  white-space: nowrap; cursor: pointer; transition: background .15s;
+}
+.sc-promo-row button:hover { background: var(--primary-dark); }
+.sc-promo-msg { font-size: 12px; font-weight: 600; display: none; margin: -4px 0 10px; }
+.sc-promo-msg.ok { display: block; color: var(--success); }
+.sc-promo-msg.err { display: block; color: var(--accent); }
+
+/* delivery */
+.sc-delivery {
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 14px 0; margin: 14px 0;
+}
+.sc-delivery label { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); display: block; margin-bottom: 7px; }
+.sc-delivery select {
+  width: 100%; border: 1px solid var(--line); border-radius: 9px;
+  padding: 10px 12px; font-size: 13px; font-family: inherit; color: var(--ink);
+}
+.sc-delivery select:focus { outline: none; border-color: var(--primary); }
+
+/* checkout btn */
+.sc-checkout-btn {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%; padding: 15px 0; border-radius: 10px;
+  background: var(--primary); color: #fff; border: none;
+  font-weight: 700; font-size: 15px; text-decoration: none;
+  transition: background .15s var(--ease), transform .15s var(--ease), box-shadow .15s var(--ease);
+  margin-top: 6px; cursor: pointer;
+}
+.sc-checkout-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(29,78,216,.5);
+}
+.sc-checkout-note { text-align: center; font-size: 11.5px; color: var(--muted); margin-top: 9px; }
+
+/* trust row */
+.sc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.sc-trust span { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-soft); }
+.sc-trust i { color: var(--success); font-size: 13px; flex-shrink: 0; }
+.sc-pay-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.sc-pay-chips span {
+  background: var(--line-soft); color: var(--ink-soft);
+  font-size: 10px; font-weight: 700; padding: 5px 9px; border-radius: 6px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEMED TOAST — same gradient card used on index.html, now the
+   ONE toast system for this page (the old plain black pill is gone;
+   window.showToast() below always renders this component).
+   ══════════════════════════════════════════════════════════════ */
+.sc-toast-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(24px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(92vw, 380px);
+  background: linear-gradient(135deg, #16307F, #0B1330);
+  color: #fff;
+  padding: 14px 20px 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 24px 48px rgba(6,12,28,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s cubic-bezier(.2,.7,.3,1), transform .35s cubic-bezier(.2,.7,.3,1);
+}
+.sc-toast-wrap.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.sc-toast-wrap .sc-toast-ic {
+  flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.14);
+  color: var(--accent);
+}
+.sc-toast-wrap.sc-toast-error .sc-toast-ic { color: #ff9aa2; background: rgba(220,38,38,.22); }
+.sc-toast-wrap .sc-toast-body { display: flex; flex-direction: column; gap: 1px; }
+.sc-toast-wrap .sc-toast-title { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; letter-spacing: -0.01em; }
+.sc-toast-wrap .sc-toast-msg { font-size: 12px; color: #c3cbe0; line-height: 1.4; }
+@media (max-width: 520px) { .sc-toast-wrap { bottom: 90px; padding: 12px 16px 12px 14px; } }
+
+.cart-related{ margin-top:60px; }
+
+.section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+.section-header h2{
+  font-size:26px;
+  color:#003366;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* ── RELATED CARD — premium prod-card style: contain-fit image,
+   rounded corners, discount badge, wishlist heart, Add-to-Cart with
+   fly-icon loading + green "Added" state, full-width WhatsApp bar.
+   Now lives inside a Swiper slide (see .sc-swiper-related below). ── */
+.related-card{
+  min-width: 0;
+  background:#fff;
+  border-radius:16px;
+  padding:0;
+  position:relative;
+  overflow:hidden;
+  border:1px solid #E8EDF5;
+  box-shadow:none;
+  transition:transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .26s ease, border-color .26s ease;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+.related-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 20px 48px rgba(17,24,39,.11);
+  border-color:#C9DAFC;
+}
+
+.related-card-media{
+  position:relative;
+  aspect-ratio:1/1;
+  background:#fff;
+}
+
+.related-card-media a{ display:block; width:100%; height:100%; }
+
+.related-card img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:18px;
+}
+
+.related-wish{
+  position:absolute; top:10px; right:10px; z-index:5;
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:#fff; border:none; color:#9aa3b4; cursor:pointer;
+  box-shadow:0 4px 12px rgba(17,24,39,.16);
+  transition: transform .18s ease, color .18s ease, background .18s ease;
+}
+.related-wish svg{ width:15px; height:15px; }
+.related-wish:hover{ transform:scale(1.08); color: var(--accent); }
+.related-wish.active{ color:#fff; background: var(--accent); }
+.related-wish.active svg{ fill:currentColor; }
+.related-wish.is-wishing{ animation: sc-wish-pulse .4s ease; }
+@keyframes sc-wish-pulse{ 0%{transform:scale(1);} 50%{transform:scale(1.32);} 100%{transform:scale(1);} }
+
+.related-card-body{ padding:14px 14px 6px; display:flex; flex-direction:column; gap:8px; border-top:1px solid #EEF2F9; }
+
+.related-card h3{
+  font-size:14px;
+  font-weight:600;
+  height:auto;
+  min-height:calc(1.35em * 2);
+  line-height:1.35;
+  overflow:hidden;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  display:-webkit-box;
+  margin:0;
+  color: var(--ink);
+}
+
+.price{ display:flex; gap:10px; align-items:center; }
+.price strong{ color:var(--primary-dark); font-size:19px; font-family: var(--font-display); font-weight:800; }
+.price span{ color:#9aa0aa; text-decoration:line-through; font-size:13px; }
+
+.discount-badge{
+  position:absolute; top:12px; left:12px;
+  background:linear-gradient(120deg,var(--accent),var(--accent-dark));
+  color:white; padding:5px 12px; border-radius:999px;
+  font-size:11px; font-weight:700; z-index:4;
+}
+
+.related-actions{ display:flex; flex-direction:column; gap:8px; padding:10px 14px 14px; margin-top:auto; }
+
+.related-cart-form button{
+  width:100%;
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  position:relative; overflow:hidden;
+  height:44px;
+  border:none;
+  background:var(--primary-dark);
+  color:white;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700; font-size:13.5px; letter-spacing:-0.01em;
+  transition:background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.related-cart-form button:hover{
+  background:var(--navy);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(29,95,215,.32);
+}
+.related-cart-form button.is-loading{ pointer-events:none; }
+.related-cart-form button.is-loading .rc-btn-icon{ animation: sc-cart-fly 1.1s cubic-bezier(.5,0,.3,1) infinite; }
+@keyframes sc-cart-fly{
+  0%{ transform:translateX(0) scale(1); opacity:1; }
+  45%{ transform:translateX(60px) scale(.7); opacity:0; }
+  50%{ transform:translateX(-60px) scale(.7); opacity:0; }
+  100%{ transform:translateX(0) scale(1); opacity:1; }
+}
+.related-cart-form button.is-added{ background: var(--success); pointer-events:none; }
+.related-cart-form button.is-added .rc-btn-icon,
+.related-cart-form button.is-added .rc-btn-label{ opacity:0; }
+
+.related-wa-btn{
+  width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px; border-radius:10px; border:none;
+  background:#25D366; color:#fff; font-size:12.5px; font-weight:700;
+  text-decoration:none; transition: background .16s ease, transform .16s ease;
+  letter-spacing:-0.01em;
+}
+.related-wa-btn:hover{ background:#1ebe5a; color:#fff; transform: translateY(-1px); }
+
+/* ── SWIPER CAROUSEL SECTIONS (Related / Also Bought / Recently Viewed) ── */
+.sc-carousel-section { margin-top: 32px; }
+.sc-carousel-section .swiper,
+.cart-related .swiper { padding: 6px 4px 40px; }
+.sc-carousel-section .swiper-slide,
+.cart-related .swiper-slide { height: auto; }
+
+.sc-carousel-section .swiper-button-prev,
+.sc-carousel-section .swiper-button-next,
+.cart-related .swiper-button-prev,
+.cart-related .swiper-button-next {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--panel); border: 1px solid var(--line);
+  color: var(--ink); box-shadow: var(--shadow-sm);
+  transition: border-color .15s, color .15s, background .15s;
+  top: 40%;
+}
+.sc-carousel-section .swiper-button-prev::after,
+.sc-carousel-section .swiper-button-next::after,
+.cart-related .swiper-button-prev::after,
+.cart-related .swiper-button-next::after { font-size: 13px; font-weight: 800; }
+.sc-carousel-section .swiper-button-prev:hover,
+.sc-carousel-section .swiper-button-next:hover,
+.cart-related .swiper-button-prev:hover,
+.cart-related .swiper-button-next:hover { border-color: var(--primary); color: #fff; background: var(--primary); }
+.sc-carousel-section .swiper-button-disabled,
+.cart-related .swiper-button-disabled { opacity: .35; }
+
+.sc-carousel-section .swiper-pagination-bullet,
+.cart-related .swiper-pagination-bullet { background: var(--line); opacity: 1; }
+.sc-carousel-section .swiper-pagination-bullet-active,
+.cart-related .swiper-pagination-bullet-active { background: var(--primary); }
+
+.sc-carousel-section .prod-card { height: 100%; }
+
+/* ── SKELETON PLACEHOLDER ───────────────────────────────────────── */
+.sc-skeleton {
+  background: linear-gradient(90deg, var(--line-soft) 25%, var(--line) 50%, var(--line-soft) 75%);
+  background-size: 200% 100%;
+  animation: sc-shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+@keyframes sc-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .sc-row {
+    grid-template-columns: 16px 64px 1fr;
+    grid-template-areas:
+      "chk img info"
+      "qty qty qty"
+      "pri pri pri";
+    row-gap: 12px; padding: 14px 16px;
+  }
+  .sc-chk    { grid-area: chk; align-self: start; margin-top: 2px; }
+  .sc-img    { grid-area: img; width: 64px; height: 64px; }
+  .sc-info   { grid-area: info; }
+  .sc-qty-col{ grid-area: qty; padding-top: 10px; border-top: 1px dashed var(--line-soft); }
+  .sc-price  { grid-area: pri; text-align: left; }
+  .sc-summary { padding: 18px; }
+}
+@media (max-width: 420px) {
+  .sc-row { grid-template-columns: 14px 56px 1fr; }
+  .sc-img  { width: 56px; height: 56px; }
+  .sc-info .sc-name { font-size: 13px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">Home</a><span class="sep">/</span>
+    <span class="current">Shopping Cart</span>
+  </nav>
+</div>
+
+<section class="wrap sc-cart-page">
+
+  <div class="sc-cart-head">
+    <div>
+      <h1>Shopping Cart</h1>
+      <p class="sc-sub" id="scCartMeta">
+        {{ cart_items|length|default:"0" }} item{{ cart_items|length|pluralize }} in your cart
+      </p>
+    </div>
+    <a class="view-all" href="{% url 'home' %}">← Continue Shopping</a>
+  </div>
+
+  {# ── EMPTY STATE ── #}
+  <div id="scEmptyState" {% if cart_items %}style="display:none;"{% endif %}>
+    <div class="sc-empty">
+      <div class="sc-empty-ico"><i class="fas fa-cart-shopping"></i></div>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything yet. Browse our laptops, desktops, and accessories.</p>
+      <a href="{% url 'home' %}" class="sc-empty-btn">
+        <i class="fas fa-arrow-left"></i> Start Shopping
+      </a>
+    </div>
+  </div>
+
+  {# ── MAIN LAYOUT ── #}
+  <div id="scCartBody" {% if not cart_items %}style="display:none;"{% endif %}>
+
+    <div class="sc-grid">
+
+      {# ── LEFT COLUMN ── #}
+      <div>
+
+        {# Items panel #}
+        <div class="sc-card" id="scItemsPanel">
+          <div class="sc-toolbar">
+            <label class="sc-select-all">
+              <input type="checkbox" id="scSelectAll" checked aria-label="Select all items">
+              Select all items
+            </label>
+            <button type="button" class="sc-clear" id="scClearAll" data-url="{% url 'clear_cart' %}">
+              <span class="sc-clear-spin"></span><span class="sc-clear-lbl">Clear Cart</span>
+            </button>
+          </div>
+
+          <div id="scItemsList">
+            {% for item in cart_items %}
+            <div class="sc-row"
+                 data-cart-item-id="{{ item.id }}"
+                 data-product-id="{{ item.product.id }}"
+                 data-unit-price="{{ item.product.discount_price|default:item.product.price }}">
+              <input type="checkbox" class="sc-chk" checked aria-label="Select {{ item.product.name }}">
+              {% if item.product.image %}
+              <img class="sc-img" src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy">
+              {% else %}
+              <img class="sc-img" src="{% static 'images/no-image.png' %}" alt="{{ item.product.name }}" loading="lazy">
+              {% endif %}
+              <div class="sc-info">
+                <div class="sc-brand">{{ item.product.brand.name|default:"SmartComputersKE" }}</div>
+                <div class="sc-name">
+                  <a href="{% url 'product_detail' item.product.slug %}">{{ item.product.name }}</a>
+                </div>
+                <div class="sc-badges">
+                  {% if item.product.condition %}
+                  <span class="badge-condition">{{ item.product.get_condition_display }}</span>
+                  {% endif %}
+                  {% if item.product.stock <= 5 and item.product.stock > 0 %}
+                  <span class="sc-low-stock">
+                    <i class="fas fa-triangle-exclamation" style="font-size:9px;"></i>
+                    Only {{ item.product.stock }} left
+                  </span>
+                  {% endif %}
+                </div>
+                <div class="sc-actions">
+                  <button class="sc-save"
+                          data-url="{% url 'save_for_later' item.id %}"
+                          data-item-id="{{ item.id }}"
+                          aria-label="Save {{ item.product.name }} for later">
+                    <i class="far fa-bookmark"></i><span>Save for later</span>
+                  </button>
+                  <button class="sc-remove"
+                          data-url="{% url 'remove_from_cart' item.id %}"
+                          data-item-id="{{ item.id }}"
+                          aria-label="Remove {{ item.product.name }}">
+                    <i class="fas fa-trash-alt"></i><span>Remove</span>
+                  </button>
+                </div>
+              </div>
+              <div class="sc-qty-col">
+                <div class="sc-qty">
+                  <button type="button" class="sc-qty-minus" aria-label="Decrease">−</button>
+                  <input type="text" class="sc-qty-input" value="{{ item.quantity }}"
+                         inputmode="numeric" aria-label="Quantity" data-update-url="{% url 'update_cart' item.id %}">
+                  <button type="button" class="sc-qty-plus" aria-label="Increase">+</button>
+                </div>
+              </div>
+              <div class="sc-price">
+                <div class="sc-unit">KSh {{ item.product.discount_price|default:item.product.price }} / unit</div>
+                <div class="sc-subtotal">KSh {{ item.product.discount_price|default:item.product.price }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {# Saved for later panel #}
+        <div class="sc-saved-section" id="scSavedSection"
+             {% if not saved_for_later %}style="display:none;"{% endif %}>
+          <div class="sc-card" id="scSavedPanel">
+            <div class="sc-saved-head">
+              <h3>Saved for Later</h3>
+              <span class="sc-saved-meta" id="scSavedMeta">
+                <span id="scSavedCount">{{ saved_for_later|length|default:"0" }}</span> item(s)
+              </span>
+            </div>
+
+            <div id="scSavedList">
+              {% for item in saved_for_later %}
+              <div class="sc-row sc-saved-row"
+                   data-cart-item-id="{{ item.id }}"
+                   data-product-id="{{ item.product.id }}"
+                   data-unit-price="{{ item.product.discount_price|default:item.product.price }}">
+                <span></span>
+                {% if item.product.image %}
+                <img class="sc-img" src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy">
+                {% else %}
+                <img class="sc-img" src="{% static 'images/no-image.png' %}" alt="{{ item.product.name }}" loading="lazy">
+                {% endif %}
+                <div class="sc-info">
+                  <div class="sc-brand">{{ item.product.brand.name|default:"" }}</div>
+                  <div class="sc-name">{{ item.product.name }}</div>
+                  <div class="sc-badges">
+                    {% if item.product.badge_stock == "out" %}
+                    <span class="badge-stock out">Out of Stock</span>
+                    {% else %}
+                    <span class="badge-stock in">In Stock</span>
+                    {% endif %}
+                  </div>
+                  <div class="sc-actions">
+                    <button class="sc-move-to-cart"
+                            data-url="{% url 'move_to_cart' item.id %}"
+                            data-item-id="{{ item.id }}"
+                            aria-label="Move {{ item.product.name }} to cart">
+                      <i class="fas fa-cart-plus"></i><span>Move to Cart</span>
+                    </button>
+                    <button class="sc-remove"
+                            data-url="{% url 'remove_from_cart' item.id %}"
+                            data-item-id="{{ item.id }}"
+                            aria-label="Remove {{ item.product.name }}">
+                      <i class="fas fa-trash-alt"></i><span>Remove</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="sc-price">
+                  <div class="sc-subtotal">KSh {{ item.product.discount_price|default:item.product.price }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      {# end left column #}
+
+      {# ── SUMMARY ── #}
+      <aside class="sc-summary">
+        <h3>Order Summary</h3>
+
+        <div class="sc-ship-bar" id="scShipBar" style="display:none;">
+          <div class="sc-ship-msg" id="scShipMsg"></div>
+          <div class="sc-ship-track">
+            <span class="sc-ship-fill" id="scShipFill" style="width:0%;"></span>
+          </div>
+        </div>
+
+        <div class="sc-sum-line">
+          <span>Subtotal (<span id="scSumCount">{{ cart_items|length }}</span> items)</span>
+          <span id="scSumSubtotal">KSh {{ cart_subtotal|default:"0" }}</span>
+        </div>
+        <div class="sc-sum-line"><span class="sc-muted">Includes 16% VAT</span></div>
+
+        <div class="sc-sum-line" id="scPromoRow" style="display:none;">
+          <span>Promo discount</span>
+          <span id="scPromoVal" style="color:var(--success);">− KSh 0</span>
+        </div>
+
+        <div class="sc-promo-row">
+          <input type="text" id="scPromoInput" placeholder="Promo code" aria-label="Promo code">
+          <button type="button" id="scPromoApply">Apply</button>
+        </div>
+        <div class="sc-promo-msg" id="scPromoMsg" role="status" aria-live="polite"></div>
+
+        <div class="sc-delivery">
+          <label for="scDelivery">Delivery location</label>
+          <select id="scDelivery">
+            <option value="200">Nairobi CBD — KSh 200</option>
+            <option value="350">Nairobi (Outer) — KSh 350</option>
+            <option value="500">Kiambu — KSh 500</option>
+            <option value="600">Machakos — KSh 600</option>
+            <option value="900">Other / Upcountry — KSh 900</option>
+          </select>
+        </div>
+
+        <div class="sc-sum-line"><span>Delivery fee</span><span id="scSumDelivery">KSh 200</span></div>
+        <div class="sc-sum-line sc-total"><span>Total</span><span id="scSumTotal">KSh {{ cart_total|default:"0" }}</span></div>
+
+        <a href="{% url 'checkout' %}" class="sc-checkout-btn" id="scCheckoutBtn">
+          <i class="fas fa-lock" style="font-size:15px;"></i>
+          Proceed to Checkout
+        </a>
+        <p class="sc-checkout-note">You won't be charged until you confirm your order.</p>
+
+        <div class="sc-trust">
+          <span><i class="fas fa-circle-check"></i>Genuine, verified hardware</span>
+          <span><i class="fas fa-shield-halved"></i>12-month official warranty</span>
+          <span><i class="fas fa-truck-fast"></i>Same-day delivery in Nairobi</span>
+        </div>
+        <div class="sc-pay-chips">
+          <span>M-PESA</span><span>VISA</span><span>CASH</span><span>BANK TRANSFER</span>
+        </div>
+      </aside>
+
+    </div>
+    {# end sc-grid #}
+
+    {% if related_products %}
+    <section class="cart-related">
+
+      <div class="section-header">
+        <h2><i class="fa-solid fa-bag-shopping"></i> Related to items in your cart</h2>
+      </div>
+
+      <div class="swiper sc-swiper-related">
+        <div class="swiper-wrapper">
+          {% for product in related_products %}
+          <div class="swiper-slide">
+            <div class="related-card" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">
+
+              <div class="related-card-media">
+                <a href="{% url 'product_detail' product.slug %}">
+                  {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                  {% else %}
+                  <img src="{% static 'images/no-image.png' %}" alt="{{ product.name }}" loading="lazy">
+                  {% endif %}
+                </a>
+
+                {% if product.default_variant.discount_active %}
+                <span class="discount-badge">-{{ product.default_variant.discount_percent }}%</span>
+                {% endif %}
+
+                <button type="button"
+                        class="related-wish js-related-wishlist"
+                        data-product-id="{{ product.id }}"
+                        data-product-name="{{ product.name }}"
+                        aria-label="Save {{ product.name }} to wishlist">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="related-card-body">
+                <h3>{{ product.name }}</h3>
+
+                <div class="price">
+                  <strong>KSh {{ product.current_price|floatformat:0 }}</strong>
+                  {% if product.discount_price %}
+                  <span>KSh {{ product.price|floatformat:0 }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="related-actions">
+                <form method="post" action="{% url 'add_to_cart' product.id %}" class="related-cart-form js-related-cart-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="variant_id" value="{{ product.default_variant.id }}">
+                  <button type="button" class="js-related-add-cart">
+                    <i class="fa-solid fa-cart-plus rc-btn-icon"></i>
+                    <span class="rc-btn-label">Add to Cart</span>
+                  </button>
+                </form>
+                <a class="related-wa-btn"
+                   href="https://wa.me/254792758560?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}"
+                   target="_blank" rel="noopener">
+                  <i class="fab fa-whatsapp"></i> Order on WhatsApp
+                </a>
+              </div>
+
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+    </section>
+    {% endif %}
+
+    {% if customers_also_bought %}
+    <div class="sc-carousel-section section" style="padding-bottom:0;">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow-sm">Customers Favourite</span>
+          <h2>Customers Also Bought</h2>
+        </div>
+      </div>
+      <div class="swiper sc-swiper-cab">
+        <div class="swiper-wrapper">
+          {% for product in customers_also_bought %}
+          <div class="swiper-slide">
+            {% include "partials/_sc_carousel_card.html" %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if recently_viewed %}
+    <div class="sc-carousel-section section" style="padding-bottom:0;">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow-sm">Your History</span>
+          <h2>Recently Viewed</h2>
+        </div>
+      </div>
+      <div class="swiper sc-swiper-rv">
+        <div class="swiper-wrapper">
+          {% for product in recently_viewed %}
+          <div class="swiper-slide">
+            {% include "partials/_sc_carousel_card.html" %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+  {# end scCartBody #}
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+{# Shared cart / wishlist engine — still loaded for the swiper cards #}
+<script src="{% static 'js/shared-components.js' %}"></script>
+
+<script>
+/* =====================================================================
+   SMARTCOMPUTERSKE — CART PAGE JAVASCRIPT
+   getCookie() is defined in base.html. Cart/wishlist badges: #cartCount
+   / #wishCount (base.html IDs). This file now owns ONE consistent
+   themed toast (the gradient card, same as index.html) used for every
+   notification on this page, replacing the old plain black pill.
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  /* ── Constants ── */
+  var FREE_SHIP = 5000;
+  var ANIM_MS   = 320;
+  var PROMO_CODES = { 'SAVE10': 10, 'WELCOME5': 5 };
+
+  var promoDiscountPct = 0;
+
+  /* ── DOM refs ── */
+  var scItemsList= document.getElementById('scItemsList');
+  var scSavedList= document.getElementById('scSavedList');
+  var scEmptyState = document.getElementById('scEmptyState');
+  var scCartBody   = document.getElementById('scCartBody');
+  var scSavedSection = document.getElementById('scSavedSection');
+
+  /* ── CSRF ── */
+  function csrf() {
+    return typeof getCookie === 'function' ? getCookie('csrftoken') : '';
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     THEMED TOAST — identical gradient card to index.html. This is
+     now the single toast system on the cart page; toast()/showToast()
+     both route through it.
+     ══════════════════════════════════════════════════════════════ */
+  var toastEl = null, toastHideTimer = null;
+  var ICON_SUCCESS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg>';
+  var ICON_HEART   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/></svg>';
+  var ICON_ERROR   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+
+  function ensureToastEl() {
+    if (toastEl) return toastEl;
+    toastEl = document.createElement('div');
+    toastEl.className = 'sc-toast-wrap';
+    toastEl.innerHTML = '<span class="sc-toast-ic" data-role="ic"></span><span class="sc-toast-body"><span class="sc-toast-title" data-role="title"></span><span class="sc-toast-msg" data-role="msg"></span></span>';
+    document.body.appendChild(toastEl);
+    return toastEl;
+  }
+
+  function toast(msg, isErr) {
+    var el = ensureToastEl();
+    el.classList.toggle('sc-toast-error', !!isErr);
+    el.querySelector('[data-role="ic"]').innerHTML = isErr ? ICON_ERROR : ICON_SUCCESS;
+    el.querySelector('[data-role="title"]').textContent = isErr ? "Something slipped." : "Updated";
+    el.querySelector('[data-role="msg"]').textContent = msg || '';
+    clearTimeout(toastHideTimer);
+    requestAnimationFrame(function () { el.classList.add('show'); });
+    toastHideTimer = setTimeout(function () { el.classList.remove('show'); }, 3000);
+  }
+
+  /* Also expose window.showToast so shared-components.js / other
+     scripts on this page render the SAME themed toast. */
+  window.showToast = function (msg, type) { toast(msg, type === 'error'); };
+
+  /* ── Badge helpers ── */
+  function setCartBadge(n) { if (n == null) return; var el = document.getElementById('cartCount'); if (el) el.textContent = n; }
+  function setWishBadge(n) { if (n == null) return; var el = document.getElementById('wishCount'); if (el) el.textContent = n; }
+
+  /* ── Currency ── */
+  function fmt(n) { return 'KSh ' + Math.round(n).toLocaleString(); }
+
+  /* ── Free-ship bar ── */
+  function updateShipBar(subtotal) {
+    var bar  = document.getElementById('scShipBar');
+    var msg  = document.getElementById('scShipMsg');
+    var fill = document.getElementById('scShipFill');
+    if (!bar) return;
+    if (subtotal <= 0) { bar.style.display = 'none'; return; }
+    bar.style.display = 'block';
+    if (subtotal >= FREE_SHIP) {
+      msg.innerHTML = '🎉 You\u2019ve unlocked <b>free Nairobi CBD delivery</b>';
+      fill.style.width = '100%';
+    } else {
+      var rem = FREE_SHIP - subtotal;
+      msg.innerHTML = 'Add <b>' + fmt(rem) + '</b> more for free Nairobi CBD delivery';
+      fill.style.width = Math.min(100, (subtotal / FREE_SHIP) * 100) + '%';
+    }
+  }
+
+  /* ── Recalculate totals ── */
+  function recalc() {
+    if (!scItemsList) return;
+    var subtotal = 0, count = 0;
+
+    scItemsList.querySelectorAll('.sc-row').forEach(function (row) {
+      var chk = row.querySelector('.sc-chk');
+      if (chk && !chk.checked) return;
+      var unit = parseFloat(row.dataset.unitPrice) || 0;
+      var qtyEl = row.querySelector('.sc-qty-input');
+      var qty   = parseInt(qtyEl ? qtyEl.value : 1, 10) || 1;
+      var line  = unit * qty;
+      var subEl = row.querySelector('.sc-subtotal');
+      if (subEl) subEl.textContent = fmt(line);
+      subtotal += line;
+      count    += qty;
+    });
+
+    var discount = subtotal * (promoDiscountPct / 100);
+    var delivery = document.getElementById('scDelivery');
+    var delFee   = delivery ? (parseFloat(delivery.value) || 0) : 200;
+    var freeShip = subtotal >= FREE_SHIP && delFee === 200;
+    if (freeShip) delFee = 0;
+    var total = subtotal - discount + delFee;
+
+    var el = function(id){ return document.getElementById(id); };
+    if (el('scSumSubtotal'))  el('scSumSubtotal').textContent  = fmt(subtotal);
+    if (el('scSumCount'))     el('scSumCount').textContent     = count;
+    if (el('scSumDelivery'))  el('scSumDelivery').textContent  = freeShip ? 'FREE' : fmt(delFee);
+    if (el('scSumTotal'))     el('scSumTotal').textContent     = fmt(total);
+
+    var promoRow = el('scPromoRow');
+    var promoVal = el('scPromoVal');
+    if (discount > 0) {
+      promoRow && (promoRow.style.display = 'flex');
+      promoVal && (promoVal.textContent = '− ' + fmt(discount));
+    } else {
+      promoRow && (promoRow.style.display = 'none');
+    }
+
+    updateShipBar(subtotal);
+    updateSelectAll();
+
+    var rows = scItemsList.querySelectorAll('.sc-row').length;
+    var meta = document.getElementById('scCartMeta');
+    if (meta) meta.textContent = rows + ' item' + (rows !== 1 ? 's' : '') + ' in your cart';
+
+    if (rows === 0) {
+      scCartBody   && (scCartBody.style.display   = 'none');
+      scEmptyState && (scEmptyState.style.display = '');
+    } else {
+      scCartBody   && (scCartBody.style.display   = '');
+      scEmptyState && (scEmptyState.style.display = 'none');
+    }
+  }
+
+  /* ── Select-all sync ── */
+  function updateSelectAll() {
+    var selectAll = document.getElementById('scSelectAll');
+    if (!selectAll || !scItemsList) return;
+    var cbs = scItemsList.querySelectorAll('.sc-chk');
+    if (!cbs.length) { selectAll.checked = false; selectAll.indeterminate = false; return; }
+    var checked = 0;
+    cbs.forEach(function(cb){ if (cb.checked) checked++; });
+    selectAll.checked = checked === cbs.length;
+    selectAll.indeterminate = checked > 0 && checked < cbs.length;
+  }
+
+  /* ── Animate row out ── */
+  function animateOut(row, cb) {
+    row.classList.add('sc-removing');
+    setTimeout(function () {
+      row.remove();
+      if (typeof cb === 'function') cb();
+    }, ANIM_MS);
+  }
+
+  /* ── POST helper ── */
+  function post(url, cb) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': csrf(), 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+
+  /* ── Set button loading ── */
+  function setBtnLoading(btn, loading, label) {
+    btn.classList.toggle('sc-btn-loading', loading);
+    btn.disabled = loading;
+    var sp = btn.querySelector('span');
+    if (sp && label) sp.textContent = label;
+  }
+
+  /* ── Update saved count badge ── */
+  function updateSavedCount() {
+    if (!scSavedList) return;
+    var n = scSavedList.querySelectorAll('.sc-row').length;
+    var el = document.getElementById('scSavedCount');
+    if (el) el.textContent = n;
+    if (scSavedSection) scSavedSection.style.display = n ? '' : 'none';
+  }
+
+  /* ── Cart items: delegated click ── */
+  if (scItemsList) {
+
+    scItemsList.addEventListener('click', function (e) {
+      var row = e.target.closest('.sc-row');
+      if (!row) return;
+      var qtyInput = row.querySelector('.sc-qty-input');
+
+      if (e.target.classList.contains('sc-qty-plus')) {
+        qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1;
+        recalc();
+        return;
+      }
+      if (e.target.classList.contains('sc-qty-minus')) {
+        qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
+        recalc();
+        return;
+      }
+
+      var removeBtn = e.target.closest('.sc-remove');
+      if (removeBtn && scItemsList.contains(removeBtn)) {
+        e.preventDefault();
+        var url = removeBtn.dataset.url;
+        if (!url) return;
+        setBtnLoading(removeBtn, true, 'Removing…');
+        post(url)
+          .then(function (data) {
+            if (data.success === false) { toast(data.message || 'Could not remove item.', true); setBtnLoading(removeBtn, false, 'Remove'); return; }
+            animateOut(row, function () {
+              recalc();
+              setCartBadge(data.cart_count);
+              toast(data.message || 'Item removed from your cart.');
+            });
+          })
+          .catch(function () { setBtnLoading(removeBtn, false, 'Remove'); toast('Could not remove item. Try again.', true); });
+        return;
+      }
+
+      var saveBtn = e.target.closest('.sc-save');
+      if (saveBtn) {
+        e.preventDefault();
+        var url = saveBtn.dataset.url;
+        if (!url) return;
+        setBtnLoading(saveBtn, true, 'Saving…');
+        post(url)
+          .then(function (data) {
+            if (data.success === false) { toast(data.message || 'Could not save.', true); setBtnLoading(saveBtn, false, 'Save for later'); return; }
+            var clone = row.cloneNode(true);
+            clone.classList.remove('sc-removing');
+            clone.classList.add('sc-saved-row');
+            var actDiv = clone.querySelector('.sc-actions');
+            if (actDiv) {
+              actDiv.innerHTML =
+                '<button class="sc-move-to-cart" data-url="' + (data.move_url || '#') + '" data-item-id="' + (data.saved_item_id || '') + '" aria-label="Move to cart">' +
+                '<i class="fas fa-cart-plus"></i><span>Move to Cart</span></button>' +
+                '<button class="sc-remove" data-url="' + (data.remove_url || '#') + '" data-item-id="' + (data.saved_item_id || '') + '" aria-label="Remove">' +
+                '<i class="fas fa-trash-alt"></i><span>Remove</span></button>';
+            }
+            var qtyCol = clone.querySelector('.sc-qty-col');
+            if (qtyCol) qtyCol.style.display = 'none';
+
+            if (scSavedList) scSavedList.appendChild(clone);
+            animateOut(row, function () {
+              recalc();
+              setCartBadge(data.cart_count);
+              updateSavedCount();
+              if (scSavedSection) scSavedSection.style.display = '';
+              toast(data.message || 'Saved for later.');
+            });
+          })
+          .catch(function () { setBtnLoading(saveBtn, false, 'Save for later'); toast('Could not save item. Try again.', true); });
+        return;
+      }
+    });
+
+    scItemsList.addEventListener('change', function (e) {
+      if (e.target.classList.contains('sc-qty-input')) {
+        var v = parseInt(e.target.value, 10);
+        if (!v || v < 1) e.target.value = 1;
+        recalc();
+      }
+      if (e.target.classList.contains('sc-chk')) recalc();
+    });
+  }
+
+  /* ── Saved for later: delegated click ── */
+  if (scSavedList) {
+    scSavedList.addEventListener('click', function (e) {
+      var row = e.target.closest('.sc-row');
+      if (!row) return;
+
+      var moveBtn = e.target.closest('.sc-move-to-cart');
+      if (moveBtn) {
+        e.preventDefault();
+        var url = moveBtn.dataset.url;
+        if (!url || url === '#') {
+          var clone = row.cloneNode(true);
+          clone.classList.remove('sc-saved-row', 'sc-removing');
+          var actDiv = clone.querySelector('.sc-actions');
+          if (actDiv) {
+            actDiv.innerHTML =
+              '<button class="sc-save" data-url="#" aria-label="Save for later">' +
+              '<i class="far fa-bookmark"></i><span>Save for later</span></button>' +
+              '<button class="sc-remove" data-url="#" aria-label="Remove">' +
+              '<i class="fas fa-trash-alt"></i><span>Remove</span></button>';
+          }
+          var qtyCol = clone.querySelector('.sc-qty-col');
+          if (qtyCol) qtyCol.style.display = '';
+          if (scItemsList) scItemsList.appendChild(clone);
+          animateOut(row, function () { recalc(); updateSavedCount(); toast('Item moved to your cart.'); });
+          return;
+        }
+        setBtnLoading(moveBtn, true, 'Moving…');
+        post(url)
+          .then(function (data) {
+            if (data.success === false) { toast(data.message || 'Could not move item.', true); setBtnLoading(moveBtn, false, 'Move to Cart'); return; }
+            animateOut(row, function () {
+              recalc();
+              setCartBadge(data.cart_count);
+              updateSavedCount();
+              toast(data.message || 'Item moved to your cart.');
+              if (data.cart_count !== undefined && scItemsList) {
+                setTimeout(function () { location.reload(); }, 800);
+              }
+            });
+          })
+          .catch(function () { setBtnLoading(moveBtn, false, 'Move to Cart'); toast('Could not move item. Try again.', true); });
+        return;
+      }
+
+      var removeBtn = e.target.closest('.sc-remove');
+      if (removeBtn) {
+        e.preventDefault();
+        var url = removeBtn.dataset.url;
+        if (!url || url === '#') { animateOut(row, updateSavedCount); return; }
+        setBtnLoading(removeBtn, true, 'Removing…');
+        post(url)
+          .then(function (data) {
+            animateOut(row, function () { updateSavedCount(); toast(data.message || 'Item removed.'); });
+          })
+          .catch(function () { setBtnLoading(removeBtn, false, 'Remove'); toast('Could not remove. Try again.', true); });
+        return;
+      }
+    });
+  }
+
+  /* ── Select all ── */
+  var selectAllChk = document.getElementById('scSelectAll');
+  if (selectAllChk) {
+    selectAllChk.addEventListener('change', function () {
+      scItemsList && scItemsList.querySelectorAll('.sc-chk').forEach(function (cb) { cb.checked = selectAllChk.checked; });
+      recalc();
+    });
+  }
+
+  /* ── Clear cart ── */
+  var clearBtn = document.getElementById('scClearAll');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      if (clearBtn.disabled) return;
+      if (!confirm('Remove all items from your cart?')) return;
+
+      var url = clearBtn.dataset.url;
+      if (!url) { toast('Clear cart isn\u2019t configured yet. Please contact support.', true); return; }
+
+      setBtnLoading(clearBtn, true, 'Clearing…');
+
+      post(url)
+        .then(function (data) {
+          if (data.success === false) {
+            toast(data.message || 'Could not clear cart.', true);
+            setBtnLoading(clearBtn, false, 'Clear Cart');
+            return;
+          }
+          if (scItemsList) scItemsList.querySelectorAll('.sc-row').forEach(function (r) { r.remove(); });
+          recalc();
+          setCartBadge(data.cart_count != null ? data.cart_count : 0);
+          setBtnLoading(clearBtn, false, 'Clear Cart');
+          toast(data.message || 'Cart cleared.');
+        })
+        .catch(function () {
+          setBtnLoading(clearBtn, false, 'Clear Cart');
+          toast('Could not clear cart. Try again.', true);
+        });
+    });
+  }
+
+  /* ── Delivery select ── */
+  var deliverySelect = document.getElementById('scDelivery');
+  if (deliverySelect) deliverySelect.addEventListener('change', recalc);
+
+  /* ── Promo code ── */
+  var promoApply = document.getElementById('scPromoApply');
+  if (promoApply) {
+    promoApply.addEventListener('click', function () {
+      var code = (document.getElementById('scPromoInput').value || '').trim().toUpperCase();
+      var msgEl = document.getElementById('scPromoMsg');
+      if (code && PROMO_CODES[code]) {
+        promoDiscountPct = PROMO_CODES[code];
+        msgEl.textContent = code + ' applied — ' + promoDiscountPct + '% off!';
+        msgEl.className = 'sc-promo-msg ok';
+      } else {
+        promoDiscountPct = 0;
+        msgEl.textContent = code ? 'That code isn\u2019t valid.' : 'Enter a promo code first.';
+        msgEl.className = 'sc-promo-msg err';
+      }
+      recalc();
+    });
+  }
+
+  /* ── Related card: Add to Cart (fly-icon loading + green "Added") ── */
+  document.querySelectorAll('.js-related-add-cart').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.classList.contains('is-loading') || btn.classList.contains('is-added')) return;
+      var form = btn.closest('form');
+      var card = btn.closest('.related-card');
+      var productName = card ? card.dataset.productName : 'Item';
+
+      btn.classList.add('is-loading');
+
+      fetch(form.action, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRFToken': csrf(), 'X-Requested-With': 'XMLHttpRequest' },
+        body: new FormData(form)
+      })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (data) {
+          btn.classList.remove('is-loading');
+          btn.classList.add('is-added');
+          setCartBadge(data.cart_count);
+          toast((productName || 'Item') + ' added to your cart.');
+          setTimeout(function () { btn.classList.remove('is-added'); }, 1800);
+        })
+        .catch(function () {
+          btn.classList.remove('is-loading');
+          toast("Couldn't add " + (productName || 'item') + ' to your cart.', true);
+        });
+    });
+  });
+
+  /* ── Related card: wishlist heart with pulse ── */
+  document.querySelectorAll('.js-related-wishlist').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (btn.dataset.loading === '1') return;
+      btn.dataset.loading = '1';
+      var pid = btn.dataset.productId;
+      var name = btn.dataset.productName || 'Item';
+
+      fetch('/wishlist/toggle/' + pid + '/', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRFToken': csrf(), 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (data) {
+          var added = !!data.added;
+          btn.classList.toggle('active', added);
+          btn.classList.remove('is-wishing');
+          void btn.offsetWidth;
+          btn.classList.add('is-wishing');
+          setTimeout(function () { btn.classList.remove('is-wishing'); }, 420);
+          setWishBadge(data.wishlist_count);
+          toast(added ? (name + ' saved to your wishlist.') : 'Removed from your wishlist.');
+        })
+        .catch(function () { toast("Couldn't update your wishlist right now.", true); })
+        .finally(function () { btn.dataset.loading = '0'; });
+    });
+  });
+
+  /* ── Swiper carousels ── */
+  function makeSwiper(selector, opts) {
+    var el = document.querySelector(selector);
+    if (!el) return;
+    var base = {
+      loop: true,
+      autoplay: { delay: 3800, disableOnInteraction: false, pauseOnMouseEnter: true },
+      slidesPerView: 2,
+      spaceBetween: 16,
+      navigation: { nextEl: el.querySelector('.swiper-button-next'), prevEl: el.querySelector('.swiper-button-prev') },
+      pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+      breakpoints: {
+        520:  { slidesPerView: 2 },
+        768:  { slidesPerView: 3 },
+        1024: { slidesPerView: 4 },
+        1200: { slidesPerView: 5 }
+      }
+    };
+    new Swiper(el, Object.assign(base, opts || {}));
+  }
+  /* Related-to-cart carousel: slightly slower autoplay, roomier cards */
+  makeSwiper('.sc-swiper-related', {
+    autoplay: { delay: 4200, disableOnInteraction: false, pauseOnMouseEnter: true },
+    breakpoints: {
+      480:  { slidesPerView: 2, spaceBetween: 16 },
+      768:  { slidesPerView: 3, spaceBetween: 18 },
+      1024: { slidesPerView: 4, spaceBetween: 20 },
+      1280: { slidesPerView: 5, spaceBetween: 20 }
+    }
+  });
+  makeSwiper('.sc-swiper-fbt');
+  makeSwiper('.sc-swiper-cab');
+  makeSwiper('.sc-swiper-rv');
+
+  /* ── Initial recalc ── */
+  recalc();
+  updateSavedCount();
+
+})();
+</script>
+
+{% endblock %}

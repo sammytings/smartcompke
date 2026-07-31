@@ -1,0 +1,264 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Analytics
+{% endblock %}
+
+{% block content %}
+
+<div class="page-title">
+
+    <h2>Analytics Dashboard</h2>
+
+    <p>
+        Monitor customer engagement and product performance.
+    </p>
+
+</div>
+
+
+<div class="analytics-cards">
+
+    <div class="card blue">
+
+        <h4>Total Views</h4>
+
+        <h2>{{ total_views|intcomma }}</h2>
+
+    </div>
+
+    <div class="card green">
+
+        <h4>Cart Adds</h4>
+
+        <h2>{{ total_cart_adds|intcomma }}</h2>
+
+    </div>
+
+    <div class="card orange">
+
+        <h4>Checkout</h4>
+
+        <h2>{{ total_checkouts|intcomma }}</h2>
+
+    </div>
+
+    <div class="card red">
+
+        <h4>Sales</h4>
+
+        <h2>{{ total_sales|intcomma }}</h2>
+
+    </div>
+
+    <div class="card dark">
+
+        <h4>Revenue</h4>
+
+        <h2>KES {{ total_revenue|floatformat:0|intcomma }}</h2>
+
+    </div>
+
+</div>
+
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+        <tr>
+
+            <th>Product</th>
+
+            <th>Category</th>
+
+            <th>Brand</th>
+
+            <th>Views</th>
+
+            <th>Wishlist</th>
+
+            <th>Cart</th>
+
+            <th>Checkout</th>
+
+            <th>Sales</th>
+
+            <th>Revenue</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for item in analytics %}
+
+        <tr>
+
+            <td>
+
+                {{ item.product.name }}
+
+            </td>
+
+            <td>
+
+                {{ item.product.category }}
+
+            </td>
+
+            <td>
+
+                {{ item.product.brand }}
+
+            </td>
+
+            <td>
+
+                {{ item.total_views|intcomma }}
+
+            </td>
+
+            <td>
+
+                {{ item.wishlist_adds|intcomma }}
+
+            </td>
+
+            <td>
+
+                {{ item.cart_adds|intcomma }}
+
+            </td>
+
+            <td>
+
+                {{ item.checkout_count|intcomma }}
+
+            </td>
+
+            <td>
+
+                {{ item.total_sales|intcomma }}
+
+            </td>
+
+            <td>
+
+                KES {{ item.total_revenue|floatformat:0|intcomma }}
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="9">
+
+                No analytics data yet.
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+<style>.page-title{
+
+margin-bottom:25px;
+
+}
+
+.analytics-cards{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+margin-bottom:30px;
+
+}
+
+.card{
+
+padding:25px;
+
+border-radius:14px;
+
+color:#fff;
+
+}
+
+.card h4{
+
+margin-bottom:10px;
+
+font-weight:500;
+
+}
+
+.card h2{
+
+font-size:34px;
+
+}
+
+.blue{background:#2563eb;}
+
+.green{background:#16a34a;}
+
+.orange{background:#ea580c;}
+
+.red{background:#dc2626;}
+
+.dark{background:#111827;}
+
+.table-card{
+
+background:#fff;
+
+border-radius:14px;
+
+overflow:hidden;
+
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th{
+
+background:#f8fafc;
+
+padding:16px;
+
+}
+
+td{
+
+padding:16px;
+
+border-top:1px solid #eee;
+
+}</style>
+{% endblock %}

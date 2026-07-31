@@ -1,0 +1,669 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>Add Product</h2>
+
+    <a href="{% url 'dashboard_products' %}" class="btn btn-outline">
+        Back
+    </a>
+
+</div>
+
+<div class="card">
+
+<form method="POST" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <label>Name</label>
+        {{ form.name }}
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label>Slug</label>
+        {{ form.slug }}
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label>Category</label>
+        {{ form.category }}
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label>Brand</label>
+        {{ form.brand }}
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label>Condition</label>
+        {{ form.condition }}
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label>Warranty</label>
+        {{ form.warranty }}
+
+    </div>
+
+    <div class="col-12">
+
+        <label>Short Description</label>
+        {{ form.short_description }}
+
+    </div>
+
+    <div class="col-12">
+
+        <label>Description</label>
+        {{ form.description }}
+
+    </div>
+
+    <!-- Main Product Image -->
+
+    <div class="col-md-6">
+
+        <label>Main Product Image</label>
+
+        {{ form.image }}
+
+        <small class="text-muted d-block mt-2">
+            Used if no gallery images are uploaded.
+        </small>
+
+    </div>
+
+    <!-- Multiple Gallery Images -->
+
+    <div class="col-md-6">
+
+        <label>Product Gallery Images</label>
+
+        <input
+            type="file"
+            name="gallery_images"
+            id="gallery_images"
+            class="form-control"
+            multiple
+            accept="image/*">
+
+        <small class="text-muted mt-2 d-block">
+            You can select many images at once.
+            <br>
+            The <strong>first selected image</strong> will automatically become the display image.
+        </small>
+
+    </div>
+
+    <!-- Preview -->
+
+    <div class="col-12 mt-4">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <strong>Selected Images Preview</strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div id="preview-container"
+                     style="display:flex;flex-wrap:wrap;gap:15px;">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Product Settings -->
+
+    <div class="col-12 mt-4">
+
+        <div class="card p-3">
+
+            <h5>Product Settings</h5>
+
+            <div class="form-check form-switch">
+
+                {{ form.featured }}
+
+                <label class="form-check-label">
+                    Featured Product
+                </label>
+
+            </div>
+
+            <div class="form-check form-switch">
+
+                {{ form.new_arrival }}
+
+                <label class="form-check-label">
+                    New Arrival
+                </label>
+
+            </div>
+
+            <div class="form-check form-switch">
+
+                {{ form.trending }}
+
+                <label class="form-check-label">
+                    Trending
+                </label>
+
+            </div>
+
+            <div class="form-check form-switch">
+
+                {{ form.active }}
+
+                <label class="form-check-label">
+                    Active
+                </label>
+
+            </div>
+
+            <hr>
+
+            <div class="form-check form-switch">
+
+                {{ form.vat_inclusive }}
+
+                <label class="form-check-label fw-bold">
+
+                    Price Includes 16% VAT
+
+                </label>
+
+            </div>
+
+            <small class="text-muted">
+
+                If enabled, prices entered already include VAT.
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+<hr>
+
+<button class="btn btn-primary">
+
+    Save Product
+
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+const input = document.getElementById("gallery_images");
+const preview = document.getElementById("preview-container");
+
+input.addEventListener("change", function(){
+
+    preview.innerHTML = "";
+
+    Array.from(this.files).forEach((file,index)=>{
+
+        const reader = new FileReader();
+
+        reader.onload=function(e){
+
+            const box=document.createElement("div");
+
+            box.style.width="160px";
+            box.style.textAlign="center";
+
+            let badge="";
+
+            if(index===0){
+
+                badge=`
+                    <div style="
+                        background:#28a745;
+                        color:white;
+                        padding:4px;
+                        border-radius:4px;
+                        margin-bottom:5px;
+                        font-size:12px;
+                        font-weight:bold;
+                    ">
+                        MAIN DISPLAY IMAGE
+                    </div>
+                `;
+
+            }
+
+            box.innerHTML=`
+
+                ${badge}
+
+                <img
+                    src="${e.target.result}"
+                    style="
+                        width:150px;
+                        height:150px;
+                        object-fit:cover;
+                        border-radius:8px;
+                        border:1px solid #ddd;
+                    ">
+
+                <div style="
+                    margin-top:8px;
+                    font-size:12px;
+                    word-break:break-word;
+                ">
+                    ${file.name}
+                </div>
+
+            `;
+
+            preview.appendChild(box);
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+});
+
+</script>
+<style>/*==================================================
+    ADD PRODUCT PAGE
+    Premium SmartComputersKE Dashboard Design
+==================================================*/
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.page-header h2{
+    font-size:2rem;
+    font-weight:700;
+    color:#0f172a;
+    margin:0;
+}
+
+.page-header .btn-outline{
+    padding:11px 24px;
+    border:2px solid #2563eb;
+    border-radius:12px;
+    color:#2563eb;
+    text-decoration:none;
+    font-weight:600;
+    transition:.3s;
+}
+
+.page-header .btn-outline:hover{
+    background:#2563eb;
+    color:#fff;
+}
+
+/*=============================
+CARD
+=============================*/
+
+.card{
+    background:#fff;
+    border:none;
+    border-radius:18px;
+    padding:35px;
+    box-shadow:0 12px 40px rgba(15,23,42,.08);
+}
+
+/*=============================
+LABELS
+=============================*/
+
+label{
+    display:block;
+    font-weight:600;
+    color:#334155;
+    margin-bottom:8px;
+    margin-top:18px;
+}
+
+/*=============================
+INPUTS
+=============================*/
+
+input,
+select,
+textarea,
+.form-control,
+.form-select{
+    width:100%;
+    border:1px solid #dbe4f0;
+    border-radius:12px;
+    background:#fff;
+    padding:13px 15px;
+    font-size:.95rem;
+    transition:.25s;
+    box-shadow:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+/*=============================
+TEXTAREA
+=============================*/
+
+textarea{
+    min-height:140px;
+    resize:vertical;
+}
+
+/*=============================
+FILE INPUT
+=============================*/
+
+input[type=file]{
+    padding:12px;
+    border:2px dashed #cbd5e1;
+    background:#f8fbff;
+}
+
+input[type=file]:hover{
+    border-color:#2563eb;
+}
+
+/*=============================
+IMAGE PREVIEW CARD
+=============================*/
+
+.card .card{
+    margin-top:15px;
+    border-radius:15px;
+    border:1px solid #eef2f7;
+    box-shadow:none;
+    overflow:hidden;
+}
+
+.card-header{
+    background:#f8fafc;
+    border-bottom:1px solid #edf2f7;
+    padding:16px 22px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.card-body{
+    padding:25px;
+}
+
+/*=============================
+PREVIEW IMAGES
+=============================*/
+
+#preview-container{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+}
+
+#preview-container div{
+    width:165px;
+    text-align:center;
+    background:#fff;
+    border:1px solid #edf2f7;
+    border-radius:14px;
+    padding:12px;
+    transition:.3s;
+}
+
+#preview-container div:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+#preview-container img{
+    width:145px !important;
+    height:145px !important;
+    object-fit:cover;
+    border-radius:12px !important;
+}
+
+#preview-container small,
+#preview-container div div{
+    font-size:12px;
+    color:#64748b;
+}
+
+/*=============================
+MAIN IMAGE BADGE
+=============================*/
+
+#preview-container .main-image{
+    background:#16a34a;
+    color:#fff;
+    padding:6px;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:700;
+}
+
+/*=============================
+SETTINGS CARD
+=============================*/
+
+.form-switch{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 0;
+    border-bottom:1px solid #edf2f7;
+}
+
+.form-switch:last-child{
+    border-bottom:none;
+}
+
+.form-check-input{
+    width:52px;
+    height:28px;
+    cursor:pointer;
+}
+
+.form-check-label{
+    font-weight:600;
+    color:#334155;
+}
+
+/*=============================
+HELP TEXT
+=============================*/
+
+.text-muted{
+    color:#64748b!important;
+    font-size:.9rem;
+    line-height:1.6;
+}
+
+/*=============================
+SAVE BUTTON
+=============================*/
+
+.btn-primary{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:14px 34px;
+    font-weight:700;
+    transition:.3s;
+    box-shadow:0 12px 30px rgba(37,99,235,.25);
+}
+
+.btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 18px 38px rgba(37,99,235,.35);
+}
+
+/*=============================
+ROW SPACING
+=============================*/
+
+.row>[class*="col"]{
+    margin-bottom:18px;
+}
+
+/*=============================
+HORIZONTAL RULE
+=============================*/
+
+hr{
+    margin:35px 0;
+    border-color:#edf2f7;
+}
+
+/*=============================
+SMALL CARDS
+=============================*/
+
+.card h5{
+    font-weight:700;
+    color:#0f172a;
+}
+
+/*=============================
+RESPONSIVE
+=============================*/
+
+@media(max-width:992px){
+
+.card{
+    padding:25px;
+}
+
+.page-header{
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+.page-header .btn-outline{
+    width:100%;
+    text-align:center;
+}
+
+.btn-primary{
+    width:100%;
+}
+
+#preview-container{
+    justify-content:center;
+}
+
+#preview-container div{
+    width:150px;
+}
+
+}
+
+@media(max-width:768px){
+
+.page-header h2{
+    font-size:1.6rem;
+}
+
+.card{
+    padding:20px;
+}
+
+.card-body{
+    padding:20px;
+}
+
+.card-header{
+    padding:15px 18px;
+}
+
+label{
+    margin-top:14px;
+}
+
+#preview-container div{
+    width:100%;
+}
+
+#preview-container img{
+    width:100%!important;
+    height:220px!important;
+}
+
+.form-switch{
+    flex-direction:row;
+}
+
+}
+
+@media(max-width:480px){
+
+.page-header h2{
+    font-size:1.4rem;
+}
+
+.card{
+    border-radius:15px;
+    padding:18px;
+}
+
+.btn-primary,
+.btn-outline{
+    width:100%;
+}
+
+input,
+select,
+textarea{
+    font-size:.9rem;
+}
+
+}</style>
+
+{% endblock %}

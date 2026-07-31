@@ -1,0 +1,799 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Receipt {{ order.order_id }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.receipt-page{
+  --navy:#123a66;
+  --navy-dark:#0b2544;
+  --red:#c8272c;
+  --ink:#0F172A;
+  --text-dark:#0F172A;
+  --text-muted:#64748B;
+  --paper:#F8FAFC;
+  --panel:#FFFFFF;
+  --line:#E2E8F0;
+  --line-soft:#EEF2F7;
+}
+
+.receipt-page,
+.receipt-page *{
+  box-sizing:border-box;
+}
+
+.receipt-page{
+  background:#f2f3f6;
+  padding:40px 20px;
+  font-family:Arial, Helvetica, sans-serif;
+  color:var(--text-dark);
+}
+
+.receipt-page h1,
+.receipt-page h2,
+.receipt-page h3,
+.receipt-page p,
+.receipt-page span,
+.receipt-page small,
+.receipt-page label,
+.receipt-page table,
+.receipt-page td,
+.receipt-page th{
+  margin:0;
+  padding:0;
+  font-family:inherit;
+  font-weight:400;
+  line-height:1.4;
+}
+
+.receipt-page img{
+  display:block;
+  max-width:100%;
+  border-radius:0;
+  box-shadow:none;
+}
+
+.receipt-container{
+  max-width:840px;
+  margin:0 auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:40px 44px;
+}
+
+/* HEADER */
+
+.receipt-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding-bottom:24px;
+  border-bottom:2px solid var(--navy);
+}
+
+.receipt-header .company{
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+
+.receipt-header .company img{
+  width:56px;
+  height:56px;
+  object-fit:contain;
+}
+
+.receipt-header .company h1{
+  font-size:18px;
+  letter-spacing:.5px;
+  color:var(--navy);
+  font-weight:700;
+}
+
+.receipt-header .company p{
+  font-size:12px;
+  color:var(--text-muted);
+  margin-top:2px;
+}
+
+.receipt-header .company small{
+  font-size:11px;
+  color:var(--text-muted);
+}
+
+.receipt-title{
+  text-align:right;
+}
+
+.receipt-title h2{
+  font-size:14px;
+  letter-spacing:1px;
+  color:var(--text-muted);
+  font-weight:600;
+}
+
+.receipt-title .receipt-number{
+  display:block;
+  font-size:20px;
+  font-weight:700;
+  color:var(--navy-dark);
+  margin-top:4px;
+}
+
+/* STATUS BAR */
+
+.status-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0;
+  margin-top:24px;
+}
+
+.status-bar > div{
+  flex:1;
+  min-width:150px;
+  padding:14px 18px;
+  border-left:1px solid var(--line);
+  font-size:13px;
+  color:var(--text-dark);
+}
+
+.status-bar > div:first-child{
+  border-left:none;
+  padding-left:0;
+}
+
+.status-bar strong{
+  display:block;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:var(--text-muted);
+  font-weight:600;
+  margin-bottom:4px;
+}
+
+.status{
+  display:inline-block;
+  font-size:12px;
+  font-weight:700;
+  padding:2px 10px;
+  border-radius:3px;
+}
+
+.status-pending{
+  background:#fdecea;
+  color:var(--red);
+}
+
+.status-processing{
+  background:#e9eff7;
+  color:var(--navy);
+}
+
+.status-completed,
+.status-delivered{
+  background:#e9eff7;
+  color:var(--navy);
+}
+
+.status-cancelled{
+  background:#fdecea;
+  color:var(--red);
+}
+
+/* CARDS */
+
+.receipt-card{
+  margin-top:32px;
+}
+
+.receipt-card h3{
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  color:var(--navy);
+  font-weight:700;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:16px;
+}
+
+.receipt-card p{
+  font-size:14px;
+  color:var(--text-dark);
+}
+
+/* CUSTOMER */
+
+.customer-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:18px;
+}
+
+.customer-grid label{
+  display:block;
+  font-size:11px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  margin-bottom:3px;
+}
+
+.customer-grid p{
+  font-size:14px;
+  color:var(--text-dark);
+  font-weight:600;
+}
+
+.address{
+  margin-top:18px;
+}
+
+.address label{
+  display:block;
+  font-size:11px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  margin-bottom:3px;
+}
+
+.address p{
+  font-size:14px;
+  color:var(--text-dark);
+}
+
+/* PRODUCT TABLE */
+
+.receipt-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+.receipt-table thead th{
+  text-align:left;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:var(--text-muted);
+  font-weight:600;
+  padding:8px 10px;
+  border-bottom:1px solid var(--line);
+}
+
+.receipt-table tbody td{
+  padding:14px 10px;
+  border-bottom:1px solid var(--line);
+  vertical-align:middle;
+  color:var(--text-dark);
+  font-size:13px;
+}
+
+.receipt-table tbody tr:last-child td{
+  border-bottom:none;
+}
+
+.receipt-table strong{
+  font-weight:700;
+}
+
+.receipt-table small{
+  color:var(--text-muted);
+  font-size:12px;
+}
+
+.product-image{
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border:1px solid var(--line);
+}
+
+/* SUMMARY */
+
+.receipt-summary{
+  margin-top:24px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+.receipt-summary table{
+  width:280px;
+  font-size:14px;
+  border-collapse:collapse;
+}
+
+.receipt-summary td{
+  padding:8px 0;
+  color:var(--text-dark);
+}
+
+.receipt-summary td:last-child{
+  text-align:right;
+}
+
+.receipt-summary .grand-total td{
+  border-top:2px solid var(--navy);
+  padding-top:12px;
+  font-size:16px;
+  font-weight:700;
+  color:var(--red);
+}
+
+/* FOOTER */
+
+.receipt-footer{
+  text-align:center;
+  margin-top:40px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+}
+
+.receipt-footer h3{
+  font-size:15px;
+  color:var(--navy);
+  margin-bottom:6px;
+  font-weight:700;
+}
+
+.receipt-footer p{
+  font-size:13px;
+  color:var(--text-muted);
+}
+
+/* ACTIONS */
+
+.receipt-actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:28px;
+  flex-wrap:wrap;
+}
+
+.receipt-actions button,
+.receipt-actions a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:600;
+  padding:10px 18px;
+  border-radius:4px;
+  text-decoration:none;
+  cursor:pointer;
+  border:1px solid transparent;
+  font-family:inherit;
+  line-height:1;
+}
+
+.receipt-page #printReceipt{
+  background:#fff;
+  color:var(--navy);
+  border:1px solid var(--navy);
+}
+
+.receipt-page .download-btn{
+  background:var(--red);
+  color:#fff;
+}
+
+.receipt-page .continue-btn{
+  background:var(--navy);
+  color:#fff;
+}
+
+@media (max-width:640px){
+
+  .receipt-container{
+    padding:26px 20px;
+  }
+
+  .receipt-header{
+    flex-direction:column;
+    gap:16px;
+  }
+
+  .receipt-title{
+    text-align:left;
+  }
+
+  .customer-grid{
+    grid-template-columns:repeat(2, 1fr);
+  }
+
+  .status-bar > div{
+    border-left:none;
+    padding-left:0;
+    border-top:1px solid var(--line);
+    padding-top:10px;
+  }
+
+  .status-bar > div:first-child{
+    border-top:none;
+    padding-top:0;
+  }
+
+}
+
+@media print{
+
+  .no-print{
+    display:none;
+  }
+
+  .receipt-page{
+    background:#fff;
+    padding:0;
+  }
+
+  .receipt-container{
+    border:none;
+    max-width:100%;
+  }
+
+}
+
+</style>
+
+<section class="receipt-page">
+
+    <div class="receipt-container">
+
+        <!-- HEADER -->
+
+        <div class="receipt-header">
+
+            <div class="company">
+
+                <img src="{% static 'images/logo.png' %}" alt="SmartComputersKE">
+
+                <div>
+
+                    <h1>SMARTCOMPUTERSKE</h1>
+
+                    <p>Technology You Can Trust</p>
+
+                    <small>
+                        Nairobi, Kenya
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="receipt-title">
+
+                <h2>ORDER RECEIPT</h2>
+
+                <span class="receipt-number">
+                    {{ order.order_id }}
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- STATUS -->
+
+        <div class="status-bar">
+
+            <div>
+
+                <strong>Status</strong>
+
+                <span class="status status-{{ order.status }}">
+                    {{ order.get_status_display }}
+                </span>
+
+            </div>
+
+            <div>
+
+                <strong>Order Date</strong>
+
+                {{ order.created_at|date:"d M Y, H:i" }}
+
+            </div>
+
+            <div>
+
+                <strong>Payment</strong>
+
+                {{ order.get_payment_method_display }}
+
+            </div>
+
+            <div>
+
+                <strong>Delivery</strong>
+
+                {{ order.get_delivery_method_display }}
+
+            </div>
+
+        </div>
+
+        <!-- CUSTOMER -->
+
+        <div class="receipt-card">
+
+            <h3>Customer Information</h3>
+
+            <div class="customer-grid">
+
+                <div>
+
+                    <label>Full Name</label>
+
+                    <p>{{ order.full_name }}</p>
+
+                </div>
+
+                <div>
+
+                    <label>Email</label>
+
+                    <p>{{ order.email }}</p>
+
+                </div>
+
+                <div>
+
+                    <label>Phone</label>
+
+                    <p>{{ order.phone }}</p>
+
+                </div>
+
+                <div>
+
+                    <label>County</label>
+
+                    <p>{{ order.county }}</p>
+
+                </div>
+
+            </div>
+
+            <div class="address">
+
+                <label>Delivery Address</label>
+
+                <p>{{ order.address }}</p>
+
+            </div>
+
+        </div>
+
+        <!-- PRODUCTS -->
+
+        <div class="receipt-card">
+
+            <h3>Purchased Products</h3>
+
+            <table class="receipt-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Image</th>
+
+                        <th>Product</th>
+
+                        <th>Quantity</th>
+
+                        <th>Unit Price</th>
+
+                        <th>Total</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in items %}
+
+                    <tr>
+
+                        <td>
+
+                            <img src="{{ item.product.image.url }}"
+                                 class="product-image">
+
+                        </td>
+
+                        <td>
+
+                            <strong>
+
+                                {{ item.product.name }}
+
+                            </strong>
+
+                            <br>
+
+                            {% if item.product.brand %}
+
+                                {{ item.product.brand.name }}
+
+                            {% endif %}
+
+                            <br>
+
+                            <small>
+
+                                {{ item.product.short_description }}
+
+                            </small>
+
+                        </td>
+
+                        <td>
+
+                            {{ item.quantity }}
+
+                        </td>
+
+                        <td>
+
+                            KSh {{ item.price }}
+
+                        </td>
+
+                        <td>
+
+                            <strong>
+
+                                KSh {{ item.total }}
+
+                            </strong>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- TOTALS -->
+
+        <div class="receipt-summary">
+
+            <table>
+
+                <tr>
+
+                    <td>Subtotal</td>
+
+                    <td>KSh {{ order.subtotal }}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Delivery Fee</td>
+
+                    <td>KSh {{ order.delivery_fee }}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>VAT</td>
+
+                    <td>KSh {{ order.vat_amount }}</td>
+
+                </tr>
+
+                <tr class="grand-total">
+
+                    <td>Grand Total</td>
+
+                    <td>KSh {{ order.grand_total }}</td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+        <!-- NOTES -->
+
+        {% if order.notes %}
+
+        <div class="receipt-card">
+
+            <h3>Customer Notes</h3>
+
+            <p>{{ order.notes }}</p>
+
+        </div>
+
+        {% endif %}
+
+        <!-- THANK YOU -->
+
+        <div class="receipt-footer">
+
+            <h3>
+
+                Thank you for shopping with SmartComputersKE.
+
+            </h3>
+
+            <p>
+
+                We appreciate your business and look forward to serving you again.
+
+            </p>
+
+        </div>
+
+        <!-- BUTTONS -->
+
+        <div class="receipt-actions no-print">
+
+            <button id="printReceipt">
+
+                <i class="fas fa-print"></i>
+
+                Print Receipt
+
+            </button>
+
+            <a href="#"
+               class="download-btn">
+
+                <i class="fas fa-download"></i>
+
+                Download PDF
+
+            </a>
+
+            <a href="{% url 'home' %}"
+               class="continue-btn">
+
+                <i class="fas fa-shopping-bag"></i>
+
+                Continue Shopping
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+<script>document.addEventListener("DOMContentLoaded", () => {
+
+    const printButton = document.getElementById("printReceipt");
+
+    if (printButton) {
+
+        printButton.addEventListener("click", () => {
+
+            window.print();
+
+        });
+
+    }
+
+});</script>
+
+{% endblock %}

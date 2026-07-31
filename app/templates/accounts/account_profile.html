@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile - SmartComputersKE{% endblock %}
+
+{% block content %}
+<div class="page-wrap" style="max-width: 700px;">
+    <div class="card">
+
+        <div class="profile-header">
+            {% if user.userprofile.profile_image %}
+                <img src="{{ user.userprofile.profile_image.url }}" class="profile-avatar" alt="{{ user.username }}">
+            {% else %}
+                <div class="profile-avatar">{{ user.username|first|upper }}</div>
+            {% endif %}
+            <div>
+                <h1 style="margin-bottom:2px;">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="card-subtitle" style="margin-bottom:0;">Member since {{ user.date_joined|date:"M Y" }}</p>
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            <div class="profile-field">
+                <div class="label">Username</div>
+                <div class="value">{{ user.username }}</div>
+            </div>
+            <div class="profile-field">
+                <div class="label">Email</div>
+                <div class="value">{{ user.email|default:"Not provided" }}</div>
+            </div>
+            <div class="profile-field">
+                <div class="label">Phone</div>
+                <div class="value">{{ user.userprofile.phone|default:"Not provided" }}</div>
+            </div>
+            <div class="profile-field">
+                <div class="label">County</div>
+                <div class="value">{{ user.userprofile.county|default:"Not provided" }}</div>
+            </div>
+            <div class="profile-field">
+                <div class="label">Town</div>
+                <div class="value">{{ user.userprofile.town|default:"Not provided" }}</div>
+            </div>
+            <div class="profile-field">
+                <div class="label">Address</div>
+                <div class="value">{{ user.userprofile.address|default:"Not provided" }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; display:flex; gap:12px;">
+            <a href="{% url 'password_reset' %}" class="btn btn-outline">Change password</a>
+            <a href="{% url 'logout' %}" class="btn btn-red">Log out</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

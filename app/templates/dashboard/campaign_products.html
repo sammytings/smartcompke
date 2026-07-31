@@ -1,0 +1,137 @@
+
+
+
+
+
+
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>{{ campaign.name }}</h2>
+
+    <a href="{% url 'dashboard_deals' %}" class="btn btn-secondary">
+        ← Back
+    </a>
+
+</div>
+
+<table class="table">
+
+    <thead>
+
+        <tr>
+
+            <th>Image</th>
+
+            <th>Product</th>
+
+            <th>SKU</th>
+
+            <th>Original Price</th>
+
+            <th>Deal Price</th>
+
+            <th>Discount</th>
+
+            <th>Stock</th>
+
+            <th>Status</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for variant in variants %}
+
+        <tr>
+
+            <td>
+
+                {% if variant.image %}
+                    <img src="{{ variant.image.url }}"
+                         width="70">
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {{ variant.product.name }}
+
+            </td>
+
+            <td>
+
+                {{ variant.sku }}
+
+            </td>
+
+            <td>
+
+                KSh {{ variant.price|floatformat:0|intcomma }}
+
+            </td>
+
+            <td>
+
+                {% if variant.discount_price %}
+                    KSh {{ variant.discount_price|floatformat:0|intcomma }}
+                {% else %}
+                    —
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {{ variant.discount_percent }}%
+
+            </td>
+
+            <td>
+
+                {{ variant.stock }}
+
+            </td>
+
+            <td>
+
+                {% if variant.discount_active %}
+                    <span class="badge bg-success">
+                        Live
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary">
+                        Inactive
+                    </span>
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+    {% empty %}
+
+        <tr>
+
+            <td colspan="8">
+
+                No products assigned to this campaign.
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

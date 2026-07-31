@@ -1,0 +1,102 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Delete Banner{% endblock %}
+
+{% block content %}
+
+<div class="delete-card">
+
+    <div class="delete-icon">
+
+        <i class="fas fa-trash-alt"></i>
+
+    </div>
+
+    <h2>Delete Banner</h2>
+
+    <p>
+
+        Are you sure you want to delete
+
+        <strong>{{ banner.title }}</strong>?
+
+    </p>
+
+    {% if banner.image %}
+
+    <img
+        src="{{ banner.image.url }}"
+        class="delete-preview"
+    >
+
+    {% endif %}
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <button class="btn-danger">
+
+            <i class="fas fa-trash"></i>
+
+            Delete Banner
+
+        </button>
+
+        <a
+            href="{% url 'dashboard_banners' %}"
+            class="btn-secondary"
+        >
+
+            Cancel
+
+        </a>
+
+    </form>
+
+</div>
+<style>.delete-card{
+max-width:650px;
+margin:60px auto;
+background:#fff;
+padding:40px;
+border-radius:14px;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+text-align:center;
+}
+
+.delete-icon{
+font-size:70px;
+color:#ef4444;
+margin-bottom:20px;
+}
+
+.delete-preview{
+width:100%;
+max-height:250px;
+object-fit:cover;
+border-radius:12px;
+margin:20px 0;
+border:1px solid #eee;
+}
+
+.btn-danger{
+background:#ef4444;
+color:#fff;
+padding:12px 25px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-right:10px;
+}
+
+.btn-secondary{
+background:#f3f4f6;
+color:#333;
+padding:12px 25px;
+border-radius:8px;
+text-decoration:none;
+display:inline-block;
+}</style>
+
+{% endblock %}

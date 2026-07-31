@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+PRIVACY POLICY PAGE
+Placeholder copy — replace bracketed sections with your actual policy
+before publishing. Shares the .lg-scope styling with terms.html, and now
+matches the red/blue theme used on the auth pages (verify OTP / reset password).
+{% endcomment %}
+
+{% block title %}Privacy Policy{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  .lg-scope{
+    --lg-ink:#17212B; --lg-ink-soft:#5B6B7A; --lg-line:#E1E6EC; --lg-bg:#F5F7FA;
+    --lg-card:#FFFFFF; --lg-brand:#123A75; --lg-brand-dark:#0B2750; --lg-brand-soft:#EAF0FB;
+    --lg-gold:#C8202F; --lg-gold-soft:#FCEAEA;
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--lg-ink); background:var(--lg-bg);
+  }
+  .lg-scope h1,.lg-scope h2{ font-family:'Sora',sans-serif; letter-spacing:-.01em; }
+  .lg-scope a{ color:var(--lg-brand); }
+
+  .lg-topbar{ background:var(--lg-brand); position:relative; }
+  .lg-topbar::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:3px;
+    background:var(--lg-gold);
+  }
+  .lg-topbar-inner{ max-width:860px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; gap:10px; color:#fff; font-weight:700; font-size:16px; }
+  .lg-brand-mark{ width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:#fff; }
+
+  .lg-hero{ max-width:860px; margin:0 auto; padding:36px 24px 8px; }
+  .lg-hero h1{ font-size:28px; font-weight:700; margin:0 0 8px; }
+  .lg-hero .lg-updated{ font-size:13px; color:var(--lg-ink-soft); display:flex; align-items:center; gap:6px; }
+
+  .lg-body{ max-width:860px; margin:0 auto; padding:20px 24px 60px; }
+  .lg-card{ background:var(--lg-card); border:1px solid var(--lg-line); border-radius:12px; box-shadow:0 1px 2px rgba(15,30,45,.04), 0 8px 24px -12px rgba(15,30,45,.14); padding:30px 32px; }
+
+  .lg-toc{ background:var(--lg-brand-soft); border-radius:10px; padding:16px 20px; margin-bottom:26px; }
+  .lg-toc h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--lg-brand); margin:0 0 10px; }
+  .lg-toc ol{ margin:0; padding-left:18px; columns:2; column-gap:20px; }
+  .lg-toc li{ font-size:13.5px; margin-bottom:6px; }
+  .lg-toc a{ text-decoration:none; }
+  .lg-toc a:hover{ text-decoration:underline; }
+  @media (max-width:600px){ .lg-toc ol{ columns:1; } }
+
+  .lg-section{ padding:20px 0; border-bottom:1px solid var(--lg-line); }
+  .lg-section:last-child{ border-bottom:none; padding-bottom:0; }
+  .lg-section h2{ font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; margin:0 0 10px; }
+  .lg-num{ width:24px; height:24px; border-radius:50%; background:var(--lg-brand-soft); color:var(--lg-brand); font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Manrope',sans-serif; flex:none; }
+  .lg-section p, .lg-section li{ font-size:14px; line-height:1.7; color:var(--lg-ink-soft); }
+  .lg-section ul{ margin:8px 0 0; padding-left:20px; }
+  .lg-section strong{ color:var(--lg-ink); }
+  .lg-table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13.5px; }
+  .lg-table th, .lg-table td{ text-align:left; padding:9px 10px; border-bottom:1px solid var(--lg-line); color:var(--lg-ink-soft); }
+  .lg-table th{ color:var(--lg-ink); font-weight:700; }
+
+  .lg-contact{ margin-top:8px; font-size:14px; color:var(--lg-ink-soft); }
+  .lg-contact a{ font-weight:600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lg-scope">
+
+  <div class="lg-topbar">
+    <div class="lg-topbar-inner">
+      <span class="lg-brand-mark">{{ site_initials|default:"YS" }}</span>
+      {{ site_name|default:"Your Store" }}
+    </div>
+  </div>
+
+  <div class="lg-hero">
+    <h1>Privacy Policy</h1>
+    <div class="lg-updated">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Last updated: {{ privacy_updated_date|default:"22 July 2026" }}
+    </div>
+  </div>
+
+  <div class="lg-body">
+    <div class="lg-card">
+
+      <div class="lg-toc">
+        <h4>On this page</h4>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#collect">Information we collect</a></li>
+          <li><a href="#use">How we use it</a></li>
+          <li><a href="#sharing">Sharing with third parties</a></li>
+          <li><a href="#security">Data security</a></li>
+          <li><a href="#retention">Data retention</a></li>
+          <li><a href="#rights">Your rights</a></li>
+          <li><a href="#cookies">Cookies</a></li>
+          <li><a href="#changes">Changes to this policy</a></li>
+          <li><a href="#contact">Contact us</a></li>
+        </ol>
+      </div>
+
+      <div class="lg-section" id="overview">
+        <h2><span class="lg-num">1</span>Overview</h2>
+        <p>{{ site_name|default:"Your Store" }} respects your privacy. This policy explains what personal data we collect when you shop with us, why we collect it, and the choices you have. It applies in line with Kenya's Data Protection Act, 2019.</p>
+      </div>
+
+      <div class="lg-section" id="collect">
+        <h2><span class="lg-num">2</span>Information we collect</h2>
+        <table class="lg-table">
+          <tr><th>Category</th><th>Examples</th></tr>
+          <tr><td>Contact details</td><td>Name, email address, phone number</td></tr>
+          <tr><td>Delivery information</td><td>County, sub-county, street address, delivery notes</td></tr>
+          <tr><td>Order details</td><td>Items purchased, order value, promo codes used</td></tr>
+          <tr><td>Payment information</td><td>M-Pesa transaction reference, card token (never full card numbers)</td></tr>
+          <tr><td>Technical data</td><td>IP address, device/browser type, pages visited</td></tr>
+        </table>
+      </div>
+
+      <div class="lg-section" id="use">
+        <h2><span class="lg-num">3</span>How we use it</h2>
+        <ul>
+          <li>To process, deliver, and provide support for your orders.</li>
+          <li>To calculate accurate delivery fees, including any additional charges based on location or weight.</li>
+          <li>To send order confirmations, delivery updates, and (with your consent) promotional offers.</li>
+          <li>To detect and prevent fraud, and to comply with legal obligations.</li>
+        </ul>
+      </div>
+
+      <div class="lg-section" id="sharing">
+        <h2><span class="lg-num">4</span>Sharing with third parties</h2>
+        <p>We share data only where necessary: payment processors (for M-Pesa and card transactions), delivery/courier partners (to fulfil your order), and service providers who help us run the site. We do not sell your personal data.</p>
+      </div>
+
+      <div class="lg-section" id="security">
+        <h2><span class="lg-num">5</span>Data security</h2>
+        <p>We use industry-standard safeguards, including encrypted checkout and restricted access to customer data, to protect your information from unauthorised access, loss, or misuse.</p>
+      </div>
+
+      <div class="lg-section" id="retention">
+        <h2><span class="lg-num">6</span>Data retention</h2>
+        <p>We retain order and account data for as long as needed to fulfil orders, meet tax/accounting obligations, and resolve disputes, after which it is securely deleted or anonymised.</p>
+      </div>
+
+      <div class="lg-section" id="rights">
+        <h2><span class="lg-num">7</span>Your rights</h2>
+        <p>You may request access to, correction of, or deletion of your personal data, and may withdraw marketing consent at any time by contacting us using the details below.</p>
+      </div>
+
+      <div class="lg-section" id="cookies">
+        <h2><span class="lg-num">8</span>Cookies</h2>
+        <p>We use cookies to keep your cart working, remember preferences, and understand site usage. You can control cookies through your browser settings.</p>
+      </div>
+
+      <div class="lg-section" id="changes">
+        <h2><span class="lg-num">9</span>Changes to this policy</h2>
+        <p>We may update this Privacy Policy periodically. Material changes will be highlighted on this page with a new "last updated" date.</p>
+      </div>
+
+      <div class="lg-section" id="contact">
+        <h2><span class="lg-num">10</span>Contact us</h2>
+        <p class="lg-contact">For privacy questions or requests, contact us at <a href="mailto:{{ support_email|default:'support@yourstore.co.ke' }}">{{ support_email|default:"support@yourstore.co.ke" }}</a>.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,470 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Import Product{% endblock %}
+
+{% block content %}
+
+<style>
+
+/*==================================================
+        IMPORT PRODUCT PAGE
+==================================================*/
+
+.import-page{
+    max-width:950px;
+    margin:0 auto;
+    padding:20px;
+}
+
+/*=============================================*/
+
+.import-header{
+
+    background:rgb(67, 67, 238);
+
+    border-radius:24px;
+
+    padding:35px;
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:25px;
+
+    margin-bottom:35px;
+
+    box-shadow:0 20px 45px rgba(15,23,42,.18);
+
+}
+
+.import-icon{
+
+    width:85px;
+
+    height:85px;
+
+    border-radius:22px;
+
+    background:rgba(255,255,255,.15);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:36px;
+
+    flex-shrink:0;
+
+}
+
+.import-header h2{
+
+    margin:0;
+
+    font-size:34px;
+
+    font-weight:800;
+
+}
+
+.import-header p{
+
+    margin-top:8px;
+
+    opacity:.9;
+
+    font-size:15px;
+
+    line-height:1.7;
+
+}
+
+/*=============================================*/
+
+.import-card{
+
+    background:#fff;
+
+    border-radius:22px;
+
+    padding:40px;
+
+    box-shadow:0 15px 40px rgba(15,23,42,.08);
+
+}
+
+/*=============================================*/
+
+.import-label{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+    display:block;
+
+    color:#1e293b;
+
+}
+
+/*=============================================*/
+
+.import-card textarea{
+
+    width:100%;
+
+    min-height:260px;
+
+    resize:vertical;
+
+    border:2px solid #dbeafe;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    font-size:15px;
+
+    line-height:1.8;
+
+    background:#fafcff;
+
+    transition:.3s;
+
+}
+
+.import-card textarea:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+
+    background:#fff;
+
+    box-shadow:0 0 0 5px rgba(37,99,235,.12);
+
+}
+
+/*=============================================*/
+
+.import-note{
+
+    margin-top:15px;
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+/*=============================================*/
+
+.import-features{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:18px;
+
+    margin:35px 0;
+
+}
+
+.feature{
+
+    border:1px solid #edf2f7;
+
+    border-radius:16px;
+
+    padding:22px;
+
+    background:#fafbff;
+
+    text-align:center;
+
+    transition:.3s;
+
+}
+
+.feature:hover{
+
+    transform:translateY(-5px);
+
+    border-color:#2563eb;
+
+    box-shadow:0 12px 25px rgba(37,99,235,.08);
+
+}
+
+.feature i{
+
+    font-size:28px;
+
+    color:#2563eb;
+
+    margin-bottom:12px;
+
+}
+
+.feature h5{
+
+    margin-bottom:8px;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+.feature p{
+
+    margin:0;
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+/*=============================================*/
+
+.import-btn{
+
+    width:100%;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+
+    color:#fff;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    transition:.3s;
+
+}
+
+.import-btn:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(37,99,235,.28);
+
+}
+
+/*=============================================*/
+
+@media(max-width:900px){
+
+.import-features{
+
+grid-template-columns:1fr;
+
+}
+
+.import-header{
+
+flex-direction:column;
+
+text-align:center;
+
+}
+
+.import-card{
+
+padding:25px;
+
+}
+
+.import-header h2{
+
+font-size:28px;
+
+}
+
+.import-icon{
+
+width:70px;
+
+height:70px;
+
+font-size:30px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.import-page{
+
+padding:10px;
+
+}
+
+.import-header{
+
+padding:25px;
+
+}
+
+.import-card{
+
+padding:20px;
+
+}
+
+.import-card textarea{
+
+min-height:220px;
+
+}
+
+.import-btn{
+
+height:56px;
+
+font-size:16px;
+
+}
+
+}
+
+</style>
+
+<div class="import-page">
+
+<div class="import-header">
+
+<div class="import-icon">
+
+<i class="fas fa-cloud-download-alt"></i>
+
+</div>
+
+<div>
+
+<h2>Import Products</h2>
+
+<p>
+
+Import products directly from supported supplier websites.
+
+Paste one or multiple product links below and SmartComputersKE will automatically extract product details.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="import-card">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label class="import-label">
+
+Paste Product URLs
+
+</label>
+
+<textarea
+
+name="urls"
+
+placeholder="https://example.com/product1
+
+https://example.com/product2
+
+https://example.com/product3"
+
+required></textarea>
+
+<div class="import-note">
+
+Maximum of <strong>10 products</strong> per import.
+
+</div>
+
+<div class="import-features">
+
+<div class="feature">
+
+<i class="fas fa-link"></i>
+
+<h5>One URL Per Line</h5>
+
+<p>
+
+Paste every product on its own line.
+
+</p>
+
+</div>
+
+<div class="feature">
+
+<i class="fas fa-box-open"></i>
+
+<h5>Automatic Extraction</h5>
+
+<p>
+
+Images, descriptions and specifications are imported automatically.
+
+</p>
+
+</div>
+
+<div class="feature">
+
+<i class="fas fa-bolt"></i>
+
+<h5>Fast Import</h5>
+
+<p>
+
+Import multiple products in seconds without manual entry.
+
+</p>
+
+</div>
+
+</div>
+
+<button
+
+type="submit"
+
+class="import-btn">
+
+<i class="fas fa-download"></i>
+
+Import Products
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,598 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Product Workspace{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                {{ product.name }}
+
+            </h2>
+
+            <small class="text-muted">
+
+                Product Workspace
+
+            </small>
+
+        </div>
+
+        <div>
+
+            <a href="{% url 'dashboard_products' %}" class="btn btn-outline-secondary">
+
+                Back
+
+            </a>
+
+            <button class="btn btn-primary">
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </div>
+
+<form method="POST" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<input type="hidden" name="next" value="{{ next_page }}">
+
+<div class="row">
+
+<!-- ====================================================== -->
+
+<!-- LEFT SIDE -->
+
+<!-- ====================================================== -->
+
+<div class="col-lg-8">
+
+<!-- GENERAL -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header">
+
+<h5 class="mb-0">
+
+General Information
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label>Name</label>
+
+{{ product_form.name }}
+
+</div>
+
+<div class="col-md-6">
+
+<label>Slug</label>
+
+{{ product_form.slug }}
+
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label>Category</label>
+
+{{ product_form.category }}
+
+</div>
+
+<div class="col-md-6">
+
+<label>Brand</label>
+
+{{ product_form.brand }}
+
+</div>
+
+</div>
+
+<br>
+
+<label>Short Description</label>
+
+{{ product_form.short_description }}
+
+<br><br>
+
+<label>Description</label>
+
+{{ product_form.description }}
+
+</div>
+
+</div>
+
+<!-- ================================================= -->
+
+<!-- PRICING -->
+
+<!-- ================================================= -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header">
+
+<h5>
+
+Pricing
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label>Regular Price</label>
+
+{{ variant_form.price }}
+
+</div>
+
+<div class="col-md-6">
+
+<label>Discount Price</label>
+
+{{ variant_form.discount_price }}
+
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label>Discount Starts</label>
+
+{{ variant_form.discount_start }}
+
+</div>
+
+<div class="col-md-6">
+
+<label>Discount Ends</label>
+
+{{ variant_form.discount_end }}
+
+</div>
+
+</div>
+
+<br>
+
+<div class="form-check">
+
+{{ product_form.vat_inclusive }}
+
+<label>
+
+Price Includes VAT
+
+</label>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ================================================= -->
+
+<!-- INVENTORY -->
+
+<!-- ================================================= -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header">
+
+<h5>
+
+Inventory
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label>SKU</label>
+
+{{ variant_form.sku }}
+
+</div>
+
+<div class="col-md-6">
+
+<label>Stock</label>
+
+{{ variant_form.stock }}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ================================================= -->
+
+<!-- RIGHT -->
+
+<!-- ================================================= -->
+
+<div class="col-lg-4">
+
+<!-- IMAGE -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header">
+
+<h5>
+
+Images
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+{% if product.image %}
+
+<img
+
+src="{{ product.image.url }}"
+
+class="img-fluid rounded mb-3">
+
+{% endif %}
+
+<label>Main Image</label>
+
+{{ product_form.image }}
+
+<hr>
+
+<label>Variant Image</label>
+
+{{ variant_form.image }}
+
+</div>
+
+</div>
+
+<!-- SETTINGS -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header">
+
+<h5>
+
+Settings
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<label>Condition</label>
+
+{{ product_form.condition }}
+
+<br><br>
+
+<label>Warranty</label>
+
+{{ product_form.warranty }}
+
+<hr>
+
+<div class="form-check">
+
+{{ product_form.featured }}
+
+<label>
+
+Featured
+
+</label>
+
+</div>
+
+<div class="form-check">
+
+{{ product_form.new_arrival }}
+
+<label>
+
+New Arrival
+
+</label>
+
+</div>
+
+<div class="form-check">
+
+{{ product_form.trending }}
+
+<label>
+
+Trending
+
+</label>
+
+</div>
+
+<div class="form-check">
+
+{{ product_form.active }}
+
+<label>
+
+Active
+
+</label>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- QUICK ACTIONS -->
+
+<div class="card shadow-sm">
+
+<div class="card-header">
+
+<h5>
+
+Quick Actions
+
+</h5>
+
+</div>
+
+<div class="list-group list-group-flush">
+
+<a
+
+href="{% url 'dashboard_product_variants' product.id %}"
+
+class="list-group-item list-group-item-action">
+
+Manage Variants
+
+</a>
+
+<a
+
+href="{% url 'dashboard_add_variant' product.id %}"
+
+class="list-group-item list-group-item-action">
+
+Add Variant
+
+</a>
+
+<a
+
+href="#"
+
+class="list-group-item list-group-item-action">
+
+Manage Specifications
+
+</a>
+
+href="{% url 'dashboard_product_specifications' product.id %}"
+
+class="list-group-item list-group-item-action">
+
+Gallery Images
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="text-end">
+
+<button
+
+class="btn btn-success btn-lg">
+
+Save Product
+
+</button>
+
+</div>
+
+</form>
+
+<hr>
+
+<!-- ============================================ -->
+
+<!-- EXISTING VARIANTS -->
+
+<!-- ============================================ -->
+
+<div class="card mt-5 shadow-sm">
+
+<div class="card-header">
+
+<h4>
+
+Existing Variants
+
+</h4>
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-hover">
+
+<thead>
+
+<tr>
+
+<th>SKU</th>
+
+<th>Price</th>
+
+<th>Stock</th>
+
+<th>Status</th>
+
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for variant in variants %}
+
+<tr>
+
+<td>
+
+{{ variant.sku }}
+
+</td>
+
+<td>
+
+KSh {{ variant.price }}
+
+</td>
+
+<td>
+
+{{ variant.stock }}
+
+</td>
+
+<td>
+
+{% if variant.active %}
+
+<span class="badge bg-success">
+
+Active
+
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+
+Inactive
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<a
+
+href="{% url 'dashboard_edit_variant' variant.id %}"
+
+class="btn btn-sm btn-primary">
+
+Edit
+
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="5">
+
+No variants yet.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

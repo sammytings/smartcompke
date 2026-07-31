@@ -1,0 +1,231 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Inventory Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">
+                Inventory Dashboard
+            </h2>
+
+            <p class="text-muted">
+                Monitor stock levels and inventory movement.
+            </p>
+        </div>
+
+        <a href="{% url 'inventory_list' %}"
+           class="btn btn-primary">
+
+            View Inventory
+
+        </a>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="col-lg-3 mb-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Total Products</h6>
+
+                    <h2 class="fw-bold">
+
+                        {{ total_products }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 mb-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Total Stock</h6>
+
+                    <h2>
+
+                        {{ total_stock }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 mb-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Low Stock</h6>
+
+                    <h2 class="text-warning">
+
+                        {{ low_stock }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 mb-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Out Of Stock</h6>
+
+                    <h2 class="text-danger">
+
+                        {{ out_of_stock }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card border-0 shadow">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+
+                Recent Transactions
+
+            </h5>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Product</th>
+
+                        <th>SKU</th>
+
+                        <th>Type</th>
+
+                        <th>Quantity</th>
+
+                        <th>Balance</th>
+
+                        <th>User</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in recent_transactions %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ item.created_at|date:"d M Y H:i" }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.variant.product.name }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.variant.sku }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.get_transaction_type_display }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.quantity }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.balance_after }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.created_by }}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="7">
+
+                            No inventory transactions.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

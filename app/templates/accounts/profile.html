@@ -1,0 +1,1019 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile | SmartComputersKE{% endblock %}
+
+{% block extra_head %}
+<style>
+
+:root{
+    --primary:#1E40AF;
+    --primary-dark:#16389a;
+    --primary-light:#EEF4FF;
+
+    --accent:#E11D48;
+    --accent-dark:#BE123C;
+    --accent-light:#FFF1F4;
+
+    --success:#16A34A;
+    --warning:#F59E0B;
+
+    --bg:#F8FAFC;
+    --card:#ffffff;
+
+    --text:#111827;
+    --muted:#6B7280;
+
+    --border:#E5E7EB;
+
+    --radius:18px;
+
+    --shadow:
+        0 15px 40px rgba(15,23,42,.08);
+}
+
+.profile-page{
+    background:var(--bg);
+    padding:45px 0 70px;
+    min-height:80vh;
+}
+
+.profile-container{
+    width:min(1350px,95%);
+    margin:auto;
+}
+
+.profile-title{
+    margin-bottom:35px;
+}
+
+.profile-title h1{
+    font-size:34px;
+    color:var(--text);
+    font-weight:800;
+}
+
+.profile-title p{
+    margin-top:6px;
+    color:var(--muted);
+    font-size:15px;
+}
+
+.profile-grid{
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:30px;
+}
+
+.profile-sidebar{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+    overflow:hidden;
+}
+
+.profile-cover{
+    height:110px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+}
+
+.profile-body{
+    padding:0 28px 30px;
+    text-align:center;
+}
+
+.avatar{
+    width:120px;
+    height:120px;
+    margin:-60px auto 15px;
+    border-radius:50%;
+    overflow:hidden;
+    border:6px solid white;
+    background:#fff;
+    box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.avatar-placeholder{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:48px;
+    color:var(--primary);
+    background:#eef4ff;
+}
+
+.profile-name{
+    font-size:24px;
+    font-weight:800;
+    color:var(--text);
+}
+
+.profile-email{
+    color:var(--muted);
+    margin-top:5px;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:18px;
+    background:#ECFDF5;
+    color:#047857;
+    padding:8px 18px;
+    border-radius:100px;
+    font-weight:700;
+    font-size:13px;
+}
+
+.profile-buttons{
+    margin-top:25px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.btn{
+    text-decoration:none;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    height:48px;
+    border-radius:12px;
+    font-weight:700;
+    transition:.25s;
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:white;
+}
+
+.btn-primary:hover{
+    background:var(--primary-dark);
+}
+
+.btn-danger{
+    background:var(--accent);
+    color:white;
+}
+
+.btn-danger:hover{
+    background:var(--accent-dark);
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+    padding:24px;
+}
+
+.stat{
+    background:#F9FAFB;
+    border-radius:15px;
+    padding:18px;
+    text-align:center;
+}
+
+.stat h2{
+    color:var(--primary);
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.stat p{
+    color:var(--muted);
+    font-size:13px;
+    font-weight:600;
+}
+
+.profile-main{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+.section{
+    padding:30px;
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.section-title h2{
+    font-size:22px;
+    color:var(--text);
+}
+
+.edit-btn{
+    padding:10px 18px;
+    border-radius:10px;
+    background:var(--primary-light);
+    color:var(--primary);
+    text-decoration:none;
+    font-weight:700;
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.info{
+    background:#F9FAFB;
+    border-radius:14px;
+    padding:18px;
+}
+
+.info span{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:8px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.info strong{
+    font-size:16px;
+    color:var(--text);
+}
+
+.quick-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.quick-card{
+    padding:30px 15px;
+    text-align:center;
+    border-radius:18px;
+    background:white;
+    border:1px solid var(--border);
+    transition:.3s;
+}
+
+.quick-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 18px 35px rgba(0,0,0,.08);
+}
+
+.quick-card i{
+    font-size:32px;
+    color:var(--primary);
+    margin-bottom:15px;
+}
+
+.quick-card h3{
+    font-size:17px;
+    margin-bottom:8px;
+}
+
+.quick-card p{
+    color:var(--muted);
+    font-size:13px;
+}
+
+@media(max-width:1000px){
+
+.profile-grid{
+grid-template-columns:1fr;
+}
+
+.quick-grid{
+grid-template-columns:repeat(2,1fr);
+}
+
+.info-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:650px){
+
+.quick-grid{
+grid-template-columns:1fr;
+}
+
+.profile-title h1{
+font-size:28px;
+}
+
+.section{
+padding:22px;
+}
+
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+<div class="profile-container">
+
+<div class="profile-title">
+
+<h1>My Profile</h1>
+
+<p>Manage your SmartComputersKE account, orders, wishlist and personal information.</p>
+
+</div>
+
+<div class="profile-grid">
+
+<!-- LEFT SIDEBAR STARTS HERE -->
+
+<div class="profile-sidebar">
+<!-- PROFILE CARD -->
+
+<div class="card">
+
+    <div class="profile-cover"></div>
+
+    <div class="profile-body">
+
+        <div class="avatar">
+
+            {% if request.user.userprofile.profile_picture %}
+                <img src="{{ request.user.userprofile.profile_picture.url }}" alt="{{ request.user.username }}">
+            {% else %}
+                <div class="avatar-placeholder">
+                    <i class="fas fa-user"></i>
+                </div>
+            {% endif %}
+
+        </div>
+
+        <h2 class="profile-name">
+            {{ request.user.get_full_name|default:request.user.username }}
+        </h2>
+
+        <div class="profile-email">
+            {{ request.user.email }}
+        </div>
+
+        <div class="badge">
+            <i class="fas fa-check-circle"></i>
+            Verified Account
+        </div>
+
+        <div class="profile-buttons">
+
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-user-edit"></i>
+                Edit Profile
+            </a>
+
+            <a href="{% url 'account_change_password' %}" class="btn btn-primary">
+                <i class="fas fa-lock"></i>
+                Change Password
+            </a>
+
+            <a href="{% url 'account_logout' %}" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ACCOUNT STATS -->
+
+<div class="card">
+
+    <div class="stats">
+
+        <div class="stat">
+            <h2>{{ orders.count }}</h2>
+            <p>Orders</p>
+        </div>
+
+        <div class="stat">
+            <h2>{{ wishlist.count }}</h2>
+            <p>Wishlist</p>
+        </div>
+
+        <div class="stat">
+            <h2>{{ cart_count }}</h2>
+            <p>Cart Items</p>
+        </div>
+
+        <div class="stat">
+            <h2>{{ addresses.count }}</h2>
+            <p>Addresses</p>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<!-- RIGHT COLUMN -->
+
+<div class="profile-main">
+
+<div class="card section">
+
+<div class="section-title">
+
+<h2>
+<i class="fas fa-id-card"></i>
+Personal Information
+</h2>
+
+<a href="#" class="edit-btn">
+Edit
+</a>
+
+</div>
+
+<div class="info-grid">
+
+<div class="info">
+<span>Full Name</span>
+<strong>{{ request.user.get_full_name|default:"Not Provided" }}</strong>
+</div>
+
+<div class="info">
+<span>Username</span>
+<strong>{{ request.user.username }}</strong>
+</div>
+
+<div class="info">
+<span>Email Address</span>
+<strong>{{ request.user.email }}</strong>
+</div>
+
+<div class="info">
+<span>Phone Number</span>
+<strong>
+{{ request.user.userprofile.phone|default:"Not Added" }}
+</strong>
+</div>
+
+<div class="info">
+<span>County</span>
+<strong>
+{{ request.user.userprofile.county|default:"Not Added" }}
+</strong>
+</div>
+
+<div class="info">
+<span>Joined</span>
+<strong>{{ request.user.date_joined|date:"d M Y" }}</strong>
+</div>
+
+</div>
+
+</div>
+
+<!-- QUICK ACTIONS -->
+
+<div class="card section">
+
+<div class="section-title">
+
+<h2>Quick Actions</h2>
+
+</div>
+
+<div class="quick-grid">
+
+<a href="{% url 'orders' %}" class="quick-card">
+
+<i class="fas fa-box"></i>
+
+<h3>Orders</h3>
+
+<p>Track your purchases.</p>
+
+</a>
+
+<a href="{% url 'wishlist' %}" class="quick-card">
+
+<i class="fas fa-heart"></i>
+
+<h3>Wishlist</h3>
+
+<p>Products you love.</p>
+
+</a>
+
+<a href="{% url 'cart' %}" class="quick-card">
+
+<i class="fas fa-shopping-cart"></i>
+
+<h3>Cart</h3>
+
+<p>Ready for checkout.</p>
+
+</a>
+
+<a href="{% url 'home' %}" class="quick-card">
+
+<i class="fas fa-store"></i>
+
+<h3>Continue Shopping</h3>
+
+<p>Discover new arrivals.</p>
+
+</a>
+
+</div>
+
+</div>
+<!-- RECENT ORDERS -->
+
+<div class="card section">
+
+    <div class="section-title">
+
+        <h2>
+            <i class="fas fa-box-open"></i>
+            Recent Orders
+        </h2>
+
+        <a href="{% url 'orders' %}" class="edit-btn">
+            View All
+        </a>
+
+    </div>
+
+    {% if orders %}
+
+        {% for order in orders|slice:":5" %}
+
+        <div class="order-row">
+
+            <div class="order-left">
+
+                <div class="order-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+
+                <div>
+
+                    <div class="order-id">
+                        #{{ order.order_id }}
+                    </div>
+
+                    <div class="order-date">
+                        {{ order.created_at|date:"d M Y • H:i" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="order-right">
+
+                <div class="status status-{{ order.status|lower }}">
+                    {{ order.status }}
+                </div>
+
+                <div class="order-price">
+                    KES {{ order.total_amount }}
+                </div>
+
+                <a href="{% url 'order_detail' order.order_id %}" class="small-btn">
+                    View
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+    <div class="empty-box">
+
+        <i class="fas fa-box-open"></i>
+
+        <h3>No Orders Yet</h3>
+
+        <p>
+            Once you place your first order it will appear here.
+        </p>
+
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            Shop Now
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- WISHLIST -->
+
+<div class="card section">
+
+    <div class="section-title">
+
+        <h2>
+
+            <i class="fas fa-heart"></i>
+
+            Wishlist
+
+        </h2>
+
+        <a href="{% url 'wishlist' %}" class="edit-btn">
+
+            View Wishlist
+
+        </a>
+
+    </div>
+
+    {% if wishlist %}
+
+    <div class="wishlist-grid">
+
+        {% for item in wishlist|slice:":4" %}
+
+        <div class="wish-card">
+
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+
+            <h4>{{ item.product.name }}</h4>
+
+            <span>
+
+                KES {{ item.product.current_price }}
+
+            </span>
+
+            <a href="{{ item.product.get_absolute_url }}">
+
+                View Product
+
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-box">
+
+        <i class="far fa-heart"></i>
+
+        <h3>Your Wishlist is Empty</h3>
+
+        <p>
+
+            Save products you love for later.
+
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- ACCOUNT SECURITY -->
+
+<div class="card section">
+
+<div class="section-title">
+
+<h2>
+
+<i class="fas fa-shield-alt"></i>
+
+Account Security
+
+</h2>
+
+</div>
+
+<div class="security-list">
+
+<div class="security-item">
+
+<div>
+
+<h4>Password</h4>
+
+<p>Last updated recently</p>
+
+</div>
+
+<a href="{% url 'account_change_password' %}" class="small-btn">
+
+Change
+
+</a>
+
+</div>
+
+<div class="security-item">
+
+<div>
+
+<h4>Email Address</h4>
+
+<p>{{ request.user.email }}</p>
+
+</div>
+
+<span class="verified">
+
+<i class="fas fa-check-circle"></i>
+
+Verified
+
+</span>
+
+</div>
+
+<div class="security-item">
+
+<div>
+
+<h4>Account Status</h4>
+
+<p>Your account is active.</p>
+
+</div>
+
+<span class="verified">
+
+<i class="fas fa-check-circle"></i>
+
+Active
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<style>.order-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 0;
+border-bottom:1px solid var(--border);
+gap:20px;
+}
+
+.order-row:last-child{
+border-bottom:none;
+}
+
+.order-left{
+display:flex;
+align-items:center;
+gap:18px;
+}
+
+.order-icon{
+width:55px;
+height:55px;
+border-radius:15px;
+background:var(--primary-light);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+color:var(--primary);
+}
+
+.order-id{
+font-weight:700;
+font-size:16px;
+}
+
+.order-date{
+color:var(--muted);
+font-size:13px;
+margin-top:4px;
+}
+
+.order-right{
+display:flex;
+align-items:center;
+gap:18px;
+flex-wrap:wrap;
+}
+
+.order-price{
+font-weight:800;
+color:var(--accent);
+}
+
+.status{
+padding:8px 16px;
+border-radius:50px;
+font-size:12px;
+font-weight:700;
+text-transform:uppercase;
+}
+
+.status-pending{
+background:#FEF3C7;
+color:#B45309;
+}
+
+.status-processing{
+background:#DBEAFE;
+color:#1D4ED8;
+}
+
+.status-shipped{
+background:#E0F2FE;
+color:#0369A1;
+}
+
+.status-delivered{
+background:#DCFCE7;
+color:#15803D;
+}
+
+.status-cancelled{
+background:#FEE2E2;
+color:#B91C1C;
+}
+
+.small-btn{
+padding:10px 18px;
+background:var(--primary);
+color:#fff;
+text-decoration:none;
+border-radius:10px;
+font-weight:700;
+transition:.25s;
+}
+
+.small-btn:hover{
+background:var(--primary-dark);
+}
+
+.wishlist-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:20px;
+}
+
+.wish-card{
+border:1px solid var(--border);
+border-radius:16px;
+padding:18px;
+text-align:center;
+transition:.3s;
+}
+
+.wish-card:hover{
+transform:translateY(-5px);
+box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+.wish-card img{
+width:100%;
+height:140px;
+object-fit:contain;
+margin-bottom:15px;
+}
+
+.wish-card h4{
+font-size:15px;
+height:42px;
+overflow:hidden;
+}
+
+.wish-card span{
+display:block;
+margin:12px 0;
+font-size:18px;
+font-weight:800;
+color:var(--accent);
+}
+
+.wish-card a{
+display:inline-block;
+padding:10px 18px;
+background:var(--primary);
+color:#fff;
+border-radius:10px;
+text-decoration:none;
+font-weight:700;
+}
+
+.security-list{
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.security-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px;
+background:#F9FAFB;
+border-radius:14px;
+}
+
+.security-item h4{
+margin-bottom:5px;
+}
+
+.security-item p{
+color:var(--muted);
+font-size:13px;
+}
+
+.verified{
+background:#DCFCE7;
+color:#15803D;
+padding:8px 15px;
+border-radius:50px;
+font-size:13px;
+font-weight:700;
+}
+
+.empty-box{
+text-align:center;
+padding:60px 20px;
+}
+
+.empty-box i{
+font-size:60px;
+color:var(--primary);
+margin-bottom:20px;
+}
+
+.empty-box h3{
+margin-bottom:10px;
+font-size:24px;
+}
+
+.empty-box p{
+color:var(--muted);
+margin-bottom:25px;
+}
+
+@media(max-width:900px){
+
+.order-row,
+.security-item{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.order-right{
+width:100%;
+justify-content:space-between;
+}
+
+}</style>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% load static %}
+
+<article class="prod-card">
+  <div class="prod-media">
+    <a href="{% url 'product_detail' product.slug %}">
+      {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+{% else %}
+    <img src="{% static 'images/no-image.png' %}" alt="{{ product.name }}" loading="lazy">
+{% endif %}
+    </a>
+    <div class="product-tools">
+      <button type="button"
+              class="tool-btn wishlist js-wishlist-toggle"
+              data-url="/wishlist/toggle/{{ product.id }}/"
+              data-product-id="{{ product.id }}"
+              data-product-name="{{ product.name|escapejs }}"
+              title="Add to Wishlist">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+        </svg>
+      </button>
+      <button type="button" class="tool-btn compare-btn" data-product="{{ product.id }}" title="Compare Product">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
+        </svg>
+      </button>
+      <a class="tool-btn wa-btn"
+         href="https://wa.me/254700000000?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}"
+         target="_blank" rel="noopener" title="Order via WhatsApp" aria-label="Order via WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor"><path d="M16.004 3C9.377 3 3.999 8.377 3.999 15.003c0 2.34.63 4.53 1.727 6.417L3.5 28.5l7.27-2.19a12.94 12.94 0 005.234 1.096h.005c6.627 0 12.005-5.377 12.005-12.003C28.014 8.377 22.636 3 16.004 3zm0 21.803a9.77 9.77 0 01-4.98-1.363l-.357-.212-3.65 1.1 1.117-3.556-.232-.365a9.79 9.79 0 01-1.5-5.204c0-5.41 4.4-9.81 9.807-9.81 2.62 0 5.084 1.022 6.94 2.878a9.744 9.744 0 012.867 6.937c0 5.41-4.4 9.595-9.812 9.595zm5.373-7.34c-.294-.148-1.74-.859-2.01-.957-.27-.099-.467-.148-.663.148-.196.295-.76.957-.932 1.153-.172.196-.343.222-.638.074-.294-.148-1.243-.458-2.367-1.462-.875-.78-1.466-1.744-1.638-2.038-.172-.295-.018-.454.13-.601.133-.133.294-.345.442-.517.147-.172.196-.295.294-.492.098-.196.049-.369-.025-.517-.074-.148-.663-1.6-.909-2.192-.24-.575-.483-.497-.663-.507-.172-.008-.369-.01-.565-.01-.196 0-.517.074-.787.369-.27.295-1.03 1.006-1.03 2.454 0 1.448 1.055 2.847 1.202 3.043.147.196 2.077 3.174 5.033 4.45.703.303 1.252.484 1.68.62.706.225 1.348.193 1.856.117.566-.084 1.74-.712 1.985-1.4.245-.688.245-1.278.172-1.4-.074-.123-.27-.197-.564-.345z"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="prod-body">
+    {% if product.brand %}<div class="prod-brand">{{ product.brand.name|default:product.brand }}</div>{% endif %}
+    <a href="{% url 'product_detail' product.slug %}" class="product-title-link">
+      <div class="prod-name">{{ product.name }}</div>
+    </a>
+    {% if product.short_description %}
+    <div class="prod-specs">{{ product.short_description }}</div>
+    {% endif %}
+    <div class="badge-row">
+      {% if product.stock > 0 %}
+      <span class="badge-stock in">✓ In Stock</span>
+      {% else %}
+      <span class="badge-stock out">Out of Stock</span>
+      {% endif %}
+    </div>
+    <div class="price-container">
+      {% if product.discount_price %}
+      <div class="prod-price vat-price"
+           data-inclusive="{{ product.discount_price_with_vat }}"
+           data-exclusive="{{ product.default_variant.discount_price|default:product.default_variant.price_without_vat }}">
+        KSh {{ product.discount_price_with_vat|floatformat:0 }}
+      </div>
+      <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
+      {% else %}
+      <div class="prod-price vat-price"
+           data-inclusive="{{ product.price_with_vat }}"
+           data-exclusive="{{ product.default_variant.price_without_vat }}">
+        KSh {{ product.price_with_vat|floatformat:0 }}
+      </div>
+      {% endif %}
+    </div>
+    <div class="vat-note"><span class="vat-text">✓ Includes 16% VAT</span></div>
+  </div>
+  <div class="prod-actions">
+    <form action="{% url 'add_to_cart' product.id %}" method="post" class="js-add-to-cart-form" style="width:100%;">
+      {% csrf_token %}
+      <button class="btn-cart-add" type="submit" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
+        <span class="cart-loader" aria-hidden="true">
+          <svg viewBox="0 0 26 22" fill="none">
+            <g class="cart-body">
+              <path d="M1 1h3l2.2 12.4a2 2 0 0 0 2 1.6h9.6a2 2 0 0 0 2-1.6L22 5.5H6.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <circle class="cart-wheel" cx="9.5" cy="19" r="1.8"/>
+            <circle class="cart-wheel" cx="17.5" cy="19" r="1.8"/>
+          </svg>
+        </span>
+        <svg class="btn-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+        </svg>
+        <span class="btn-label">Add to Cart</span>
+      </button>
+    </form>
+  </div>
+</article>

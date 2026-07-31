@@ -1,0 +1,584 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Frequently Asked Questions | SmartComputersKE Technologies Kenya
+{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ---------------------------------------------------------
+   SCK FAQ — v3 (blue/red rework, July 2026)
+   notes to self: killed the gradient hero + floaty shadow
+   cards from v2, they looked like every other template out
+   there. going for "spec sheet / warranty card" instead.
+   --------------------------------------------------------- */
+
+.sck-faq{
+  --ink:#12181f;
+  --ink-soft:#57626e;
+  --paper:#eef1f5;
+  --card:#ffffff;
+  --line:#c9d2db;
+  --blue:#123e91;
+  --blue-dark:#0a2a63;
+  --blue-soft:#dde7fb;
+  --red:#c81e3a;
+  --red-dark:#8f1428;
+  --red-soft:#fbe1e5;
+
+  font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+}
+
+.sck-faq h1, .sck-faq h2, .sck-faq .sck-display{
+  font-family:'Big Shoulders Display', sans-serif;
+  letter-spacing:.01em;
+}
+
+.sck-faq .sck-mono{
+  font-family:'IBM Plex Mono', monospace;
+}
+
+/* ---- topbar ---- */
+.sck-topbar{
+  background:var(--blue-dark);
+  color:#fff;
+}
+.sck-topbar-inner{
+  max-width:980px;
+  margin:0 auto;
+  padding:10px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  opacity:.9;
+}
+.sck-topbar-inner span:last-child{ color:#ff8a9a; }
+
+/* ---- hero ---- */
+.sck-hero{
+  max-width:980px;
+  margin:0 auto;
+  padding:56px 22px 34px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:24px;
+  align-items:start;
+}
+.sck-hero h1{
+  font-size:56px;
+  font-weight:800;
+  line-height:.96;
+  margin:0 0 14px;
+  color:var(--blue-dark);
+}
+.sck-hero h1 em{
+  font-style:normal;
+  color:var(--red);
+}
+.sck-hero p{
+  max-width:520px;
+  font-size:16px;
+  line-height:1.7;
+  color:var(--ink-soft);
+  margin:0;
+}
+
+/* the signature bit: a warranty-seal stamp, tilted, not a generic icon */
+.sck-stamp{
+  width:118px;
+  height:118px;
+  border:3px dashed var(--red);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  transform:rotate(-9deg);
+  color:var(--red);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  line-height:1.5;
+  flex:none;
+  margin-top:6px;
+}
+
+@media (max-width:640px){
+  .sck-hero{ grid-template-columns:1fr; }
+  .sck-hero h1{ font-size:40px; }
+  .sck-stamp{ margin:6px auto 0; }
+}
+
+/* ---- search + filters ---- */
+.sck-toolbar{
+  max-width:980px;
+  margin:0 auto;
+  padding:0 22px 10px;
+}
+
+.sck-search{
+  position:relative;
+  margin-bottom:16px;
+}
+.sck-search input{
+  width:100%;
+  box-sizing:border-box;
+  border:2px solid var(--ink);
+  background:var(--card);
+  padding:13px 16px 13px 40px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:14px;
+  color:var(--ink);
+  border-radius:4px;
+}
+.sck-search input::placeholder{ color:#9aa5b1; }
+.sck-search input:focus-visible{
+  outline:3px solid var(--blue);
+  outline-offset:1px;
+}
+.sck-search::before{
+  content:"$";
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  font-family:'IBM Plex Mono', monospace;
+  color:var(--red);
+  font-weight:600;
+}
+
+.sck-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:8px;
+}
+.sck-chip{
+  border:1.5px solid var(--ink);
+  background:var(--card);
+  color:var(--ink);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12.5px;
+  padding:7px 13px;
+  border-radius:100px;
+  cursor:pointer;
+  transition:background .12s ease, color .12s ease;
+}
+.sck-chip:hover{ background:var(--blue-soft); }
+.sck-chip.is-active{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
+}
+.sck-chip:focus-visible{ outline:3px solid var(--red); outline-offset:2px; }
+
+/* ---- faq list ---- */
+.sck-list{
+  max-width:980px;
+  margin:0 auto;
+  padding:18px 22px 10px;
+}
+
+.sck-item{
+  background:var(--card);
+  border:2px solid var(--ink);
+  box-shadow:5px 5px 0 var(--blue);
+  margin-bottom:22px;
+}
+.sck-item[data-hidden="true"]{ display:none; }
+
+.sck-q{
+  width:100%;
+  border:none;
+  background:none;
+  padding:18px 20px;
+  text-align:left;
+  cursor:pointer;
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  font:inherit;
+  color:inherit;
+}
+.sck-q:focus-visible{ outline:3px solid var(--red); outline-offset:-3px; }
+
+.sck-idx{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  font-weight:600;
+  color:var(--blue);
+  padding-top:3px;
+  flex:none;
+  white-space:nowrap;
+}
+
+.sck-qtext{
+  flex:1;
+  font-family:'Big Shoulders Display', sans-serif;
+  font-weight:700;
+  font-size:21px;
+  line-height:1.25;
+  color:var(--ink);
+}
+
+.sck-toggle{
+  flex:none;
+  width:26px;
+  height:26px;
+  border:1.5px solid var(--ink);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:15px;
+  line-height:1;
+  color:var(--ink);
+}
+.sck-item.active .sck-toggle{
+  background:var(--red);
+  border-color:var(--red);
+  color:#fff;
+}
+
+.sck-a{
+  display:none;
+  padding:0 20px 22px 66px;
+  color:var(--ink-soft);
+  line-height:1.75;
+  font-size:14.5px;
+  border-top:1px solid var(--line);
+  margin-top:2px;
+  padding-top:14px;
+}
+.sck-item.active .sck-a{ display:block; }
+
+.sck-a ul{ margin:8px 0 0; padding-left:18px; }
+.sck-a strong{ color:var(--ink); }
+
+.sck-empty{
+  display:none;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:13.5px;
+  color:var(--ink-soft);
+  padding:24px 0;
+}
+.sck-empty.show{ display:block; }
+.sck-empty .sck-red{ color:var(--red); }
+
+/* ---- ticket stub footer ---- */
+.sck-stub{
+  max-width:980px;
+  margin:34px auto 70px;
+  padding:0 22px;
+}
+.sck-stub-inner{
+  background:var(--blue-dark);
+  color:#fff;
+  border-top:3px dashed var(--red);
+  padding:28px 26px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  justify-content:space-between;
+  align-items:center;
+}
+.sck-stub h3{
+  font-family:'Big Shoulders Display', sans-serif;
+  font-size:24px;
+  font-weight:700;
+  margin:0 0 4px;
+}
+.sck-stub p{
+  margin:0;
+  font-size:13.5px;
+  color:#c9d5f2;
+}
+.sck-stub-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.sck-stub-actions a{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12.5px;
+  font-weight:600;
+  text-decoration:none;
+  padding:11px 16px;
+  border-radius:4px;
+  border:1.5px solid #fff;
+  color:#fff;
+  white-space:nowrap;
+}
+.sck-stub-actions a.sck-fill{
+  background:var(--red);
+  border-color:var(--red);
+}
+.sck-stub-actions a:focus-visible{ outline:3px solid #fff; outline-offset:2px; }
+
+.sck-ref{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  color:#8fa3d1;
+  margin-top:14px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .sck-chip, .sck-item{ transition:none; }
+}
+
+</style>
+
+<div class="sck-faq">
+
+  <div class="sck-topbar">
+    <div class="sck-topbar-inner">
+      <span>SmartComputersKE &middot; Nairobi CBD</span>
+      <span>Genuine stock only</span>
+    </div>
+  </div>
+
+  <div class="sck-hero">
+    <div>
+      <h1>Got a question<br>before you <em>buy</em>?</h1>
+      <p>
+        Laptops, desktops, printers and accessories — plus the fine print on
+        delivery, payment, warranty and repairs. Type below or pick a topic.
+      </p>
+    </div>
+    <div class="sck-stamp">100%<br>genuine<br>stock</div>
+  </div>
+
+  <div class="sck-toolbar">
+    <div class="sck-search">
+      <input type="text" id="sckSearch" placeholder="search_faqs.txt — try 'warranty' or 'delivery'" autocomplete="off">
+    </div>
+    <div class="sck-chips" id="sckChips">
+      <button class="sck-chip is-active" data-cat="all">All questions</button>
+      <button class="sck-chip" data-cat="products">Products &amp; orders</button>
+      <button class="sck-chip" data-cat="delivery">Payment &amp; delivery</button>
+      <button class="sck-chip" data-cat="services">Repairs &amp; services</button>
+      <button class="sck-chip" data-cat="contact">Visit &amp; contact</button>
+    </div>
+  </div>
+
+  <div class="sck-list" id="sckList">
+
+    <div class="sck-item active" data-cat="products" data-search="do you sell genuine products authentic laptops desktops manufacturer distributor">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;01</span>
+        <span class="sck-qtext">Do you sell genuine products?</span>
+        <span class="sck-toggle">&minus;</span>
+      </button>
+      <div class="sck-a">
+        Yes. Every laptop, desktop, printer, monitor and accessory sold by
+        SmartComputersKE Technologies is sourced from trusted manufacturers
+        and authorized distributors.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="products" data-search="warranty manufacturer cover duration brand product">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;02</span>
+        <span class="sck-qtext">Do your products come with warranty?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Yes. Most products include an official manufacturer warranty.
+        Warranty duration depends on the brand and product purchased.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="delivery" data-search="delivery time how long shipping nairobi upcountry days">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;03</span>
+        <span class="sck-qtext">How long does delivery take?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Nairobi deliveries are normally completed within the same day or
+        next business day.
+        <br><br>
+        Upcountry deliveries usually take between 1 and 3 working days.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="delivery" data-search="payment methods mpesa visa mastercard bank transfer cash purchase order">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;04</span>
+        <span class="sck-qtext">Which payment methods do you accept?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        We accept:
+        <ul>
+          <li>M-Pesa</li>
+          <li>Visa &amp; Mastercard</li>
+          <li>Bank Transfer</li>
+          <li>Cash</li>
+          <li>Corporate Purchase Orders (approved organizations)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="products" data-search="quotation request business school ngo government">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;05</span>
+        <span class="sck-qtext">Can I request a quotation?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Yes. Businesses, schools, NGOs and government institutions can
+        request professional quotations directly from our quotation page.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="services" data-search="installation setup configuration networking office it">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;06</span>
+        <span class="sck-qtext">Do you offer installation services?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Yes. We provide installation, setup and configuration services for
+        computers, printers, networking equipment and office IT solutions.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="products" data-search="return product refund policy original condition">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;07</span>
+        <span class="sck-qtext">Can I return a product?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Yes. Returns are accepted according to our Returns &amp; Refund
+        Policy. Products must be returned in their original condition.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="services" data-search="repair computers diagnostics upgrades laptops desktops printers">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;08</span>
+        <span class="sck-qtext">Do you repair computers?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Yes. We provide professional diagnostics, upgrades and repairs for
+        laptops, desktops and printers.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="contact" data-search="location where are you shop address superior centre kimathi kenyatta avenue">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;09</span>
+        <span class="sck-qtext">Where are you located?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Shop No. H29, Superior Centre, Kenyatta Avenue / Kimathi Street
+        Junction, Nairobi, Kenya.
+      </div>
+    </div>
+
+    <div class="sck-item" data-cat="contact" data-search="contact phone email sales">
+      <button class="sck-q">
+        <span class="sck-idx">FAQ&middot;10</span>
+        <span class="sck-qtext">How can I contact SmartComputersKE?</span>
+        <span class="sck-toggle">+</span>
+      </button>
+      <div class="sck-a">
+        Phone: <strong>0720 635023</strong>
+        <br><br>
+        Email: <strong>sales@smartcomputerske.co.ke</strong>
+      </div>
+    </div>
+
+    <p class="sck-empty" id="sckEmpty">
+      &gt; no matches for that <span class="sck-red">search</span> — try a
+      different word, or call us on 0720 635023.
+    </p>
+
+  </div>
+
+  <div class="sck-stub">
+    <div class="sck-stub-inner">
+      <div>
+        <h3>Still stuck?</h3>
+        <p>Talk to the shop floor directly — same people who'll box your order.</p>
+        <div class="sck-ref">REF: SCK-FAQ-2026 &middot; Kenyatta Ave / Kimathi St, Nairobi</div>
+      </div>
+      <div class="sck-stub-actions">
+        <a href="tel:0720635023" class="sck-fill">Call 0720 635023</a>
+        <a href="mailto:sales@smartcomputerske.co.ke">Email sales</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var list = document.getElementById('sckList');
+  var items = Array.prototype.slice.call(list.querySelectorAll('.sck-item'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.sck-chip'));
+  var search = document.getElementById('sckSearch');
+  var empty = document.getElementById('sckEmpty');
+  var activeCat = 'all';
+
+  items.forEach(function(item){
+    var btn = item.querySelector('.sck-q');
+    var toggle = item.querySelector('.sck-toggle');
+    btn.addEventListener('click', function(){
+      item.classList.toggle('active');
+      toggle.textContent = item.classList.contains('active') ? '\u2212' : '+';
+    });
+  });
+
+  chips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      chips.forEach(function(c){ c.classList.remove('is-active'); });
+      chip.classList.add('is-active');
+      activeCat = chip.getAttribute('data-cat');
+      applyFilters();
+    });
+  });
+
+  search.addEventListener('input', applyFilters);
+
+  function applyFilters(){
+    var q = search.value.trim().toLowerCase();
+    var visibleCount = 0;
+
+    items.forEach(function(item){
+      var matchesCat = activeCat === 'all' || item.getAttribute('data-cat') === activeCat;
+      var haystack = item.getAttribute('data-search') || '';
+      var matchesSearch = q === '' || haystack.indexOf(q) !== -1;
+      var show = matchesCat && matchesSearch;
+      item.setAttribute('data-hidden', show ? 'false' : 'true');
+      if (show) visibleCount++;
+    });
+
+    empty.classList.toggle('show', visibleCount === 0);
+  }
+})();
+</script>
+
+{% endblock %}

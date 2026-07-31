@@ -1,0 +1,407 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <div>
+        <h1>Orders</h1>
+        <p>View and manage customer orders</p>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="table-tools">
+
+        <form method="GET" class="search-box">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ request.GET.q }}"
+                placeholder="Search order ID..."
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <table class="dashboard-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Order ID</th>
+
+                <th>Customer</th>
+
+                <th>Payment</th>
+
+                <th>Delivery</th>
+
+                <th>Subtotal</th>
+
+                <th>Delivery Fee</th>
+
+                <th>VAT</th>
+
+                <th>VAT Option</th>
+
+                <th>Total</th>
+
+                <th>Date</th>
+
+                <th>Action</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for order in orders %}
+
+            <tr>
+
+                <td>
+
+                    <strong>
+
+                        {{ order.order_id }}
+
+                    </strong>
+
+                </td>
+
+                <td>
+
+                    {{ order.full_name }}
+
+                    <br>
+
+                    <small>
+
+                        {{ order.email }}
+
+                    </small>
+
+                </td>
+
+                <td>
+
+                    {{ order.get_payment_method_display }}
+
+                </td>
+
+                <td>
+
+                    {{ order.get_delivery_method_display }}
+
+                </td>
+
+                <td>
+
+                    KSh {{ order.subtotal }}
+
+                </td>
+
+                <td>
+
+                    KSh {{ order.delivery_fee }}
+
+                </td>
+
+                <td>
+
+                    KSh {{ order.vat_amount }}
+
+                </td>
+
+                <td>
+
+                    {% if order.vat_option == "inclusive" %}
+
+                        <span class="badge bg-success">
+
+                            VAT Included
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-warning">
+
+                            VAT Later
+
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <strong>
+
+                        KSh {{ order.grand_total }}
+
+                    </strong>
+
+                </td>
+
+                <td>
+
+                    {{ order.created_at|date:"d M Y" }}
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{% url 'order_detail' order.order_id %}"
+                        class="action-btn view">
+
+                        View
+
+                    </a>
+
+                    <a
+                        href="{% url 'delete_order' order.order_id %}"
+                        class="action-btn delete"
+                        onclick="return confirm('Delete this order?');">
+
+                        Delete
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="11" style="text-align:center;padding:40px;">
+
+                    No orders available.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<style>
+
+/* ==========================================================
+   ORDERS PAGE
+========================================================== */
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    padding:28px 32px;
+    border-radius:18px;
+    background:linear-gradient(#1e3a8a);
+    color:#fff;
+    box-shadow:0 15px 35px rgba(15,23,42,.18);
+}
+
+.dashboard-header h1{
+    margin:0;
+    font-size:34px;
+    font-weight:800;
+}
+
+.dashboard-header p{
+    margin-top:6px;
+    opacity:.9;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    overflow-x:auto;
+    box-shadow:0 12px 35px rgba(0,0,0,.08);
+}
+
+.table-tools{
+    display:flex;
+    justify-content:flex-end;
+    padding:20px;
+    border-bottom:1px solid #eee;
+}
+
+.search-box{
+    display:flex;
+    gap:10px;
+}
+
+.search-box input{
+    width:320px;
+    height:46px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:0 16px;
+}
+
+.search-box button{
+    border:none;
+    padding:0 24px;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.dashboard-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.dashboard-table thead{
+    background:#111827;
+    color:#fff;
+}
+
+.dashboard-table th{
+
+    padding:18px;
+
+    text-align:left;
+
+    white-space:nowrap;
+
+}
+
+.dashboard-table td{
+
+    padding:18px;
+
+    border-bottom:1px solid #eee;
+
+    white-space:nowrap;
+
+}
+
+.dashboard-table tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.dashboard-table strong{
+
+    color:#2563eb;
+
+}
+
+.dashboard-table small{
+
+    color:#777;
+
+}
+
+.badge{
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+}
+
+.bg-success{
+
+    background:#dcfce7;
+
+    color:#15803d;
+
+}
+
+.bg-warning{
+
+    background:#fef3c7;
+
+    color:#b45309;
+
+}
+
+.action-btn{
+
+    display:inline-block;
+
+    padding:10px 18px;
+
+    border-radius:8px;
+
+    color:white;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    margin-right:8px;
+
+}
+
+.view{
+
+    background:#2563eb;
+
+}
+
+.delete{
+
+    background:#dc2626;
+
+}
+
+.view:hover{
+
+    background:#1d4ed8;
+
+}
+
+.delete:hover{
+
+    background:#b91c1c;
+
+}
+
+@media(max-width:1200px){
+
+.dashboard-table{
+
+    min-width:1200px;
+
+}
+
+}
+
+</style>
+
+{% endblock %}

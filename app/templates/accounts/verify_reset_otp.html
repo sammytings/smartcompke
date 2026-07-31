@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block content %}
+<div class="au-scope">
+  <div class="au-wrap">
+    <div class="au-card">
+
+      <div class="au-badge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="10" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+
+      <h1>Verify your <span>email</span></h1>
+      <p class="au-subtitle">
+        We've sent a 6-digit code to <strong>{{ email }}</strong>. Enter it below to continue.
+      </p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="au-alert au-alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" class="au-form" id="otp-form" novalidate>
+        {% csrf_token %}
+
+        <input type="hidden" name="otp" id="otp-hidden" required>
+
+        <div class="au-otp-boxes" id="otp-boxes" aria-label="6 digit verification code">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="au-otp-box" data-index="0" autofocus>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="au-otp-box" data-index="1">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="au-otp-box" data-index="2">
+          <span class="au-otp-dash">&ndash;</span>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="au-otp-box" data-index="3">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="au-otp-box" data-index="4">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="au-otp-box" data-index="5">
+        </div>
+
+        <button type="submit" class="au-btn">Verify code</button>
+      </form>
+
+      <p class="au-resend">
+        Didn't get anything? <a href="#">Resend code</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .au-scope{
+    --au-blue:#123A75; --au-blue-dark:#0B2750; --au-blue-soft:#EAF0FB;
+    --au-red:#C8202F; --au-red-dark:#9A1722; --au-red-soft:#FCEAEA;
+    --au-ink:#17212B; --au-ink-soft:#5B6B7A; --au-line:#E1E6EC; --au-bg:#F5F7FA; --au-card:#FFFFFF;
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--au-bg); color:var(--au-ink); min-height:100vh;
+  }
+  .au-scope h1{ font-family:'Sora',sans-serif; }
+
+  .au-wrap{ max-width:440px; margin:0 auto; padding:64px 20px; }
+
+  .au-card{
+    background:var(--au-card); border:1px solid var(--au-line); border-radius:16px;
+    padding:36px 32px 32px; text-align:center; position:relative; overflow:hidden;
+    box-shadow:0 1px 2px rgba(15,30,45,.04), 0 12px 32px -16px rgba(15,30,45,.18);
+  }
+  .au-card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg, var(--au-blue) 0 60%, var(--au-red) 60% 100%);
+  }
+
+  .au-badge{
+    width:52px; height:52px; border-radius:50%; background:var(--au-blue-soft); color:var(--au-blue);
+    display:flex; align-items:center; justify-content:center; margin:8px auto 18px;
+  }
+
+  .au-scope h1{ font-size:23px; font-weight:700; margin:0 0 8px; color:var(--au-ink); }
+  .au-scope h1 span{ color:var(--au-red); }
+
+  .au-subtitle{ font-size:14px; line-height:1.6; color:var(--au-ink-soft); margin:0 0 26px; }
+  .au-subtitle strong{ color:var(--au-ink); }
+
+  .au-alert{ text-align:left; font-size:13.5px; border-radius:8px; padding:10px 14px; margin-bottom:18px; }
+  .au-alert-error{ background:var(--au-red-soft); color:var(--au-red-dark); }
+  .au-alert-success{ background:var(--au-blue-soft); color:var(--au-blue-dark); }
+
+  .au-otp-boxes{ display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:26px; }
+  .au-otp-box{
+    width:42px; height:52px; text-align:center; font-size:20px; font-weight:700; font-family:'Sora',sans-serif;
+    color:var(--au-ink); border:1.5px solid var(--au-line); border-radius:10px; background:var(--au-bg);
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .au-otp-box:focus{
+    outline:none; border-color:var(--au-blue); background:#fff;
+    box-shadow:0 0 0 3px var(--au-blue-soft);
+  }
+  .au-otp-box.au-filled{ border-color:var(--au-blue); background:#fff; }
+  .au-otp-dash{ color:var(--au-line); font-size:18px; }
+
+  .au-btn{
+    width:100%; padding:13px 16px; border:none; border-radius:10px; background:var(--au-blue);
+    color:#fff; font-size:15px; font-weight:700; font-family:'Manrope',sans-serif; cursor:pointer;
+    transition:background .15s, transform .1s;
+  }
+  .au-btn:hover{ background:var(--au-blue-dark); }
+  .au-btn:active{ transform:translateY(1px); }
+
+  .au-resend{ font-size:13px; color:var(--au-ink-soft); margin:20px 0 0; }
+  .au-resend a{ color:var(--au-red); font-weight:600; text-decoration:none; }
+  .au-resend a:hover{ text-decoration:underline; }
+
+  @media (max-width:400px){
+    .au-otp-box{ width:36px; height:46px; font-size:18px; }
+  }
+</style>
+
+<script>
+(function(){
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.au-otp-box'));
+  var hidden = document.getElementById('otp-hidden');
+
+  function syncHidden(){
+    hidden.value = boxes.map(function(b){ return b.value; }).join('');
+  }
+
+  boxes.forEach(function(box, i){
+    box.addEventListener('input', function(){
+      box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      box.classList.toggle('au-filled', box.value.length === 1);
+      if (box.value && i < boxes.length - 1){ boxes[i + 1].focus(); }
+      syncHidden();
+    });
+    box.addEventListener('keydown', function(e){
+      if (e.key === 'Backspace' && !box.value && i > 0){ boxes[i - 1].focus(); }
+    });
+    box.addEventListener('paste', function(e){
+      e.preventDefault();
+      var digits = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '').split('');
+      digits.forEach(function(d, idx){ if (boxes[idx]){ boxes[idx].value = d; boxes[idx].classList.add('au-filled'); } });
+      syncHidden();
+      var next = boxes[Math.min(digits.length, boxes.length - 1)];
+      if (next) next.focus();
+    });
+  });
+
+  document.getElementById('otp-form').addEventListener('submit', syncHidden);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+SmartComputersKe Blog | Technology News, Buying Guides & Reviews Kenya
+{% endblock %}
+
+
+{% block meta_description %}
+Read the latest technology articles, laptop buying guides, computer tips, smartphone reviews and expert advice from SmartComputersKe Kenya.
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="breadcrumb">
+    <a href="{% url 'home' %}">Home</a> / <span class="current">Blog</span>
+</div>
+
+<section class="blog-hero">
+
+    <div class="container">
+
+        <h1>
+            SmartComputersKe Technology Blog
+        </h1>
+
+        <p>
+            Expert guides, technology tips, product reviews and buying advice
+            to help you make smarter decisions.
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<section class="featured-blog container">
+
+<h2>
+Featured Articles
+</h2>
+
+
+<div class="blog-grid">
+
+
+{% for post in featured_posts %}
+
+<article class="blog-card">
+
+
+<img 
+src="{{ post.image.url }}"
+alt="{{ post.title }}"
+loading="lazy">
+
+
+<div class="blog-content">
+
+
+<span class="category">
+{{ post.category.name }}
+</span>
+
+
+<h3>
+<a href="{% url 'blog_detail' post.slug %}">
+{{ post.title }}
+</a>
+</h3>
+
+
+<p>
+{{ post.excerpt|truncatewords:25 }}
+</p>
+
+
+
+<div class="blog-meta">
+
+<span>
+<i class="fa fa-user"></i>
+SmartComputersKe
+</span>
+
+
+<span>
+<i class="fa fa-calendar"></i>
+{{post.created_at|date:"M d, Y"}}
+</span>
+
+
+</div>
+
+
+</div>
+
+
+</article>
+
+
+{% endfor %}
+
+
+</div>
+
+
+</section>
+
+
+
+
+<section class="container latest-blog">
+
+
+<h2>
+Latest Technology Articles
+</h2>
+
+
+
+<div class="blog-grid">
+
+
+{% for post in posts %}
+
+
+<article class="blog-card">
+
+
+<img
+src="{{post.image.url}}"
+alt="{{post.title}}"
+loading="lazy">
+
+
+
+<div class="blog-content">
+
+
+<h3>
+
+<a href="{% url 'blog_detail' post.slug %}">
+{{post.title}}
+</a>
+
+</h3>
+
+
+
+<p>
+{{post.excerpt|truncatewords:25}}
+</p>
+
+
+
+<div class="blog-meta">
+
+<span>
+<i class="fa fa-user"></i>
+SmartComputersKe
+</span>
+
+
+<span>
+<i class="fa fa-calendar"></i>
+{{post.created_at|date:"M d, Y"}}
+</span>
+
+
+</div>
+
+
+
+<a class="read-more"
+href="{% url 'blog_detail' post.slug %}">
+Read More →
+</a>
+
+
+
+</div>
+
+
+</article>
+
+
+
+{% empty %}
+
+
+<p>
+No articles published yet.
+</p>
+
+
+{% endfor %}
+
+
+</div>
+
+
+</section>
+
+
+
+{% endblock %}

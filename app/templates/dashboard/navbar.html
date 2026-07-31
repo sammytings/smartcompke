@@ -1,0 +1,569 @@
+{% load static %}
+
+<header class="topbar" id="topbar">
+
+    <div class="topbar-left">
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="page-title">
+            <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+            <p>Welcome back, {{ request.user.get_full_name|default:request.user.username }}</p>
+        </div>
+
+    </div>
+
+    <div class="topbar-right">
+
+        <div class="search-box">
+
+            <i class="fas fa-search"></i>
+
+            <input
+                type="text"
+                id="topbarSearch"
+                placeholder="Search products, orders, customers..."
+            >
+
+            <kbd class="search-kbd">/</kbd>
+
+        </div>
+
+        <button class="icon-btn" id="searchToggle" aria-label="Search">
+            <i class="fas fa-search"></i>
+        </button>
+
+        <button class="icon-btn" aria-label="Notifications">
+
+            <i class="far fa-bell"></i>
+
+            {% if pending_orders %}
+            <span class="notification-dot"></span>
+            {% endif %}
+
+        </button>
+
+        <button class="icon-btn" aria-label="Messages">
+            <i class="far fa-envelope"></i>
+        </button>
+
+        <button class="icon-btn hide-on-tablet" onclick="toggleFullscreen()" aria-label="Toggle fullscreen">
+            <i class="fas fa-expand"></i>
+        </button>
+
+        <button class="icon-btn hide-on-tablet" id="darkModeBtn" aria-label="Toggle theme">
+            <i class="fas fa-sun"></i>
+        </button>
+
+        <div class="topbar-divider hide-on-tablet"></div>
+
+        <div class="profile">
+
+            <div class="avatar">
+
+                {% if request.user.first_name %}
+                    {{ request.user.first_name|first|upper }}
+                {% else %}
+                    {{ request.user.username|first|upper }}
+                {% endif %}
+
+            </div>
+
+            <div class="profile-info">
+
+                <h4>
+
+                    {% if request.user.get_full_name %}
+                        {{ request.user.get_full_name }}
+                    {% else %}
+                        {{ request.user.username }}
+                    {% endif %}
+
+                </h4>
+
+                <small>Administrator</small>
+
+            </div>
+
+            <div class="dropdown">
+
+                <button class="dropdown-btn" aria-label="Account menu">
+
+                    <i class="fas fa-chevron-down"></i>
+
+                </button>
+
+                <div class="dropdown-menu">
+
+                    <a href="{% url 'profile' %}">
+                        <i class="fas fa-user"></i>
+                        My Profile
+                    </a>
+
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+
+                    <a href="/">
+                        <i class="fas fa-globe"></i>
+                        Visit Website
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <a href="{% url 'logout' %}" class="text-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<style>
+/* ==============================================================
+   TOPBAR — shares the sidebar's token system (--sc-*).
+   Flat surfaces, no gradients/glow. Blue = structural,
+   red = alerts/destructive only. Values are redeclared here
+   so this partial still looks right if it's ever the only
+   file loaded, but they intentionally match sidebar.html 1:1.
+================================================================= */
+:root {
+    --sc-bg: #12151b;
+    --sc-bg-raised: #171b22;
+    --sc-hover: #1c2029;
+    --sc-border: rgba(255, 255, 255, 0.07);
+    --sc-text: #eef0f4;
+    --sc-text-muted: #838d9e;
+    --sc-text-faint: #4d5566;
+    --sc-blue: #3b73f0;
+    --sc-blue-soft: rgba(59, 115, 240, 0.12);
+    --sc-red: #e5484d;
+    --sc-red-soft: rgba(229, 72, 77, 0.12);
+    --sc-sidebar-w: 252px;
+    --sc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+    --tb-h: 66px;
+}
+
+/* Light theme overrides — toggled via body.light-mode, persisted in localStorage */
+body.light-mode {
+    --sc-bg: #ffffff;
+    --sc-bg-raised: #f6f7fa;
+    --sc-hover: #eef0f4;
+    --sc-border: rgba(15, 23, 42, 0.08);
+    --sc-text: #171923;
+    --sc-text-muted: #667085;
+    --sc-text-faint: #98a2b3;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    height: var(--tb-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 26px;
+    background: var(--sc-bg-raised);
+    border-bottom: 1px solid var(--sc-border);
+    font-family: var(--sc-font);
+}
+
+/* If this sits alongside a fixed sidebar, give the content column
+   matching left space: .main-content { margin-left: var(--sc-sidebar-w); } */
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.menu-toggle {
+    display: none;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-bg);
+    color: var(--sc-text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.14s ease, color 0.14s ease;
+}
+.menu-toggle:hover { background: var(--sc-hover); color: var(--sc-text); }
+
+.page-title { min-width: 0; }
+
+.page-title h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    letter-spacing: -0.2px;
+    color: var(--sc-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.page-title p {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--sc-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ---------------- Search ---------------- */
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 260px;
+    padding: 0 12px;
+    height: 38px;
+    border-radius: 9px;
+    background: var(--sc-bg);
+    border: 1px solid var(--sc-border);
+    transition: border-color 0.16s ease, width 0.16s ease, box-shadow 0.16s ease;
+}
+.search-box i { font-size: 13px; color: var(--sc-text-faint); flex-shrink: 0; }
+
+.search-box input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--sc-text);
+    font-size: 13.5px;
+    font-family: inherit;
+}
+.search-box input::placeholder { color: var(--sc-text-faint); }
+
+.search-box:focus-within {
+    width: 320px;
+    border-color: var(--sc-blue);
+    box-shadow: 0 0 0 3px var(--sc-blue-soft);
+}
+
+.search-kbd {
+    flex-shrink: 0;
+    font-family: var(--sc-font);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--sc-text-faint);
+    background: var(--sc-hover);
+    border: 1px solid var(--sc-border);
+    border-radius: 4px;
+    padding: 1.5px 6px;
+    line-height: 1.5;
+}
+.search-box:focus-within .search-kbd { display: none; }
+
+#searchToggle { display: none; }
+
+/* ---------------- Icon buttons ---------------- */
+
+.icon-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-bg);
+    color: var(--sc-text-muted);
+    font-size: 14.5px;
+    cursor: pointer;
+    transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+.icon-btn:hover { background: var(--sc-hover); color: var(--sc-text); border-color: var(--sc-border); }
+.icon-btn:focus-visible { outline: 2px solid var(--sc-blue); outline-offset: 2px; }
+
+.notification-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--sc-red);
+    box-shadow: 0 0 0 2px var(--sc-bg);
+    animation: sc-pulse 2.2s ease-in-out infinite;
+}
+@keyframes sc-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--sc-border);
+    margin: 0 4px;
+}
+
+/* ---------------- Profile ---------------- */
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 8px 5px 5px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: background 0.14s ease, border-color 0.14s ease;
+}
+.profile:hover { background: var(--sc-bg); border-color: var(--sc-border); }
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--sc-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--sc-red);
+}
+
+.profile-info { min-width: 0; }
+
+.profile-info h4 {
+    margin: 0;
+    font-size: 13.2px;
+    font-weight: 620;
+    color: var(--sc-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+}
+
+.profile-info small {
+    font-size: 11px;
+    color: var(--sc-text-faint);
+}
+
+.dropdown { position: relative; }
+
+.dropdown-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--sc-text-faint);
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color 0.14s ease, background 0.14s ease;
+}
+.dropdown-btn:hover { color: var(--sc-text); background: var(--sc-hover); }
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 210px;
+    background: var(--sc-bg-raised);
+    border: 1px solid var(--sc-border);
+    border-radius: 11px;
+    box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5);
+    padding: 7px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+    z-index: 950;
+}
+.dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.dropdown-menu a i { width: 15px; text-align: center; font-size: 12.5px; color: var(--sc-text-faint); }
+.dropdown-menu a:hover { background: var(--sc-hover); color: var(--sc-text); }
+
+.dropdown-menu a.text-danger:hover { background: var(--sc-red-soft); color: var(--sc-red); }
+.dropdown-menu a.text-danger:hover i { color: var(--sc-red); }
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--sc-border);
+    margin: 6px 4px;
+}
+
+/* ==============================================================
+   RESPONSIVE
+================================================================= */
+@media (max-width: 1200px) {
+    .search-box { width: 200px; }
+    .search-box:focus-within { width: 260px; }
+}
+
+@media (max-width: 1024px) {
+    .hide-on-tablet { display: none; }
+    .profile-info { display: none; }
+    .profile:hover { background: transparent; border-color: transparent; }
+}
+
+@media (max-width: 860px) {
+    .menu-toggle { display: flex; }
+    .topbar { padding: 0 16px; gap: 10px; }
+    .page-title p { display: none; }
+    .search-box { display: none; }
+    #searchToggle { display: flex; }
+}
+
+@media (max-width: 480px) {
+    .page-title h2 { font-size: 16px; }
+    .topbar { height: 58px; padding: 0 14px; }
+    .icon-btn { width: 34px; height: 34px; font-size: 13.5px; }
+    .avatar { width: 30px; height: 30px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .search-box, .icon-btn, .dropdown-menu, .notification-dot, .menu-toggle, .profile {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* If sidebar.html's own off-canvas mobile-topbar is also present on
+   the page, this header replaces it — hide the duplicate so mobile
+   doesn't get two stacked bars with two hamburgers. */
+.mobile-topbar { display: none !important; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ---------- Account dropdown ---------- */
+    const dropdownBtn = document.querySelector(".dropdown-btn");
+    const dropdown = document.querySelector(".dropdown-menu");
+
+    if (dropdownBtn) {
+        dropdownBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            dropdown.classList.toggle("show");
+        });
+        document.addEventListener("click", function () {
+            dropdown.classList.remove("show");
+        });
+    }
+
+    /* ---------- Menu toggle: defers to the sidebar's own toggle
+       button if one exists on the page, so there's a single source
+       of truth for opening/closing the sidebar. ---------- */
+    const menuToggle = document.getElementById("menuToggle");
+    if (menuToggle) {
+        menuToggle.addEventListener("click", function () {
+            const sidebarToggle = document.getElementById("sidebarToggle");
+            if (sidebarToggle) {
+                sidebarToggle.click();
+            } else {
+                document.getElementById("sidebar")?.classList.toggle("open");
+            }
+        });
+    }
+
+    /* ---------- Mobile search toggle ---------- */
+    const searchToggle = document.getElementById("searchToggle");
+    const searchBox = document.querySelector(".search-box");
+    if (searchToggle && searchBox) {
+        searchToggle.addEventListener("click", function () {
+            searchBox.classList.toggle("mobile-open");
+            if (searchBox.classList.contains("mobile-open")) {
+                searchBox.style.cssText = "display:flex;position:absolute;left:14px;right:14px;top:100%;margin-top:8px;width:auto;z-index:920;box-shadow:0 16px 32px -12px rgba(0,0,0,.5);";
+                document.getElementById("topbarSearch").focus();
+            } else {
+                searchBox.style.cssText = "";
+            }
+        });
+    }
+
+    /* ---------- "/" keyboard shortcut to focus search ---------- */
+    const searchInput = document.getElementById("topbarSearch");
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+            e.preventDefault();
+            searchInput?.focus();
+        }
+        if (e.key === "Escape") {
+            searchInput?.blur();
+        }
+    });
+
+    /* ---------- Dark / light toggle, persisted ---------- */
+    const darkBtn = document.getElementById("darkModeBtn");
+    const darkIcon = darkBtn?.querySelector("i");
+
+    function applyTheme(mode) {
+        document.body.classList.toggle("light-mode", mode === "light");
+        if (darkIcon) darkIcon.className = mode === "light" ? "fas fa-moon" : "fas fa-sun";
+    }
+
+    const savedTheme = localStorage.getItem("sc-theme") || "dark";
+    applyTheme(savedTheme);
+
+    if (darkBtn) {
+        darkBtn.addEventListener("click", function () {
+            const next = document.body.classList.contains("light-mode") ? "dark" : "light";
+            applyTheme(next);
+            localStorage.setItem("sc-theme", next);
+        });
+    }
+
+});
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.();
+    } else {
+        document.exitFullscreen?.();
+    }
+}
+</script>

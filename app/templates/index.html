@@ -1,0 +1,2184 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Smartcomputerske Technologies — Genuine Computer Hardware, Nairobi{% endblock %}
+
+{% block content %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/shared-components.css' %}">
+
+<style>
+  #main-content, .section, .brand-marquee-section, .hero {
+    --primary-blue:   #1E40AF;
+    --primary-blue-d: #16307F;
+    --secondary-blue: #2563EB;
+    --primary-blue-l: #EEF2FB;
+    --accent-red:     #DC2626;
+    --accent-red-d:   #B91C1C;
+    --accent-red-bg:  #FDECEC;
+    --accent-yellow:  #F5B400;
+    --accent-yellow-d:#C98F00;
+    --ink:            #111827;
+    --ink-soft:       #1F2937;
+    --muted:          #6B7280;
+    --surface:        #FFFFFF;
+    --surface-alt:    #F8FAFC;
+    --border:         #EAECF1;
+    --green:          #0F8A5F;
+    --green-bg:       #E7F6EF;
+    --wa-green:       #1EBE5A;
+    --hero-navy-1:    #0B1330;
+    --hero-navy-2:    #16215A;
+    --hero-navy-3:    #2545A6;
+    --r-xl: 30px;
+    --r-lg: 22px;
+    --r-md: 15px;
+    --r-sm: 12px;
+    --shadow-sm: 0 2px 12px rgba(17,24,39,.06);
+    --shadow-md: 0 18px 38px rgba(17,24,39,.10);
+    --shadow-lg: 0 32px 64px rgba(17,24,39,.16);
+    --shadow-blue: 0 18px 38px rgba(30,64,175,.24);
+    --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', sans-serif;
+  }
+
+  .sck-home { font-family: var(--font-body); color: var(--ink); background: var(--surface); }
+  .sck-home * { box-sizing: border-box; }
+
+  .sck-home .section-head h2, .sck-home .eyebrow-sm, .sck-home .cat-card h3,
+  .sck-home .prod-name, .sck-home .prod-price, .sck-home .prod-brand,
+  .sck-home .btn-cart-add, .sck-home .view-all, .sck-home #compareCounter,
+  .sck-home .review-name, .sck-home h1, .sck-home h3, .sck-home .spec-card h3,
+  .sck-home .feature-card h4, .sck-home .why-card h4, .sck-home .stat-pill b {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  .sck-home .wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .sck-home .section { padding: 88px 0; }
+  .sck-home .section.tight { padding: 64px 0; }
+  @media (max-width: 768px) {
+    .sck-home .section { padding: 52px 0; }
+    .sck-home .section.tight { padding: 40px 0; }
+    .sck-home .wrap { padding: 0 18px; }
+  }
+
+  .sck-home .eyebrow-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--primary-blue);
+  }
+  .sck-home .eyebrow-sm::before {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: var(--accent-red);
+    border-radius: 2px;
+  }
+
+  .sck-home .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .sck-home .section-head h2 {
+    position: relative;
+    font-size: clamp(26px, 3.1vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 10px 0 14px;
+    color: var(--ink);
+    padding-bottom: 14px;
+  }
+  .sck-home .section-head h2::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 46px; height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-red), var(--primary-blue));
+  }
+  .sck-home .section-head p { color: var(--muted); font-size: 15px; max-width: 540px; margin: 0; line-height: 1.6; }
+  .sck-home .view-all {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--primary-blue);
+    text-decoration: none;
+    white-space: nowrap;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    transition: border-color .18s ease, color .18s ease;
+  }
+  .sck-home .view-all:hover { border-color: var(--primary-blue); color: var(--primary-blue-d); }
+
+  header, .navbar, .site-header, nav.main-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+    background: #fff;
+    box-shadow: 0 1px 0 rgba(17,24,39,.06);
+  }
+  @media (max-width: 768px) {
+    header, .navbar, .site-header, nav.main-nav { position: sticky; top: 0; z-index: 10000; }
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     HERO — dark indigo panel, two-column, badge + rounded photo
+     ══════════════════════════════════════════════════════════════ */
+  .sck-home .hero {
+    position: relative;
+    background:
+      radial-gradient(1100px 620px at 78% 15%, rgba(37,69,166,.55), transparent 60%),
+      linear-gradient(160deg, var(--hero-navy-1), var(--hero-navy-2) 70%);
+    color: #fff;
+    overflow: hidden;
+    padding: 56px 0 0;
+  }
+  .sck-home .hero-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.08fr .92fr;
+    gap: 48px;
+    align-items: center;
+    padding-bottom: 40px;
+  }
+
+  .sck-home .hero-copy h1 {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 3.6vw, 44px);
+    font-weight: 700;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    max-width: 560px;
+    color: #fff;
+  }
+  .sck-home .hero-copy h1 .hl-orange { color: var(--accent-yellow); }
+  .sck-home .hero-copy .lede {
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: #c3cbe0;
+    max-width: 480px;
+    margin-bottom: 22px;
+    font-family: var(--font-body);
+  }
+
+  .sck-home .trust-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+    max-width: 560px;
+  }
+  .sck-home .trust-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #e7ebf6;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: var(--r-sm);
+    padding: 12px 10px;
+  }
+  .sck-home .trust-chip .ic {
+    width: 22px; height: 22px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.12); color: #ffd479; flex-shrink: 0;
+  }
+  .sck-home .trust-chip .ic svg { width: 13px; height: 13px; }
+  @media (max-width: 640px) { .sck-home .trust-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .sck-home .price-cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .sck-home .price-chip, .sck-home .limited-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 700; border-radius: 999px; padding: 10px 16px;
+  }
+  .sck-home .price-chip { background: var(--accent-yellow); color: #241a00; }
+  .sck-home .limited-chip { background: rgba(220,38,38,.18); color: #ff9aa2; border: 1px solid rgba(220,38,38,.4); }
+
+  .sck-home .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+  .sck-home .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: var(--r-sm);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+  }
+  .sck-home .btn-white { background: #fff; color: var(--hero-navy-1); box-shadow: 0 14px 30px rgba(0,0,0,.25); }
+  .sck-home .btn-white:hover { transform: translateY(-2px); background: #f2f4fa; }
+  .sck-home .btn-outline-light { background: transparent; color: #fff; border-color: rgba(255,255,255,.28); }
+  .sck-home .btn-outline-light:hover { border-color: #fff; background: rgba(255,255,255,.08); transform: translateY(-2px); }
+  .sck-home .btn-whatsapp { background: var(--wa-green); color: #fff; }
+  .sck-home .btn-whatsapp:hover { background: #17a34c; transform: translateY(-2px); box-shadow: 0 16px 34px rgba(30,190,90,.3); }
+
+  .sck-home .hero-help { font-size: 12.5px; color: #a9b3cc; margin: 0; font-family: var(--font-body); }
+  .sck-home .hero-help a { color: #ffd479; font-weight: 700; text-decoration: none; }
+  .sck-home .hero-help a:hover { text-decoration: underline; }
+
+  /* hero visual */
+  .sck-home .hero-visual { position: relative; }
+  .sck-home .hero-frame {
+    position: relative;
+    z-index: 1;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.16);
+    box-shadow: 0 36px 70px rgba(6,12,28,.42);
+    aspect-ratio: 4/3.05;
+  }
+  .sck-home .hero-slide { position: relative; width: 100%; height: 100%; display: none; }
+  .sck-home .hero-slide.active { display: block; }
+  .sck-home .hero-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sck-home .hero-slide-fade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(11,21,38,.7) 0%, rgba(11,21,38,.02) 55%, transparent 100%); }
+  .sck-home .ribbon { position: absolute; left: 18px; bottom: 16px; color: #fff; font-weight: 600; font-size: 14.5px; font-family: var(--font-display); letter-spacing: -0.01em; }
+  .sck-home .hero-slider-dots { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 7px; z-index: 2; }
+  .sck-home .hero-slider-dots button {
+    width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,.35);
+    cursor: pointer; padding: 0; transition: background .2s ease, transform .2s ease;
+  }
+  .sck-home .hero-slider-dots button.active { background: #fff; transform: scale(1.25); }
+
+  .sck-home .float-badge {
+    position: absolute;
+    z-index: 3;
+    top: 20px;
+    left: -6%;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(255,255,255,.98);
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 22px 44px rgba(6,12,28,.24);
+    max-width: 250px;
+  }
+  .sck-home .float-badge .ic {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary-blue-l); color: var(--primary-blue); flex-shrink: 0;
+  }
+  .sck-home .float-badge b { display: block; font-size: 13px; font-family: var(--font-display); line-height: 1.3; }
+  .sck-home .float-badge .fb-sub { display: block; font-size: 10.5px; color: var(--muted); font-weight: 600; line-height: 1.4; margin-top: 2px; }
+  .sck-home .float-badge .fb-stars { color: var(--accent-yellow-d); font-size: 12px; letter-spacing: 1px; margin-top: 4px; display: block; }
+  @media (max-width: 960px) { .sck-home .float-badge { left: -2%; max-width: 220px; } }
+  @media (max-width: 600px) {
+    .sck-home .float-badge { padding: 9px 12px; max-width: 190px; }
+    .sck-home .float-badge .ic { width: 24px; height: 24px; }
+  }
+
+  /* stats bar — sits inside hero, dark translucent pill */
+  .sck-home .stats-bar-wrap { position: relative; z-index: 4; padding: 0 0 44px; }
+  .sck-home .stats-bar {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+  }
+  .sck-home .stat-pill {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 18px 14px;
+    border-right: 1px solid rgba(255,255,255,.12);
+  }
+  .sck-home .stat-pill:last-child { border-right: none; }
+  .sck-home .stat-pill .ic {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.1); color: #ffd479;
+  }
+  .sck-home .stat-pill b { display: block; font-size: 15px; color: #fff; line-height: 1.1; }
+  .sck-home .stat-pill span { display: block; font-size: 10.5px; color: #a9b3cc; font-weight: 600; margin-top: 2px; text-transform: uppercase; letter-spacing: .04em; }
+  @media (max-width: 768px) {
+    .sck-home .stats-bar { grid-template-columns: repeat(2, 1fr); border-radius: var(--r-lg); }
+    .sck-home .stat-pill { padding: 14px; border-bottom: 1px solid rgba(255,255,255,.1); flex-direction: column; text-align: center; gap: 6px; }
+    .sck-home .stat-pill:nth-child(2n) { border-right: none; }
+    .sck-home .stat-pill b { font-size: 14px; }
+  }
+
+  @media (max-width: 960px) {
+    .sck-home .hero-inner { grid-template-columns: 1fr; padding-bottom: 60px; }
+    .sck-home .hero-visual { max-width: 460px; margin: 30px auto 0; }
+    .sck-home .hero-copy { text-align: left; }
+  }
+  @media (max-width: 520px) {
+    .sck-home .hero { padding-top: 32px; }
+    .sck-home .hero-actions { gap: 8px; }
+    .sck-home .btn { padding: 11px 16px; font-size: 13px; flex: 1 1 auto; }
+    .sck-home .hero-frame { border-radius: 22px; }
+    .sck-home .trust-row { gap: 8px; margin-bottom: 16px; }
+    .sck-home .trust-chip { padding: 10px 8px; font-size: 10px; }
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     TRUSTED BRANDS — flat grayscale wordmarks, centered heading
+     ══════════════════════════════════════════════════════════════ */
+  .sck-home .brand-marquee-section { padding: 52px 0; background: var(--surface-alt); border-bottom: 1px solid var(--border); }
+  .sck-home .brand-marquee-section .section-head { justify-content: center; text-align: center; margin-bottom: 30px; }
+  .sck-home .brand-marquee-section .section-head > div { width: 100%; }
+  .sck-home .brand-marquee-section .section-head h2::after { left: 50%; transform: translateX(-50%); }
+  .sck-home .brand-marquee-section .eyebrow-sm { justify-content: center; width: 100%; }
+  .sck-home .brand-marquee-section .section-head p { margin: 0 auto; }
+
+  .sck-home .brand-marquee {
+    position: relative;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+  }
+  .sck-home .brand-row { overflow: hidden; }
+  .sck-home .brand-track { display: flex; align-items: center; gap: 56px; width: max-content; animation: sck-marquee-left 38s linear infinite; }
+  .sck-home .brand-marquee:hover .brand-track { animation-play-state: paused; }
+  @keyframes sck-marquee-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .sck-home .brand-tile {
+    flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    height: 44px;
+    text-decoration: none;
+    opacity: .92;
+    transition: opacity .22s ease, transform .22s ease;
+  }
+  .sck-home .brand-tile:hover { opacity: 1; transform: translateY(-2px); }
+  .sck-home .brand-tile img { max-height: 100%; width: auto; object-fit: contain; }
+  .sck-home .brand-tile .brand-fallback-name {
+    font-family: var(--font-display); font-weight: 700; font-size: 16px;
+    color: var(--ink-soft); letter-spacing: .03em; text-align: center; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  @media (max-width: 620px) { .sck-home .brand-track { gap: 38px; } .sck-home .brand-tile { height: 32px; } .sck-home .brand-tile .brand-fallback-name { font-size: 13px; } }
+
+  /* ============ CATEGORY ROW — clean, borderless: circular icon + label only ============ */
+  .sck-home .cat-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 30px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 4px 16px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sck-home .cat-grid::-webkit-scrollbar { height: 6px; }
+  .sck-home .cat-grid::-webkit-scrollbar-track { background: transparent; }
+  .sck-home .cat-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+  .sck-home .cat-grid::-webkit-scrollbar-thumb:hover { background: #cfd7e3; }
+  .sck-home .cat-card {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    width: 108px;
+    scroll-snap-align: start;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    text-align: center;
+    text-decoration: none;
+    color: var(--ink);
+    overflow: visible;
+    transition: transform .25s cubic-bezier(.2,.7,.3,1);
+  }
+  @media (max-width: 620px) {
+    .sck-home .cat-card { width: 92px; gap: 10px; }
+  }
+  .sck-home .cat-card::after { content: none; }
+  .sck-home .cat-card:hover { transform: translateY(-5px); box-shadow: none; border-color: transparent; }
+  .sck-home .cat-icon {
+    position: relative; z-index: 1;
+    width: 78px; height: 78px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--primary-blue-l), #fff);
+    border: 1px solid #d8e6fd;
+    box-shadow: 0 10px 24px rgba(30,64,175,.09);
+    transition: box-shadow .25s ease, border-color .25s ease, transform .25s ease;
+  }
+  .sck-home .cat-card:hover .cat-icon {
+    box-shadow: 0 16px 34px rgba(30,64,175,.18);
+    border-color: var(--primary-blue);
+    transform: scale(1.05);
+  }
+  .sck-home .cat-icon img { width: 32px; height: 32px; object-fit: contain; }
+  @media (max-width: 620px) {
+    .sck-home .cat-icon { width: 64px; height: 64px; }
+    .sck-home .cat-icon img { width: 26px; height: 26px; }
+  }
+  .sck-home .cat-card h3 { position: relative; z-index: 1; font-size: 13px; font-weight: 700; margin: 0; line-height: 1.3; }
+  .sck-home .cat-card p, .sck-home .cat-link { display: none; }
+
+  /* ============ WHY CHOOSE US ============ */
+  .sck-home .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) { .sck-home .why-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .sck-home .why-grid { grid-template-columns: 1fr; } }
+  .sck-home .why-card {
+    display: flex; flex-direction: column; gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 28px 24px;
+    transition: transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease, border-color .22s ease;
+  }
+  .sck-home .why-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #d7e3f7; }
+  .sck-home .why-icon {
+    width: 50px; height: 50px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary-blue-l); color: var(--primary-blue);
+  }
+  .sck-home .why-card h4 { font-size: 16.5px; font-weight: 700; margin: 0; }
+  .sck-home .why-card p { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0; font-family: var(--font-body); }
+
+  /* ============ PRODUCT GRID ============ */
+  .sck-home .prod-grid, .sck-home .arrivals-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px; }
+  @media (max-width: 1180px) { .sck-home .prod-grid, .sck-home .arrivals-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 992px) { .sck-home .prod-grid, .sck-home .arrivals-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { .sck-home .prod-grid, .sck-home .arrivals-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+  @media (max-width: 480px) { .sck-home .prod-grid, .sck-home .arrivals-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+  /* ============ PAGINATION ============ */
+  .sck-home .sck-pagination { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 36px; }
+  .sck-home .sck-page-btn {
+    min-width: 44px; height: 44px; padding: 0 20px; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    background: var(--surface); border: none; color: #9aa3b4;
+    font-weight: 700; font-size: 14px; font-family: var(--font-body); cursor: pointer;
+    box-shadow: 0 2px 10px rgba(17,24,39,.07);
+    transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .sck-home .sck-page-btn.sck-page-num { width: 44px; padding: 0; color: var(--ink-soft); }
+  .sck-home .sck-page-btn:hover:not(:disabled):not(.active) { color: var(--primary-blue); box-shadow: 0 4px 14px rgba(17,24,39,.12); transform: translateY(-1px); }
+  .sck-home .sck-page-btn.active { background: var(--ink); color: #fff; box-shadow: 0 0 0 6px rgba(30,64,175,.12), 0 8px 18px rgba(17,24,39,.2); }
+  .sck-home .sck-page-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .sck-home .sck-page-ellipsis {
+    min-width: 24px; text-align: center; color: #9aa3b4; font-weight: 700; font-size: 14px;
+    font-family: var(--font-body); user-select: none;
+  }
+
+  /* ═══════════ PRODUCT CARD — "Featured deals" style ═══════════ */
+  .sck-home .prod-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #E8EDF5;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform .26s cubic-bezier(.2,.7,.3,1),
+                box-shadow .26s ease,
+                border-color .26s ease;
+  }
+  .sck-home .prod-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 48px rgba(17,24,39,.11);
+    border-color: #C9DAFC;
+  }
+
+  .sck-home .prod-media {
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+    background: transparent;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+  }
+  .sck-home .prod-media a {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  .sck-home .prod-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    padding: 4px;
+    transition: transform .38s cubic-bezier(.2,.7,.3,1);
+  }
+  .sck-home .prod-card:hover .prod-media img { transform: scale(1.06); }
+
+  @media (max-width: 992px) { .sck-home .prod-media { height: 175px; } }
+  @media (max-width: 768px)  { .sck-home .prod-media { height: 155px; } }
+  @media (max-width: 480px)  { .sck-home .prod-media { height: 140px; } }
+
+  /* wishlist heart — always visible, single tool, top-right circle */
+  .sck-home .product-tools {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sck-home .tool-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    border: none;
+    color: #9aa3b4;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(17,24,39,.16);
+    transition: transform .18s ease, color .18s ease, background .18s ease;
+    text-decoration: none;
+    padding: 0;
+  }
+  .sck-home .tool-btn svg { width: 15px; height: 15px; }
+  .sck-home .tool-btn:hover { transform: scale(1.08); }
+  .sck-home .tool-btn.wishlist:hover { color: var(--accent-red); }
+  .sck-home .tool-btn.wishlist.active { color: #fff; background: var(--accent-red); }
+  .sck-home .tool-btn.wishlist.active svg { fill: currentColor; }
+  .sck-home .tool-btn.compare-btn.active { color: #fff; background: var(--primary-blue); }
+  .sck-home .tool-btn.compare-btn:hover { color: var(--primary-blue); }
+
+  /* hide the compare tool visually by default to match the clean reference card;
+     it still works if re-enabled by removing this rule */
+  .sck-home .tool-btn.compare-btn { display: none; }
+
+  .sck-home .prod-tag, .sck-home .brand-badge {
+    position: absolute; top: 10px; left: 10px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .03em;
+    padding: 5px 12px; border-radius: 999px; z-index: 4;
+    font-family: var(--font-display);
+  }
+  .sck-home .prod-tag { background: linear-gradient(120deg, var(--green), #0c6c49); color: #fff; }
+  .sck-home .prod-tag.blue-tag { background: linear-gradient(120deg, var(--primary-blue), var(--primary-blue-d)); }
+  .sck-home .brand-badge { background: linear-gradient(120deg, var(--primary-blue-d), var(--hero-navy-1)); color: #fff; text-transform: uppercase; }
+
+  .sck-home .prod-body { padding: 14px 14px 6px; display: flex; flex-direction: column; gap: 8px; flex: 1; background: #fff; border-top: 1px solid #EEF2F9; }
+  .sck-home .product-title-link { text-decoration: none; color: inherit; }
+  .sck-home .product-title-link:hover .prod-name { color: var(--primary-blue); }
+  .sck-home .prod-brand { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--primary-blue); }
+  .sck-home .prod-name {
+    font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.35; transition: color .15s ease;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    min-height: calc(1.35em * 2);
+  }
+
+  /* spec rows — small icon chips, one per line, built from short_description */
+  .sck-home .prod-specs { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+  .sck-home .prod-specs .spec-row {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 9px;
+    font-size: 11px; font-weight: 600; color: var(--ink-soft);
+    font-family: var(--font-body);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sck-home .prod-specs .spec-row .spec-ic {
+    width: 14px; height: 14px; flex-shrink: 0; color: var(--primary-blue); display: flex;
+  }
+  .sck-home .prod-specs .spec-row .spec-ic svg { width: 100%; height: 100%; }
+  .sck-home .prod-specs .spec-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .sck-home .badge-row { display: flex; gap: 6px; margin-top: 1px; flex-wrap: wrap; }
+  .sck-home .badge-stock, .sck-home .badge-condition { font-size: 10px; font-weight: 700; font-family: var(--font-body); padding: 4px 10px; border-radius: 999px; }
+  .sck-home .badge-stock.in { background: var(--green-bg); color: var(--green); }
+  .sck-home .badge-stock.out { background: var(--accent-red-bg); color: var(--accent-red-d); }
+  .sck-home .badge-condition { background: var(--surface-alt); color: var(--ink-soft); border: 1px solid var(--border); }
+
+  .sck-home .prod-rating { font-size: 12px; font-family: var(--font-body); color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 1px; }
+  .sck-home .prod-rating .stars { color: var(--accent-red); letter-spacing: 1px; font-size: 12px; }
+
+  .sck-home .price-container { display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap; }
+  .sck-home .prod-price { color: var(--primary-blue-d); font-size: 19px; font-weight: 800; font-family: var(--font-display); }
+  .sck-home .prod-old-price { color: #9aa0aa; text-decoration: line-through; font-size: 13px; }
+  .sck-home .vat-note { font-size: 10.5px; font-family: var(--font-body); color: #9198a3; margin-top: -1px; width: 100%; }
+
+  .sck-home .vat-switch-container { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; font-family: var(--font-body); font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+  .sck-home .vat-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+  .sck-home .vat-switch input { opacity: 0; width: 0; height: 0; }
+  .sck-home .vat-switch .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border); transition: background-color .2s ease; border-radius: 999px; }
+  .sck-home .vat-switch .slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #fff; transition: transform .2s ease; border-radius: 50%; box-shadow: 0 1px 3px rgba(17,24,39,.3); }
+  .sck-home .vat-switch input:checked + .slider { background-color: var(--primary-blue); }
+  .sck-home .vat-switch input:checked + .slider::before { transform: translateX(20px); }
+  .sck-home #vatLabel { color: var(--primary-blue); font-weight: 700; }
+
+  /* ═══════════ PROD ACTIONS & BUTTONS ═══════════ */
+  .sck-home .prod-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px 14px;
+    margin-top: auto;
+    background: #fff;
+  }
+
+  .sck-home .btn-cart-add {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary-blue-d);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+    letter-spacing: -0.01em;
+  }
+  .sck-home .btn-cart-add:hover:not(:disabled) {
+    background: var(--hero-navy-1);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(29,95,215,.32);
+  }
+  .sck-home .btn-cart-add:active:not(:disabled) { transform: translateY(0); }
+  .sck-home .btn-cart-add:disabled { opacity: .55; cursor: not-allowed; }
+
+  .sck-home .btn-cart-add .btn-icon    { flex-shrink: 0; transition: opacity .15s; }
+  .sck-home .btn-cart-add .btn-label   { transition: opacity .15s; }
+  .sck-home .btn-cart-add .cart-loader { display: none; flex-shrink: 0; }
+
+  /* Loading: icon flies from left to right across the button and reappears on the left */
+  .sck-home .btn-cart-add.is-loading {
+    pointer-events: none;
+    background: var(--primary-blue-d);
+  }
+  .sck-home .btn-cart-add.is-loading .btn-label { opacity: .35; }
+  .sck-home .btn-cart-add.is-loading .btn-icon {
+    animation: sck-cart-fly 1.1s cubic-bezier(.5,0,.3,1) infinite;
+  }
+  @keyframes sck-cart-fly {
+    0%   { transform: translateX(0) scale(1);     opacity: 1; }
+    45%  { transform: translateX(70px) scale(.7);  opacity: 0; }
+    50%  { transform: translateX(-70px) scale(.7); opacity: 0; }
+    100% { transform: translateX(0) scale(1);      opacity: 1; }
+  }
+  .sck-home .btn-cart-add.is-loading .cart-loader { display: none; }
+
+  .sck-home .btn-cart-add.is-added {
+    background: #12A150;
+    pointer-events: none;
+  }
+  .sck-home .btn-cart-add.is-added .btn-icon  { display: none; }
+  .sck-home .btn-cart-add.is-added .btn-label { opacity: 0; width: 0; overflow: hidden; }
+  .sck-home .btn-cart-add.is-added .cart-loader {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .sck-home .btn-cart-add.is-added .cart-loader span { display: none; }
+  .sck-home .btn-cart-add.is-added .cart-loader::before {
+    content: "✓";
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .sck-home .btn-cart-add.is-added .cart-loader::after {
+  
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    animation: sck-pop-in .22s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes sck-pop-in {
+    from { opacity: 0; transform: scale(.78); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .sck-home .btn-whatsapp-card {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #25D366;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .16s ease, transform .16s ease;
+    letter-spacing: -0.01em;
+  }
+  .sck-home .btn-whatsapp-card:hover {
+    background: #1ebe5a;
+    transform: translateY(-1px);
+  }
+  .sck-home .btn-whatsapp-card svg { flex-shrink: 0; }
+
+  .sck-home .tool-btn.wishlist.is-wishing {
+    pointer-events: none;
+    animation: sck-wish-pulse .4s ease;
+  }
+  @keyframes sck-wish-pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.32); }
+    100% { transform: scale(1); }
+  }
+
+  /* ═══════════ THEMED TOAST — warm, premium, hand-crafted feel ═══════════ */
+  .sck-toast-wrap {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(24px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: min(92vw, 380px);
+    background: linear-gradient(135deg, #16307F, #0B1330);
+    color: #fff;
+    padding: 14px 20px 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 24px 48px rgba(6,12,28,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
+    font-family: var(--font-body);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s cubic-bezier(.2,.7,.3,1), transform .35s cubic-bezier(.2,.7,.3,1);
+  }
+  .sck-toast-wrap.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .sck-toast-wrap .sck-toast-ic {
+    flex-shrink: 0;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.14);
+    color: var(--accent-yellow);
+  }
+  .sck-toast-wrap.sck-toast-error .sck-toast-ic { color: #ff9aa2; background: rgba(220,38,38,.22); }
+  .sck-toast-wrap .sck-toast-body { display: flex; flex-direction: column; gap: 1px; }
+  .sck-toast-wrap .sck-toast-title { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; letter-spacing: -0.01em; }
+  .sck-toast-wrap .sck-toast-msg { font-size: 12px; color: #c3cbe0; line-height: 1.4; }
+  @media (max-width: 520px) { .sck-toast-wrap { bottom: 90px; padding: 12px 16px 12px 14px; } }
+
+  /* ============ CLIENTS — large, unboxed logos ============ */
+  .sck-home .clients-section { padding: 60px 0; background: var(--surface-alt); }
+  .sck-home .clients-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 64px;
+    row-gap: 44px;
+  }
+  .sck-home .client-tile {
+    flex: 0 0 auto;
+    width: 220px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    filter: grayscale(15%);
+    opacity: .92;
+    transition: transform .22s cubic-bezier(.2,.7,.3,1), filter .22s ease, opacity .22s ease;
+  }
+  .sck-home .client-tile:hover { transform: translateY(-4px); box-shadow: none; filter: grayscale(0%); opacity: 1; }
+  .sck-home .client-tile img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+  @media (max-width: 768px) {
+    .sck-home .clients-grid { gap: 40px; row-gap: 32px; }
+    .sck-home .client-tile { width: 150px; height: 78px; }
+  }
+  @media (max-width: 480px) {
+    .sck-home .clients-grid { gap: 28px; row-gap: 24px; }
+    .sck-home .client-tile { width: 120px; height: 62px; }
+  }
+
+  /* ============ TESTIMONIALS ============ */
+  .sck-home .review-grid { position: relative; min-height: 210px; max-width: 640px; margin: 0 auto; overflow: hidden; }
+  @media (max-width: 860px) { .sck-home .review-grid { min-height: 260px; } }
+  .sck-home .review-card {
+    position: absolute; inset: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
+    padding: 28px 24px 24px; opacity: 0; transform: translateY(115%);
+    transition: transform .75s cubic-bezier(.4,0,.2,1), opacity .6s ease, box-shadow .2s ease;
+    pointer-events: none;
+  }
+  .sck-home .review-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .sck-home .review-card.exiting { opacity: 0; transform: translateY(-115%); }
+  .sck-home .review-card:hover { box-shadow: var(--shadow-md); }
+  .sck-home .review-card::before {
+    content: "\201C"; position: absolute; top: 14px; right: 22px; font-family: Georgia, serif;
+    font-size: 52px; color: var(--primary-blue-l); line-height: 1; z-index: 0;
+  }
+  .sck-home .review-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; position: relative; z-index: 1; }
+  .sck-home .review-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-d));
+    color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); overflow: hidden;
+  }
+  .sck-home .review-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .sck-home .review-name { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+  .sck-home .review-card .stars { color: var(--primary-blue); font-size: 12.5px; letter-spacing: 1px; }
+  .sck-home .review-verified { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; color: var(--green); background: var(--green-bg); padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+  .sck-home .review-verified svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .sck-home .review-card p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; margin: 0; position: relative; z-index: 1; }
+  .sck-home .review-time { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .sck-home .review-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+  .sck-home .review-dots button { width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--border); cursor: pointer; padding: 0; transition: background .2s ease, transform .2s ease; }
+  .sck-home .review-dots button.active { background: var(--primary-blue); transform: scale(1.25); }
+  .sck-home .review-source-link { display: flex; justify-content: center; margin-top: 16px; }
+  .sck-home .review-source-link a { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--border); padding: 9px 16px; border-radius: 999px; transition: border-color .15s ease, color .15s ease; }
+  .sck-home .review-source-link a:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+
+  /* ============ NEWSLETTER ============ */
+  .sck-home .newsletter-wrap {
+    background: linear-gradient(120deg, #0F1B33, #16307F 68%, var(--secondary-blue));
+    border-radius: var(--r-xl);
+    padding: 48px 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    flex-wrap: wrap;
+    color: #fff;
+  }
+  .sck-home .newsletter-copy h3 { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+  .sck-home .newsletter-copy p { font-size: 13.5px; color: #cdd7ea; margin: 0; max-width: 400px; font-family: var(--font-body); }
+  .sck-home .newsletter-form { display: flex; gap: 10px; flex-wrap: wrap; flex: 0 1 420px; }
+  .sck-home .newsletter-form input[type="email"] {
+    flex: 1 1 220px; min-width: 200px; padding: 13px 16px; border-radius: var(--r-sm);
+    border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff; font-size: 14px; font-family: var(--font-body);
+  }
+  .sck-home .newsletter-form input[type="email"]::placeholder { color: #b9c4da; }
+  .sck-home .newsletter-form input[type="email"]:focus { outline: none; border-color: #fff; background: rgba(255,255,255,.14); }
+  .sck-home .newsletter-form button {
+    padding: 13px 22px; border-radius: var(--r-sm); border: none; background: var(--accent-red); color: #fff;
+    font-weight: 700; font-size: 14px; cursor: pointer; transition: background .18s ease, transform .18s ease;
+  }
+  .sck-home .newsletter-form button:hover { background: var(--accent-red-d); transform: translateY(-2px); }
+  @media (max-width: 700px) { .sck-home .newsletter-wrap { padding: 32px 26px; } }
+
+  /* ============ QUOTE / ACCOUNT STRIP ============ */
+  .sck-home .account-strip {
+    display: flex; align-items: center; gap: 24px;
+    background: linear-gradient(115deg, var(--primary-blue), var(--primary-blue-d));
+    color: #fff; border-radius: var(--r-xl); padding: 34px 40px; flex-wrap: wrap;
+  }
+  .sck-home .account-avatar {
+    width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3);
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; flex-shrink: 0;
+  }
+  .sck-home .account-strip h4 { font-size: 18px; font-weight: 700; margin: 0 0 5px; }
+  .sck-home .account-strip p { font-size: 13.5px; color: #dbe6fb; margin: 0; max-width: 420px; }
+  .sck-home .account-actions { display: flex; gap: 10px; margin-left: auto; }
+  .sck-home .chip-btn { padding: 11px 20px; border-radius: 999px; font-size: 13.5px; font-weight: 700; text-decoration: none; color: #fff; border: 1px solid rgba(255,255,255,.35); transition: background .18s ease, transform .18s ease; }
+  .sck-home .chip-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,.12); }
+  .sck-home .chip-btn.primary { background: var(--ink); border-color: var(--ink); }
+  .sck-home .chip-btn.primary:hover { background: #000; }
+  @media (max-width: 700px) {
+    .sck-home .account-strip { padding: 26px; }
+    .sck-home .account-actions { margin-left: 0; width: 100%; }
+    .sck-home .chip-btn { flex: 1; text-align: center; }
+  }
+
+  /* subtle reveal-on-load */
+  .sck-home .fade-up { animation: sckFadeUp .6s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes sckFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sck-home * { animation-duration: .001s !important; transition-duration: .001s !important; }
+  }
+
+  /* ============ MOBILE SAFE-AREA (avoid fixed bottom tab bar / floating WhatsApp widget) ============ */
+  @media (max-width: 768px) {
+    .sck-home { padding-bottom: 84px; }
+    .sck-home .cat-grid { padding-right: 64px; scroll-padding-right: 64px; }
+    .sck-home .brand-track { padding-right: 24px; }
+  }
+
+@media(max-width:768px){
+.newsletter-form{ flex-direction:column; }
+.newsletter-form button{ width:100%; }
+}
+</style>
+
+<div class="sck-home">
+
+<section class="hero" id="home">
+  <div class="wrap hero-inner">
+    <div class="hero-copy fade-up">
+      <h1>Buy genuine laptops, gaming PCs &amp; computers in <span class="hl-orange">Nairobi</span>.</h1>
+      <p class="lede">Smartcomputerske Technologies supplies sealed laptops, office desktops, monitors, components, and accessories with fast Nairobi delivery and dependable after-sales support.</p>
+
+      <div class="trust-row">
+        <div class="trust-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l1.75 1.75L15 10.25M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Genuine Products</div>
+        <div class="trust-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 3v6c0 5-3.4 8.4-7 11-3.6-2.6-7-6-7-11V5z"/></svg></span>Official Warranty</div>
+        <div class="trust-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v8H3zM14 10h4l3 3v2h-7zM6.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></span>Same-Day Delivery</div>
+        <div class="trust-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-9 4h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>Secure Payments</div>
+      </div>
+
+      <div class="price-cta-row">
+        <span class="price-chip">🏷️ From KSh 20,000</span>
+        <span class="limited-chip">⚡ Limited stock — grab this week's deals</span>
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn btn-white" href="#shop">Shop Now</a>
+        <a class="btn btn-outline-light" href="#categories">Browse Categories</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/254700000000" target="_blank" rel="noopener">WhatsApp an Expert</a>
+      </div>
+
+      <p class="hero-help">Need help choosing? Call or WhatsApp <a href="tel:0700000000">0700 000000</a></p>
+    </div>
+
+    <div class="hero-visual fade-up">
+      <div class="hero-frame">
+        <div class="hero-slider" id="heroSlider">
+          <div class="hero-slide active">
+            <img src="{% static 'images/hero-1.jpg' %}" alt="ASUS ROG Strix gaming laptops on display" loading="eager" fetchpriority="high" decoding="async" />
+            <div class="hero-slide-fade"></div>
+            <div class="ribbon">Gaming &amp; Performance</div>
+          </div>
+          <div class="hero-slide">
+            <img src="{% static 'images/hero-2.jpg' %}" alt="Lenovo business ultrabook lineup" loading="lazy" decoding="async" />
+            <div class="hero-slide-fade"></div>
+            <div class="ribbon">Business Ultrabooks</div>
+          </div>
+          <div class="hero-slide">
+            <img src="{% static 'images/hero-3.jpg' %}" alt="In-store laptop display shelf" loading="lazy" decoding="async" />
+            <div class="hero-slide-fade"></div>
+            <div class="ribbon">In-Store Ready Stock</div>
+          </div>
+          <div class="hero-slider-dots" id="heroDots">
+            <button class="active" data-slide="0" aria-label="Slide 1"></button>
+            <button data-slide="1" aria-label="Slide 2"></button>
+            <button data-slide="2" aria-label="Slide 3"></button>
+          </div>
+        </div>
+      </div>
+      <div class="float-badge">
+        <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4-4.5-7-8.2-7-11.5A7 7 0 0112 2a7 7 0 017 7.5C19 12.8 16 16.5 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></span>
+        <div>
+          <b>Trusted by 500+</b>
+          <span class="fb-sub">Students, professionals &amp; businesses across Kenya</span>
+          <span class="fb-stars">★★★★★</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar-wrap">
+    <div class="wrap">
+      <div class="stats-bar fade-up">
+        <div class="stat-pill">
+          <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span>
+          <div><b>500+</b><span>Products in Stock</span></div>
+        </div>
+        <div class="stat-pill">
+          <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+          <div><b>9+ yrs</b><span>In Business</span></div>
+        </div>
+        <div class="stat-pill">
+          <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l1.75 1.75L15 10.25M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+          <div><b>100%</b><span>Genuine Products</span></div>
+        </div>
+        <div class="stat-pill">
+          <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4-4.5-7-8.2-7-11.5A7 7 0 0112 2a7 7 0 017 7.5C19 12.8 16 16.5 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></span>
+          <div><b>CBD</b><span>Walk-in Welcome</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="brand-marquee-section" id="brands">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow-sm">Popular Brands</span>
+        <h2>Shop Trusted Brands</h2>
+        <p>Genuine stock, sourced and warrantied directly from trusted brands.</p>
+      </div>
+    </div>
+
+    <div class="brand-marquee">
+      <div class="brand-row">
+        <div class="brand-track">
+          {% for brand in brands %}
+          {% if brand.name and brand.name != "Unknown" %}
+          <a class="brand-tile" href="{% url 'brand_products' brand.slug %}" title="{{ brand.name }}">
+            {% if brand.logo %}
+              <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" loading="lazy" decoding="async">
+            {% else %}
+              <span class="brand-fallback-name">{{ brand.name }}</span>
+            {% endif %}
+          </a>
+          {% endif %}
+          {% endfor %}
+          {% for brand in brands %}
+          {% if brand.name and brand.name != "Unknown" %}
+          <a class="brand-tile" href="{% url 'brand_products' brand.slug %}" title="{{ brand.name }}" aria-hidden="true" tabindex="-1">
+            {% if brand.logo %}
+              <img src="{{ brand.logo.url }}" alt="" loading="lazy" decoding="async">
+            {% else %}
+              <span class="brand-fallback-name">{{ brand.name }}</span>
+            {% endif %}
+          </a>
+          {% endif %}
+          {% endfor %}
+          {% for brand in brands %}{% empty %}
+          <span class="brand-fallback-name" style="padding:20px 0;">No brands available.</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="categories">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Shop by Category</span><h2>Explore the hardware range</h2><p>From laptops and office desktops to printers, storage, and accessories.</p></div>
+      <a class="view-all" href="{% url 'home' %}">View All →</a>
+    </div>
+    <div class="cat-grid">
+      {% for category in categories %}
+      <a class="cat-card" href="{% url 'category_products' category.slug %}">
+        <div class="cat-icon">
+          {% if category.icon %}
+          <img src="{{ category.icon.url }}" alt="{{ category.name }} icon" loading="lazy" decoding="async">
+          {% endif %}
+        </div>
+        <h3>{{ category.name }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section tight" style="background: var(--surface-alt);">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Just In</span><h2>New arrivals</h2><p>The latest hardware to land in our Nairobi showroom.</p></div>
+      <a class="view-all" href="{% url 'home' %}?sort=newest">View All →</a>
+    </div>
+
+    <div class="vat-switch-container">
+      <span>Prices</span>
+      <label class="vat-switch">
+        <input type="checkbox" id="vatToggle" checked>
+        <span class="slider"></span>
+      </label>
+      <span id="vatLabel">Including VAT</span>
+    </div>
+
+    <div class="arrivals-grid" id="newArrivalsGrid">
+      {% for product in new_arrivals|slice:":60" %}
+      <article class="prod-card">
+        <div class="prod-media">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+{% elif product.primary_image %}
+    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+{% else %}
+    <img src="{% static 'images/no-image.webp' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+{% endif %}
+          </a>
+          <span class="prod-tag">New</span>
+          <div class="product-tools">
+            <button type="button" class="tool-btn wishlist js-wishlist-toggle" data-url="/wishlist/toggle/{{ product.id }}/" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}" title="Add to Wishlist">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+              </svg>
+            </button>
+            <button type="button" class="tool-btn compare-btn" data-product="{{ product.id }}" title="Compare Product">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="prod-body">
+          {% if product.brand %}<div class="prod-brand">{{ product.brand.name }}</div>{% endif %}
+          <a href="{% url 'product_detail' product.slug %}" class="product-title-link">
+            <div class="prod-name">{{ product.name }}</div>
+          </a>
+          {% if product.short_description %}
+          <div class="prod-specs" data-raw="{{ product.short_description|escapejs }}"></div>
+          {% endif %}
+          <div class="prod-rating"><span class="stars">★★★★★</span><span>(4.8)</span></div>
+          <div class="badge-row">
+{% if product.stock > 0 %}
+<span class="badge-stock in">✓ In Stock</span>
+{% else %}
+<span class="badge-stock out">Out of Stock</span>
+{% endif %}
+</div>
+          <div class="price-container">
+            {% if product.discount_price %}
+            <div
+              class="prod-price vat-price"
+              data-inclusive="{{ product.discount_price_with_vat }}"
+              data-exclusive="{{ product.default_variant.discount_price|default:product.default_variant.price_without_vat }}">
+              KSh {{ product.discount_price_with_vat|floatformat:0 }}
+            </div>
+            <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
+            {% else %}
+            <div
+              class="prod-price vat-price"
+              data-inclusive="{{ product.price_with_vat }}"
+              data-exclusive="{{ product.default_variant.price_without_vat }}">
+              KSh {{ product.price_with_vat|floatformat:0 }}
+            </div>
+            {% endif %}
+            <div class="vat-note"><span class="vat-text">✓ Includes 16% VAT</span></div>
+          </div>
+          {% if product.discount_end %}
+          <div class="vat-note">Offer ends {{ product.discount_end }}</div>
+          {% endif %}
+        </div>
+        <div class="prod-actions">
+    <form action="{% url 'add_to_cart' product.id %}" method="post" class="js-add-to-cart-form" style="width:100%;">
+        {% csrf_token %}
+        <button class="btn-cart-add" type="button" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
+          <span class="cart-loader" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+          </svg>
+          <span class="btn-label">Add to Cart</span>
+        </button>
+    </form>
+    <a class="btn-whatsapp-card"
+       href="https://wa.me/254792758560?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}"
+       target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="currentColor">
+        <path d="M16.004 3C9.377 3 3.999 8.377 3.999 15.003c0 2.34.63 4.53 1.727 6.417L3.5 28.5l7.27-2.19a12.94 12.94 0 005.234 1.096h.005c6.627 0 12.005-5.377 12.005-12.003C28.014 8.377 22.636 3 16.004 3zm5.373 16.463c-.294-.148-1.74-.859-2.01-.957-.27-.099-.467-.148-.663.148-.196.295-.76.957-.932 1.153-.172.196-.343.222-.638.074-.294-.148-1.243-.458-2.367-1.462-.875-.78-1.466-1.744-1.638-2.038-.172-.295-.018-.454.13-.601.133-.133.294-.345.442-.517.147-.172.196-.295.294-.492.098-.196.049-.369-.025-.517-.074-.148-.663-1.6-.909-2.192-.24-.575-.483-.497-.663-.507-.172-.008-.369-.01-.565-.01-.196 0-.517.074-.787.369-.27.295-1.03 1.006-1.03 2.454 0 1.448 1.055 2.847 1.202 3.043.147.196 2.077 3.174 5.033 4.45.703.303 1.252.484 1.68.62.706.225 1.348.193 1.856.117.566-.084 1.74-.712 1.985-1.4.245-.688.245-1.278.172-1.4-.074-.123-.27-.197-.564-.345z"/>
+      </svg>
+      Order on WhatsApp
+    </a>
+</div>
+      </article>
+      {% empty %}
+      <p>No products available.</p>
+      {% endfor %}
+    </div>
+    <nav class="sck-pagination" id="newArrivalsPagination" aria-label="New arrivals pagination"></nav>
+  </div>
+</section>
+
+<section class="section" id="shop">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Featured Products</span><h2>Featured deals</h2><p>Handpicked deals on laptops, desktops &amp; accessories.</p></div>
+      <a class="view-all" href="{% url 'home' %}?featured=1">See All →</a>
+    </div>
+    <div class="prod-grid" id="featuredGrid">
+      {% for product in featured_products|slice:":60" %}
+      <article class="prod-card">
+        <div class="prod-media">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+{% elif product.primary_image %}
+    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+{% else %}
+    <img src="{% static 'images/no-image.webp' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+{% endif %}
+          </a>
+          {% if product.brand %}<span class="brand-badge">{{ product.brand }}</span>{% endif %}
+          <div class="product-tools">
+            <button type="button" class="tool-btn wishlist js-wishlist-toggle" data-url="/wishlist/toggle/{{ product.id }}/" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}" title="Add to Wishlist">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+              </svg>
+            </button>
+            <button type="button" class="tool-btn compare-btn" data-product="{{ product.id }}" title="Compare Product">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="prod-body">
+          <div class="prod-brand">{{ product.brand }}</div>
+          <a href="{% url 'product_detail' product.slug %}" class="product-title-link">
+            <div class="prod-name">{{ product.name }}</div>
+          </a>
+          <div class="prod-specs" data-raw="{{ product.short_description|escapejs }}"></div>
+          <div class="prod-rating"><span class="stars">★★★★★</span><span>(4.8)</span></div>
+          <div class="price-container">
+            {% if product.discount_price %}
+            <div
+              class="prod-price vat-price"
+              data-inclusive="{{ product.discount_price_with_vat }}"
+              data-exclusive="{{ product.default_variant.discount_price|default:product.default_variant.price_without_vat }}">
+              KSh {{ product.discount_price_with_vat|floatformat:0 }}
+            </div>
+            <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
+            {% else %}
+            <div
+              class="prod-price vat-price"
+              data-inclusive="{{ product.price_with_vat }}"
+              data-exclusive="{{ product.default_variant.price_without_vat }}">
+              KSh {{ product.price_with_vat|floatformat:0 }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="vat-note"><span class="vat-text">✓ Includes 16% VAT</span></div>
+        </div>
+        <div class="prod-actions">
+    <form action="{% url 'add_to_cart' product.id %}" method="post" class="js-add-to-cart-form" style="width:100%;">
+        {% csrf_token %}
+        <button class="btn-cart-add" type="button" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
+          <span class="cart-loader" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+          </svg>
+          <span class="btn-label">Add to Cart</span>
+        </button>
+    </form>
+    <a class="btn-whatsapp-card"
+       href="https://wa.me/254792758560?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}"
+       target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="currentColor">
+        <path d="M16.004 3C9.377 3 3.999 8.377 3.999 15.003c0 2.34.63 4.53 1.727 6.417L3.5 28.5l7.27-2.19a12.94 12.94 0 005.234 1.096h.005c6.627 0 12.005-5.377 12.005-12.003C28.014 8.377 22.636 3 16.004 3zm5.373 16.463c-.294-.148-1.74-.859-2.01-.957-.27-.099-.467-.148-.663.148-.196.295-.76.957-.932 1.153-.172.196-.343.222-.638.074-.294-.148-1.243-.458-2.367-1.462-.875-.78-1.466-1.744-1.638-2.038-.172-.295-.018-.454.13-.601.133-.133.294-.345.442-.517.147-.172.196-.295.294-.492.098-.196.049-.369-.025-.517-.074-.148-.663-1.6-.909-2.192-.24-.575-.483-.497-.663-.507-.172-.008-.369-.01-.565-.01-.196 0-.517.074-.787.369-.27.295-1.03 1.006-1.03 2.454 0 1.448 1.055 2.847 1.202 3.043.147.196 2.077 3.174 5.033 4.45.703.303 1.252.484 1.68.62.706.225 1.348.193 1.856.117.566-.084 1.74-.712 1.985-1.4.245-.688.245-1.278.172-1.4-.074-.123-.27-.197-.564-.345z"/>
+      </svg>
+      Order on WhatsApp
+    </a>
+</div>
+      </article>
+      {% endfor %}
+    </div>
+    <nav class="sck-pagination" id="featuredPagination" aria-label="Featured products pagination"></nav>
+  </div>
+</section>
+
+<section class="section tight" style="background: var(--surface-alt);">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Why Shop With Us</span><h2>Built for trust, priced to compete</h2><p>Everything we sell is backed by real support, not just a checkout page.</p></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 3v6c0 5-3.4 8.4-7 11-3.6-2.6-7-6-7-11V5z"/></svg></div>
+        <h4>Official Warranty</h4>
+        <p>Every device ships with manufacturer or store-backed warranty cover, honored in full.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l1.75 1.75L15 10.25M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <h4>Certified Products</h4>
+        <p>Sealed, genuine stock sourced directly from authorised distributors — no grey imports.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-9 4h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+        <h4>Secure Payments</h4>
+        <p>Pay by M-Pesa, card, or bank transfer through encrypted, PCI-compliant checkout.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v8H3zM14 10h4l3 3v2h-7zM6.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></div>
+        <h4>Fast Delivery</h4>
+        <p>Same-day dispatch in Nairobi and reliable nationwide courier delivery countrywide.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <h4>Expert Support</h4>
+        <p>Talk to real technicians before and after purchase, over call, WhatsApp, or in-store.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.66 0-3 .9-3 2s1.34 2 3 2 3 .9 3 2-1.34 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m0-14a9 9 0 100 18 9 9 0 000-18z"/></svg></div>
+        <h4>Best Prices</h4>
+        <p>Competitive market pricing with transparent VAT-inclusive totals, no hidden fees.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section clients-section" id="clients">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Our Clients</span><h2>Trusted by businesses across Nairobi</h2><p>A few of the organizations we supply and support.</p></div>
+    </div>
+    <div class="clients-grid">
+      <div class="client-tile"><img src="{% static 'images/client1.png' %}" alt="Client 1" loading="lazy" decoding="async"></div>
+      <div class="client-tile"><img src="{% static 'images/client2.png' %}" alt="Client 2" loading="lazy" decoding="async"></div>
+      <div class="client-tile"><img src="{% static 'images/client3.png' %}" alt="Client 3" loading="lazy" decoding="async"></div>
+      <div class="client-tile"><img src="{% static 'images/client4.png' %}" alt="Client 4" loading="lazy" decoding="async"></div>
+      <div class="client-tile"><img src="{% static 'images/client5.png' %}" alt="Client 5" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow-sm">Testimonials</span><h2>What our customers say</h2><p>Real feedback pulled from our Google Business Profile.</p></div>
+    </div>
+   <div class="review-grid" id="reviewGrid">
+
+
+{% for review in google_reviews %}
+
+
+<div class="review-card">
+
+
+<div class="review-head">
+
+
+<div class="review-avatar">
+
+{% if review.reviewer_photo %}
+
+<img src="{{review.reviewer_photo}}" loading="lazy" decoding="async">
+
+{% else %}
+
+{{review.reviewer_name|first}}
+
+{% endif %}
+
+</div>
+
+
+
+<div>
+
+
+<div class="review-name">
+
+{{review.reviewer_name}}
+
+</div>
+
+
+
+<div class="stars">
+
+{% if review.rating == 5 %}
+★★★★★
+{% elif review.rating == 4 %}
+★★★★☆
+{% elif review.rating == 3 %}
+★★★☆☆
+{% elif review.rating == 2 %}
+★★☆☆☆
+{% else %}
+★☆☆☆☆
+{% endif %}
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<span class="review-verified">
+
+✓ Google Review
+
+</span>
+
+
+<p>
+
+{{review.comment}}
+
+</p>
+
+
+
+</div>
+
+
+{% empty %}
+
+
+<div class="gr-state-msg">
+
+No reviews yet. Be the first customer to review us.
+
+</div>
+
+
+{% endfor %}
+
+
+</div>
+    <div class="review-dots" id="reviewDots"></div>
+    <div class="review-source-link">
+      <a href="https://search.google.com/local/writereview?placeid=ChIJJePo5d8RLxgRb2Obcxgk9p0" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v9.1h11.9c-.5 2.8-2 5.1-4.4 6.7v5.5h7.1C42.9 37 45.1 31.3 45.1 24.5z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.7-.7-4.3s.3-3 .7-4.3v-5.7H4.5C3.1 16.9 2.3 20.3 2.3 24s.8 7.1 2.2 10z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.1 29.9 2 24 2 15.4 2 8.1 7 4.5 14l7.3 5.7c1.7-5.2 6.5-9 12.2-9z"/></svg>
+        Read all reviews &amp; leave your own on Google
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<section class="section tight" id="account">
+  <div class="wrap account-strip">
+    <div class="account-avatar">SC</div>
+    <div><h4>Request a Quote</h4><p>Tell us what hardware you need and our team will send back a tailored price quote for your business.</p></div>
+    <div class="account-actions"><a class="chip-btn primary" href="{% url 'request_quote'%}">Request a Quote</a></div>
+  </div>
+</section>
+
+</div>
+
+<!-- Cart + wishlist engine -->
+<script src="{% static 'js/shared-components.js' %}"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   SPEC ROWS — turn short_description into icon-prefixed spec chips
+   Splits on common delimiters ( | , • / newline ) and falls back
+   gracefully to a single row when no delimiter is present.
+   ══════════════════════════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", function () {
+  var ICONS = [
+    // CPU/chip icon
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>',
+    // memory stick icon
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="8" rx="1"/><path d="M7 8v8M11 8v8M15 8v8"/></svg>',
+    // storage/disk icon
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M7 8h.01"/></svg>',
+    // generic tag/spec icon
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12.75l1.75 1.75L15 10.25M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+  ];
+
+  document.querySelectorAll(".prod-specs[data-raw]").forEach(function (container) {
+    var raw = container.getAttribute("data-raw") || "";
+    raw = raw.trim();
+    if (!raw) { container.remove(); return; }
+
+    var parts = raw.split(/\s*[|•\/\n]\s*|,\s*(?=[A-Z0-9])/).filter(Boolean);
+    if (!parts.length) parts = [raw];
+    parts = parts.slice(0, 3);
+
+    parts.forEach(function (text, i) {
+      var row = document.createElement("div");
+      row.className = "spec-row";
+      var icWrap = document.createElement("span");
+      icWrap.className = "spec-ic";
+      icWrap.innerHTML = ICONS[i] || ICONS[ICONS.length - 1];
+      var label = document.createElement("span");
+      label.textContent = text.trim();
+      row.appendChild(icWrap);
+      row.appendChild(label);
+      container.appendChild(row);
+    });
+  });
+});
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   THEMED TOAST — a small, warm-worded, on-brand notification system
+   used across cart + wishlist actions.
+   ══════════════════════════════════════════════════════════════════ */
+(function () {
+  var CART_LINES = [
+    { title: "Added to your bag!", msg: "Nice pick — it's waiting for you at checkout." },
+    { title: "In the cart now.", msg: "Good choice. Ready whenever you want to check out." },
+    { title: "One step closer.", msg: "That item's tucked safely into your cart." }
+  ];
+
+  var toastEl = null;
+  var hideTimer = null;
+
+  function ensureToast() {
+    if (toastEl) return toastEl;
+    toastEl = document.createElement("div");
+    toastEl.className = "sck-toast-wrap";
+    toastEl.innerHTML =
+      '<span class="sck-toast-ic" data-role="ic"></span>' +
+      '<span class="sck-toast-body">' +
+        '<span class="sck-toast-title" data-role="title"></span>' +
+        '<span class="sck-toast-msg" data-role="msg"></span>' +
+      '</span>';
+    document.body.appendChild(toastEl);
+    return toastEl;
+  }
+
+  var ICON_SUCCESS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg>';
+  var ICON_HEART = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/></svg>';
+  var ICON_ERROR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+
+  window.sckToast = function (opts) {
+    opts = opts || {};
+    var el = ensureToast();
+    el.classList.remove("sck-toast-error");
+    if (opts.type === "error") el.classList.add("sck-toast-error");
+
+    el.querySelector('[data-role="ic"]').innerHTML = opts.icon || ICON_SUCCESS;
+    el.querySelector('[data-role="title"]').textContent = opts.title || "";
+    el.querySelector('[data-role="msg"]').textContent = opts.msg || "";
+
+    clearTimeout(hideTimer);
+    requestAnimationFrame(function () { el.classList.add("show"); });
+    hideTimer = setTimeout(function () { el.classList.remove("show"); }, 3200);
+  };
+
+  window.sckCartToast = function (productName) {
+    var line = CART_LINES[Math.floor(Math.random() * CART_LINES.length)];
+    sckToast({
+      title: line.title,
+      msg: productName ? (productName + " — " + line.msg) : line.msg,
+      icon: ICON_SUCCESS
+    });
+  };
+
+  window.sckWishlistToast = function (added, productName) {
+    sckToast({
+      title: added ? "Saved for later." : "Removed from wishlist.",
+      msg: added
+        ? (productName ? productName + " is now on your wishlist." : "You'll find it in your wishlist anytime.")
+        : "You can always add it back later.",
+      icon: ICON_HEART
+    });
+  };
+
+  window.sckErrorToast = function (msg) {
+    sckToast({ title: "Something slipped.", msg: msg || "Please try that again.", type: "error", icon: ICON_ERROR });
+  };
+})();
+</script>
+
+<script>
+/* ============ CART — AJAX with animated icon + themed toast ============ */
+document.addEventListener("DOMContentLoaded", function () {
+  function getCsrf() {
+    var m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : "";
+  }
+
+  function setCartBadge(count) {
+    if (count == null) return;
+    var n = parseInt(count, 10) || 0;
+    ["#cartCount","#cart-count",".cart-count",
+     ".cart-badge","[data-cart-count]"].forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){
+        el.textContent = n;
+        el.style.display = n > 0 ? "" : "none";
+      });
+    });
+  }
+
+  document.querySelectorAll(".js-add-to-cart-form").forEach(function(form) {
+    var btn = form.querySelector(".btn-cart-add");
+    if (!btn) return;
+
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      if (btn.classList.contains("is-loading") || btn.classList.contains("is-added")) return;
+
+      /* ── Loading state: icon glides left → right and reappears on the left ── */
+      btn.classList.add("is-loading");
+
+      var productId = btn.dataset.productId;
+      var productName = btn.dataset.productName || "Item";
+      var csrfInput = form.querySelector("[name=csrfmiddlewaretoken]");
+      var csrf = csrfInput ? csrfInput.value : getCsrf();
+
+      var body = new URLSearchParams();
+      body.append("csrfmiddlewaretoken", csrf);
+
+      fetch(form.action, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        body: body
+      })
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(data) {
+        /* ── Added state ── */
+        btn.classList.remove("is-loading");
+        btn.classList.add("is-added");
+        setCartBadge(data.cart_count);
+        window.sckCartToast && window.sckCartToast(productName);
+        /* Reset back to idle after 2s */
+        setTimeout(function() {
+          btn.classList.remove("is-added");
+        }, 2000);
+      })
+      .catch(function() {
+        btn.classList.remove("is-loading");
+        window.sckErrorToast && window.sckErrorToast("Couldn't add " + productName + " to your cart.");
+      });
+    });
+  });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const buttons = document.querySelectorAll(".compare-btn");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      const productId = this.dataset.product;
+
+      fetch(`/compare/add/${productId}/`, {
+        method: "GET",
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.added) {
+            this.classList.add("active");
+            this.style.color = "#1d5fd1";
+          } else {
+            this.classList.remove("active");
+            this.style.color = "";
+          }
+        })
+        .catch(() => {});
+    });
+  });
+});
+</script>
+
+<script>
+/* ============ WISHLIST TOGGLE — themed toast + heart pulse ============ */
+document.addEventListener("DOMContentLoaded", function () {
+
+  function getCsrfToken() {
+    const input = document.querySelector("[name=csrfmiddlewaretoken]");
+    if (input) return input.value;
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : "";
+  }
+
+  document.querySelectorAll(".js-wishlist-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (btn.dataset.loading === "1") return;
+      btn.dataset.loading = "1";
+
+      const url = btn.dataset.url;
+      const name = btn.dataset.productName || "Item";
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCsrfToken()
+        }
+      })
+        .then(function (response) {
+          if (!response.ok) return Promise.reject(response.status);
+          return response.json();
+        })
+        .then(function (data) {
+          const added = !!data.added;
+          btn.classList.toggle("active", added);
+          btn.setAttribute("title", added ? "Remove from Wishlist" : "Add to Wishlist");
+
+          /* ── Heart pulse animation ── */
+          btn.classList.remove("is-wishing");
+          void btn.offsetWidth; /* reflow to restart */
+          btn.classList.add("is-wishing");
+          setTimeout(function(){ btn.classList.remove("is-wishing"); }, 420);
+
+          window.sckWishlistToast && window.sckWishlistToast(added, name);
+
+          /* ── Instant wishlist badge update (no reload needed) ── */
+          if (typeof data.wishlist_count !== "undefined") {
+            const count = parseInt(data.wishlist_count, 10) || 0;
+            ["#wishlist-count","#wishlistCount",".wishlist-count",
+             ".wishlist-badge","[data-wishlist-count]"].forEach(function(sel){
+              document.querySelectorAll(sel).forEach(function(el){
+                el.textContent = count;
+                el.style.display = count > 0 ? "" : "none";
+              });
+            });
+          }
+        })
+        .catch(function () {
+          window.sckErrorToast && window.sckErrorToast("Couldn't update your wishlist right now.");
+        })
+        .finally(function () {
+          btn.dataset.loading = "0";
+        });
+    });
+  });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const slider = document.getElementById("heroSlider");
+  if (!slider) return;
+
+  const slides = slider.querySelectorAll(".hero-slide");
+  const dots = slider.querySelectorAll("#heroDots button");
+  if (!slides.length) return;
+
+  let current = 0;
+  let timer = null;
+  const ROTATE_MS = 5000;
+
+  function goTo(index) {
+    slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+    dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+    current = index;
+  }
+
+  function next() {
+    goTo((current + 1) % slides.length);
+  }
+
+  function start() {
+    stop();
+    timer = setInterval(next, ROTATE_MS);
+  }
+
+  function stop() {
+    if (timer) clearInterval(timer);
+  }
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+      goTo(i);
+      start();
+    });
+  });
+
+  slider.addEventListener("mouseenter", stop);
+  slider.addEventListener("mouseleave", start);
+
+  start();
+});
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   PAGINATION — windowed page numbers (max 3 visible) with working
+   Previous / Next controls that walk through ALL available pages,
+   not just the first three.
+   ══════════════════════════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", function () {
+
+  function sckPaginateGrid(gridId, navId, pageSize, maxVisible) {
+    var grid = document.getElementById(gridId);
+    var nav = document.getElementById(navId);
+    if (!grid || !nav) return;
+
+    var items = Array.prototype.filter.call(grid.children, function (el) {
+      return el.classList && el.classList.contains('prod-card');
+    });
+
+    var totalPages = Math.ceil(items.length / pageSize);
+    if (totalPages <= 1) { nav.style.display = 'none'; return; }
+
+    var current = 1;
+    maxVisible = maxVisible || 3;
+
+    function render() {
+      items.forEach(function (item, i) {
+        var page = Math.floor(i / pageSize) + 1;
+        item.style.display = (page === current) ? '' : 'none';
+      });
+
+      nav.innerHTML = '';
+
+      var prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'sck-page-btn';
+      prev.innerHTML = '&larr; Previous';
+      prev.disabled = current === 1;
+      prev.addEventListener('click', function () { goTo(current - 1); });
+      nav.appendChild(prev);
+
+      /* work out a sliding window of page numbers so at most
+         `maxVisible` numbered buttons are ever shown at once */
+      var windowStart = Math.max(1, Math.min(current - 1, totalPages - maxVisible + 1));
+      windowStart = Math.max(1, windowStart);
+      var windowEnd = Math.min(totalPages, windowStart + maxVisible - 1);
+
+      if (windowStart > 1) {
+        addPageBtn(1);
+        if (windowStart > 2) addEllipsis();
+      }
+
+      for (var p = windowStart; p <= windowEnd; p++) {
+        addPageBtn(p);
+      }
+
+      if (windowEnd < totalPages) {
+        if (windowEnd < totalPages - 1) addEllipsis();
+        addPageBtn(totalPages);
+      }
+
+      var next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'sck-page-btn';
+      next.innerHTML = 'Next &rarr;';
+      next.disabled = current === totalPages;
+      next.addEventListener('click', function () { goTo(current + 1); });
+      nav.appendChild(next);
+    }
+
+    function addPageBtn(pageNum) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sck-page-btn sck-page-num' + (pageNum === current ? ' active' : '');
+      btn.textContent = pageNum;
+      btn.addEventListener('click', function () { goTo(pageNum); });
+      nav.appendChild(btn);
+    }
+
+    function addEllipsis() {
+      var span = document.createElement('span');
+      span.className = 'sck-page-ellipsis';
+      span.textContent = '…';
+      nav.appendChild(span);
+    }
+
+    function goTo(page) {
+      if (page < 1 || page > totalPages || page === current) return;
+      current = page;
+      render();
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    render();
+  }
+
+  /* Grids are capped server-side to a maximum of 60 products
+     (see the |slice:":60" template filter above) and paginated
+     client-side in pages of 10 — showing at most 3 numbered page
+     buttons at a time, with Previous / Next walking through all
+     of them. */
+  sckPaginateGrid('newArrivalsGrid', 'newArrivalsPagination', 10, 3);
+  sckPaginateGrid('featuredGrid', 'featuredPagination', 10, 3);
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const vatToggle = document.getElementById("vatToggle");
+  const vatLabel = document.getElementById("vatLabel");
+  if (!vatToggle) return;
+
+  function formatPrice(value) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return "KSh 0";
+    return "KSh " + Math.round(num).toLocaleString();
+  }
+
+  function updatePrices(showInclusive) {
+    document.querySelectorAll(".vat-price").forEach(function (el) {
+      const inclusive = el.getAttribute("data-inclusive");
+      const exclusive = el.getAttribute("data-exclusive");
+      const value = showInclusive ? inclusive : exclusive;
+      if (value !== null && value !== undefined && value !== "") {
+        el.textContent = formatPrice(value);
+      }
+    });
+
+    document.querySelectorAll(".vat-note .vat-text").forEach(function (el) {
+      el.textContent = showInclusive ? "✓ Includes 16% VAT" : "VAT Excluded";
+    });
+
+    if (vatLabel) {
+      vatLabel.textContent = showInclusive ? "Including VAT" : "Excluding VAT";
+    }
+  }
+
+  vatToggle.addEventListener("change", function () {
+    updatePrices(this.checked);
+  });
+
+  updatePrices(vatToggle.checked);
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const grid = document.getElementById("reviewGrid");
+    const dotsWrap = document.getElementById("reviewDots");
+
+    if (!grid || !dotsWrap) return;
+
+    const cards = grid.querySelectorAll(".review-card");
+
+    if (!cards.length) {
+        return;
+    }
+
+    let current = 0;
+    let timer = null;
+
+    const ROTATE_TIME = 4500;
+    const TRANSITION_TIME = 750;
+
+    function showReview(index) {
+
+        if(index === current) return;
+
+        const oldCard = cards[current];
+
+        oldCard.classList.remove("active");
+        oldCard.classList.add("exiting");
+
+        dotsWrap.children[current]
+            ?.classList.remove("active");
+
+        current = index;
+
+        cards[current]
+            .classList.add("active");
+
+        dotsWrap.children[current]
+            ?.classList.add("active");
+
+        setTimeout(() => {
+
+            oldCard.classList.remove("exiting");
+
+        }, TRANSITION_TIME);
+
+    }
+
+    function createDots(){
+
+        dotsWrap.innerHTML="";
+
+        cards.forEach((card,index)=>{
+
+            const dot=document.createElement("button");
+
+            dot.type="button";
+
+            dot.className =
+                index===0
+                ? "active"
+                : "";
+
+            dot.setAttribute(
+                "aria-label",
+                "Show review "+(index+1)
+            );
+
+            dot.addEventListener(
+                "click",
+                function(){
+
+                    showReview(index);
+
+                    restartTimer();
+
+                }
+            );
+
+            dotsWrap.appendChild(dot);
+
+        });
+
+    }
+
+    function nextReview(){
+
+        let next =
+            (current + 1)
+            %
+            cards.length;
+
+        showReview(next);
+
+    }
+
+    function startTimer(){
+
+        stopTimer();
+
+        timer=setInterval(
+            nextReview,
+            ROTATE_TIME
+        );
+
+    }
+
+    function stopTimer(){
+
+        if(timer){
+
+            clearInterval(timer);
+
+            timer=null;
+
+        }
+
+    }
+
+    function restartTimer(){
+
+        stopTimer();
+
+        startTimer();
+
+    }
+
+    grid.addEventListener(
+        "mouseenter",
+        stopTimer
+    );
+
+    grid.addEventListener(
+        "mouseleave",
+        startTimer
+    );
+
+    document.addEventListener(
+        "keydown",
+        function(e){
+
+            if(e.key==="ArrowRight"){
+
+                showReview(
+                    (current+1)%cards.length
+                );
+
+                restartTimer();
+
+            }
+
+            if(e.key==="ArrowLeft"){
+
+                showReview(
+                    (current-1+cards.length)%cards.length
+                );
+
+                restartTimer();
+
+            }
+
+        }
+    );
+
+    createDots();
+
+    cards.forEach((card,index)=>{
+
+        if(index===0){
+
+            card.classList.add("active");
+
+        }
+        else{
+
+            card.classList.remove("active");
+
+        }
+
+    });
+
+    startTimer();
+
+});
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("sckNewsletterForm");
+  if (!form) return;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    window.sckToast && window.sckToast({ title: "You're on the list!", msg: "Thanks for subscribing — deals land in your inbox soon." });
+    form.reset();
+  });
+});
+const newsletterForm = document.getElementById("newsletterForm");
+if (newsletterForm) {
+  newsletterForm.addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    fetch("/newsletter/subscribe/",{
+
+        method:"POST",
+
+        body:new FormData(newsletterForm),
+
+        headers:{
+            "X-CSRFToken":document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+
+    })
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        if(data.success){
+
+            window.sckToast && window.sckToast({ title: "You're on the list!", msg: data.message });
+
+            newsletterForm.reset();
+
+        }
+
+        else{
+
+            window.sckErrorToast && window.sckErrorToast(data.message);
+
+        }
+
+    });
+
+  });
+}
+</script>
+
+{% endblock %}

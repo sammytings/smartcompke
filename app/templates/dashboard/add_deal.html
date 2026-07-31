@@ -1,0 +1,2110 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}
+Create Product Deal
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/add_deal.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="deal-page">
+
+    <!-- ========================================= -->
+    <!-- HEADER -->
+    <!-- ========================================= -->
+
+    <div class="deal-header">
+
+        <div>
+
+            <h1>Create Product Deal</h1>
+
+            <p>
+                Select a product, assign a promotional price and
+                choose when the deal starts and ends.
+            </p>
+
+        </div>
+
+        <a href="{% url 'dashboard_deals' %}" class="btn-back">
+
+            <i class="fas fa-arrow-left"></i>
+
+            Back to Deals
+
+        </a>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- MAIN GRID -->
+    <!-- ========================================= -->
+
+    <div class="deal-grid">
+
+        <!-- ===================================== -->
+        <!-- LEFT COLUMN -->
+        <!-- ===================================== -->
+
+        <div class="products-panel">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+
+                            Products
+
+                        </h2>
+
+                        <p>
+
+                            Choose a product to place on offer.
+
+                        </p>
+
+                    </div>
+
+                    <div class="search-box">
+
+                        <i class="fas fa-search"></i>
+
+                        <input
+                            type="text"
+                            id="productSearch"
+                            placeholder="Search products..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PRODUCT GRID STARTS -->
+
+                <div
+                    class="product-grid"
+                    id="productGrid"
+                >{% for variant in variants %}
+
+<div
+    class="product-card"
+    data-id="{{ variant.id }}"
+    data-name="{{ variant.product.name }}"
+    data-brand="{{ variant.product.brand }}"
+    data-category="{{ variant.product.category }}"
+    data-price="{{ variant.price }}"
+    data-stock="{{ variant.stock }}"
+    data-image="{% if variant.product.image %}{{ variant.product.image.url }}{% endif %}"
+>
+
+    <!-- Product Image -->
+
+    <div class="product-image">
+
+        {% if variant.product.image %}
+
+            <img
+                src="{{ variant.product.image.url }}"
+                alt="{{ variant.product.name }}"
+            >
+
+        {% else %}
+
+            <div class="image-placeholder">
+
+                <i class="fas fa-image"></i>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Product Details -->
+
+    <div class="product-body">
+
+        <h3>
+
+            {{ variant.product.name }}
+
+        </h3>
+
+        <div class="product-meta">
+
+            <span>
+
+                <i class="fas fa-tag"></i>
+
+                {{ variant.product.brand }}
+
+            </span>
+
+            <span>
+
+                <i class="fas fa-folder"></i>
+
+                {{ variant.product.category }}
+
+            </span>
+
+        </div>
+
+        <div class="sku">
+
+            SKU:
+            <strong>{{ variant.sku }}</strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <div class="product-footer">
+
+        <div class="price-block">
+
+            <small>
+
+                Current Price
+
+            </small>
+
+            <h4>
+
+                KSh {{ variant.price }}
+
+            </h4>
+
+        </div>
+
+        {% if variant.stock > 10 %}
+
+            <span class="badge badge-success">
+
+                {{ variant.stock }} In Stock
+
+            </span>
+
+        {% elif variant.stock > 0 %}
+
+            <span class="badge badge-warning">
+
+                Only {{ variant.stock }} Left
+
+            </span>
+
+        {% else %}
+
+            <span class="badge badge-danger">
+
+                Out of Stock
+
+            </span>
+
+        {% endif %}
+
+    </div>
+
+
+    <button
+        type="button"
+        class="select-product-btn"
+    >
+
+        <i class="fas fa-check-circle"></i>
+
+        Select Product
+
+    </button>
+
+</div>
+
+{% empty %}
+
+<div class="empty-products">
+
+    <i class="fas fa-box-open"></i>
+
+    <h3>
+
+        No Products Found
+
+    </h3>
+
+    <p>
+
+        Add products before creating deals.
+
+    </p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+<!-- ===================================== -->
+<!-- RIGHT COLUMN -->
+<!-- ===================================== -->
+
+<div class="deal-sidebar">
+
+    <div class="panel sticky-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+
+                    Deal Details
+
+                </h2>
+
+                <p>
+
+                    Configure the selected product's promotion.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="panel-body">
+
+            <form
+                method="POST"
+                id="dealForm"
+            >
+
+                {% csrf_token %}
+
+                <!-- Selected Product ID -->
+
+                <input
+                    type="hidden"
+                    name="product"
+                    id="selectedProduct"
+                >
+
+                <!-- ============================== -->
+                <!-- PRODUCT PREVIEW -->
+                <!-- ============================== -->
+
+                <div class="selected-product">
+
+                    <div class="selected-image">
+
+                        <img
+                            id="previewImage"
+                            src=""
+                            alt=""
+                        >
+
+                        <div
+                            id="previewPlaceholder"
+                            class="placeholder"
+                        >
+
+                            <i class="fas fa-box-open"></i>
+
+                        </div>
+
+                    </div>
+
+                    <h3 id="previewName">
+
+                        No Product Selected
+
+                    </h3>
+
+                    <p id="previewBrand">
+
+                        Select a product from the left.
+
+                    </p>
+
+                </div>
+
+                <!-- ============================== -->
+                <!-- ORIGINAL PRICE -->
+                <!-- ============================== -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Original Price
+
+                    </label>
+
+                    <div class="input-icon">
+
+                        <span>
+
+                            KSh
+
+                        </span>
+
+                        <input
+                            id="oldPrice"
+                            type="text"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- ============================== -->
+                <!-- NEW PRICE -->
+                <!-- ============================== -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Deal Price
+
+                    </label>
+
+                    <div class="input-icon">
+
+                        <span>
+
+                            KSh
+
+                        </span>
+
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            id="newPrice"
+                            name="new_price"
+                            placeholder="Enter discounted price"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- ============================== -->
+                <!-- START DATE -->
+                <!-- ============================== -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Starts On
+
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        name="start_date"
+                        required
+                    >
+
+                </div>
+
+                <!-- ============================== -->
+                <!-- END DATE -->
+                <!-- ============================== -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Ends On
+
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        name="end_date"
+                        required
+                    >
+
+                </div>
+
+                <!-- ============================== -->
+                <!-- DEAL SUMMARY -->
+                <!-- ============================== -->
+
+                <div class="deal-summary">
+
+                    <div class="summary-item">
+
+                        <span>
+
+                            Original
+
+                        </span>
+
+                        <strong id="summaryOld">
+
+                            —
+
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span>
+
+                            Deal Price
+
+                        </span>
+
+                        <strong id="summaryNew">
+
+                            —
+
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span>
+
+                            You Save
+
+                        </span>
+
+                        <strong id="saving">
+
+                            KSh 0
+
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span>
+
+                            Discount
+
+                        </span>
+
+                        <strong id="percent">
+
+                            0%
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <!-- ============================== -->
+                <!-- ACTION -->
+                <!-- ============================== -->
+
+                <button
+                    type="submit"
+                    id="createDealBtn"
+                    class="btn-create-deal"
+                    disabled
+                >
+
+                    <i class="fas fa-bolt"></i>
+
+                    Create Deal
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+<style>/* ===========================================================
+   SMARTCOMPUTERSKE
+   PRODUCT DEALS
+   =========================================================== */
+
+:root{
+
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --primary-light:#eff6ff;
+
+    --success:#16a34a;
+    --warning:#d97706;
+    --danger:#dc2626;
+
+    --text:#0f172a;
+    --text-light:#64748b;
+
+    --border:#e2e8f0;
+
+    --background:#f8fafc;
+
+    --white:#ffffff;
+
+    --radius:16px;
+
+    --shadow:
+        0 2px 8px rgba(15,23,42,.04),
+        0 12px 30px rgba(15,23,42,.08);
+
+}
+
+
+/* ========================= */
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+
+body{
+
+    background:var(--background);
+
+}
+
+
+/* ========================= */
+
+.deal-page{
+
+    padding:30px;
+
+}
+
+
+/* ========================= */
+
+.deal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+    gap:20px;
+
+}
+
+
+.deal-header h1{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:var(--text);
+
+}
+
+
+.deal-header p{
+
+    color:var(--text-light);
+
+    margin-top:6px;
+
+}
+
+
+/* ========================= */
+
+.btn-back{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    text-decoration:none;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    background:white;
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+    transition:.25s;
+
+    font-weight:600;
+
+}
+
+
+.btn-back:hover{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+
+/* ========================= */
+
+.deal-grid{
+
+    display:grid;
+
+    grid-template-columns:2fr 420px;
+
+    gap:30px;
+
+}
+
+
+/* ========================= */
+
+.panel{
+
+    background:white;
+
+    border-radius:18px;
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+
+}
+
+
+/* ========================= */
+
+.panel-header{
+
+    padding:25px;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+
+.panel-header h2{
+
+    font-size:22px;
+
+    color:var(--text);
+
+}
+
+
+.panel-header p{
+
+    margin-top:5px;
+
+    color:var(--text-light);
+
+}
+
+
+/* ========================= */
+
+.panel-body{
+
+    padding:25px;
+
+}
+
+
+/* ========================= */
+
+.sticky-panel{
+
+    position:sticky;
+
+    top:20px;
+
+}/* ===========================================================
+   SEARCH
+   =========================================================== */
+
+.search-box{
+
+    position:relative;
+
+    margin-top:20px;
+
+}
+
+.search-box i{
+
+    position:absolute;
+
+    left:16px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:var(--text-light);
+
+    font-size:15px;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    height:48px;
+
+    padding:0 18px 0 46px;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.25s;
+
+    background:white;
+
+}
+
+.search-box input:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
+
+}
+
+
+
+/* ===========================================================
+   PRODUCT GRID
+   =========================================================== */
+
+.product-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+
+    gap:20px;
+
+    padding:25px;
+
+}
+
+
+
+/* ===========================================================
+   PRODUCT CARD
+   =========================================================== */
+
+.product-card{
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    transition:.30s;
+
+    display:flex;
+
+    flex-direction:column;
+
+    cursor:pointer;
+
+    position:relative;
+
+}
+
+.product-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:
+
+        0 15px 35px rgba(0,0,0,.08);
+
+}
+
+.product-card.active{
+
+    border:2px solid var(--primary);
+
+    box-shadow:
+
+        0 0 0 4px rgba(37,99,235,.10);
+
+}
+
+
+
+/* ===========================================================
+   IMAGE
+   =========================================================== */
+
+.product-image{
+
+    height:210px;
+
+    background:#f8fafc;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.product-image img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:contain;
+
+    padding:15px;
+
+}
+
+.image-placeholder{
+
+    font-size:55px;
+
+    color:#cbd5e1;
+
+}
+
+
+
+/* ===========================================================
+   BODY
+   =========================================================== */
+
+.product-body{
+
+    padding:18px;
+
+    flex:1;
+
+}
+
+.product-body h3{
+
+    font-size:18px;
+
+    color:var(--text);
+
+    margin-bottom:12px;
+
+    line-height:1.4;
+
+}
+
+
+
+/* ===========================================================
+   META
+   =========================================================== */
+
+.product-meta{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-bottom:12px;
+
+}
+
+.product-meta span{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    font-size:13px;
+
+    color:var(--text-light);
+
+}
+
+.product-meta i{
+
+    color:var(--primary);
+
+}
+
+
+
+/* ===========================================================
+   SKU
+   =========================================================== */
+
+.sku{
+
+    font-size:13px;
+
+    color:var(--text-light);
+
+}
+
+.sku strong{
+
+    color:var(--text);
+
+}
+
+
+
+/* ===========================================================
+   FOOTER
+   =========================================================== */
+
+.product-footer{
+
+    padding:18px;
+
+    border-top:1px solid var(--border);
+
+}
+
+.price-block small{
+
+    display:block;
+
+    color:var(--text-light);
+
+    margin-bottom:6px;
+
+}
+
+.price-block h4{
+
+    color:var(--success);
+
+    font-size:22px;
+
+}
+
+
+
+/* ===========================================================
+   BADGES
+   =========================================================== */
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-top:15px;
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.badge-success{
+
+    background:#dcfce7;
+
+    color:#15803d;
+
+}
+
+.badge-warning{
+
+    background:#fef3c7;
+
+    color:#b45309;
+
+}
+
+.badge-danger{
+
+    background:#fee2e2;
+
+    color:#b91c1c;
+
+}
+
+
+
+/* ===========================================================
+   SELECT BUTTON
+   =========================================================== */
+
+.select-product-btn{
+
+    width:calc(100% - 36px);
+
+    margin:18px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.select-product-btn:hover{
+
+    background:var(--primary-dark);
+
+}
+
+.product-card.active .select-product-btn{
+
+    background:var(--success);
+
+}
+
+
+
+/* ===========================================================
+   EMPTY STATE
+   =========================================================== */
+
+.empty-products{
+
+    grid-column:1/-1;
+
+    text-align:center;
+
+    padding:70px 30px;
+
+}
+
+.empty-products i{
+
+    font-size:70px;
+
+    color:#cbd5e1;
+
+    margin-bottom:20px;
+
+}
+
+.empty-products h3{
+
+    margin-bottom:10px;
+
+    color:var(--text);
+
+}
+
+.empty-products p{
+
+    color:var(--text-light);
+
+}/* ===========================================================
+   SELECTED PRODUCT
+   =========================================================== */
+
+.selected-product{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+.selected-image{
+
+    width:180px;
+
+    height:180px;
+
+    margin:0 auto 20px;
+
+    border-radius:18px;
+
+    background:#f8fafc;
+
+    border:1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    overflow:hidden;
+
+}
+
+.selected-image img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:contain;
+
+    display:none;
+
+    padding:15px;
+
+}
+
+.placeholder{
+
+    font-size:70px;
+
+    color:#cbd5e1;
+
+}
+
+.selected-product h3{
+
+    font-size:22px;
+
+    color:var(--text);
+
+    margin-bottom:8px;
+
+}
+
+.selected-product p{
+
+    color:var(--text-light);
+
+}
+
+
+
+/* ===========================================================
+   FORM
+   =========================================================== */
+
+.form-group{
+
+    margin-bottom:22px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+    color:var(--text);
+
+}
+
+.form-group input{
+
+    width:100%;
+
+    height:48px;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:0 14px;
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.25s;
+
+    background:white;
+
+}
+
+.form-group input:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
+
+}
+
+.form-group input[readonly]{
+
+    background:#f8fafc;
+
+    color:#475569;
+
+    cursor:not-allowed;
+
+}
+
+
+
+/* ===========================================================
+   INPUT WITH PREFIX
+   =========================================================== */
+
+.input-icon{
+
+    display:flex;
+
+    align-items:center;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    background:white;
+
+}
+
+.input-icon span{
+
+    width:70px;
+
+    background:#f1f5f9;
+
+    border-right:1px solid var(--border);
+
+    text-align:center;
+
+    font-weight:700;
+
+    color:#475569;
+
+}
+
+.input-icon input{
+
+    border:none;
+
+    flex:1;
+
+    box-shadow:none !important;
+
+}
+
+
+
+/* ===========================================================
+   SUMMARY
+   =========================================================== */
+
+.deal-summary{
+
+    background:#f8fafc;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    margin:30px 0;
+
+}
+
+.summary-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px 0;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.summary-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.summary-item span{
+
+    color:var(--text-light);
+
+}
+
+.summary-item strong{
+
+    font-size:17px;
+
+    color:var(--text);
+
+}
+
+
+
+/* ===========================================================
+   BUTTON
+   =========================================================== */
+
+.btn-create-deal{
+
+    width:100%;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.btn-create-deal:hover:not(:disabled){
+
+    background:var(--primary-dark);
+
+    transform:translateY(-2px);
+
+}
+
+.btn-create-deal:disabled{
+
+    background:#cbd5e1;
+
+    cursor:not-allowed;
+
+}
+
+
+
+/* ===========================================================
+   RESPONSIVE
+   =========================================================== */
+
+@media (max-width:1200px){
+
+.deal-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.sticky-panel{
+
+    position:relative;
+
+    top:0;
+
+}
+
+}
+
+
+
+@media (max-width:768px){
+
+.deal-page{
+
+    padding:18px;
+
+}
+
+.deal-header{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.deal-header h1{
+
+    font-size:24px;
+
+}
+
+.product-grid{
+
+    grid-template-columns:1fr;
+
+    padding:18px;
+
+}
+
+.selected-image{
+
+    width:140px;
+
+    height:140px;
+
+}
+
+.panel-header{
+
+    padding:18px;
+
+}
+
+.panel-body{
+
+    padding:18px;
+
+}
+
+.btn-back{
+
+    width:100%;
+
+    justify-content:center;
+
+}
+
+}
+
+
+
+@media (max-width:480px){
+
+.product-image{
+
+    height:170px;
+
+}
+
+.product-body h3{
+
+    font-size:16px;
+
+}
+
+.price-block h4{
+
+    font-size:18px;
+
+}
+
+.summary-item{
+
+    font-size:14px;
+
+}
+
+.summary-item strong{
+
+    font-size:15px;
+
+}
+
+.btn-create-deal{
+
+    height:50px;
+
+    font-size:15px;
+
+}
+
+}</style>
+<script>"use strict";
+
+/* ==========================================================
+   PRODUCT DEALS
+========================================================== */
+
+const cards = document.querySelectorAll(".product-card");
+
+const selectedProduct = document.getElementById("selectedProduct");
+
+const previewImage = document.getElementById("previewImage");
+
+const previewPlaceholder = document.getElementById("previewPlaceholder");
+
+const previewName = document.getElementById("previewName");
+
+const previewBrand = document.getElementById("previewBrand");
+
+const oldPrice = document.getElementById("oldPrice");
+
+const newPrice = document.getElementById("newPrice");
+
+const summaryOld = document.getElementById("summaryOld");
+
+const summaryNew = document.getElementById("summaryNew");
+
+const saving = document.getElementById("saving");
+
+const percent = document.getElementById("percent");
+
+const createButton = document.getElementById("createDealBtn");
+
+
+let currentPrice = 0;
+
+
+/* ========================================= */
+
+cards.forEach(function(card){
+
+    card.addEventListener("click",function(){
+
+        cards.forEach(function(item){
+
+            item.classList.remove("active");
+
+        });
+
+        card.classList.add("active");
+
+        selectedProduct.value = card.dataset.id;
+
+        currentPrice = parseFloat(card.dataset.price);
+
+        oldPrice.value = currentPrice.toLocaleString();
+
+        summaryOld.innerHTML =
+            "KSh " + currentPrice.toLocaleString();
+
+        previewName.innerHTML =
+            card.dataset.name;
+
+        previewBrand.innerHTML =
+            card.dataset.brand +
+            " • " +
+            card.dataset.category;
+
+        if(card.dataset.image){
+
+            previewImage.src =
+                card.dataset.image;
+
+            previewImage.style.display="block";
+
+            previewPlaceholder.style.display="none";
+
+        }else{
+
+            previewImage.style.display="none";
+
+            previewPlaceholder.style.display="flex";
+
+        }
+
+        calculate();
+
+    });
+
+})/* ==========================================================
+   LIVE SAVINGS CALCULATION
+========================================================== */
+
+function calculate() {
+
+    if (!currentPrice) {
+
+        summaryNew.textContent = "—";
+        saving.textContent = "KSh 0";
+        percent.textContent = "0%";
+
+        createButton.disabled = true;
+
+        return;
+
+    }
+
+    let dealPrice = parseFloat(newPrice.value);
+
+    if (isNaN(dealPrice)) {
+
+        summaryNew.textContent = "—";
+        saving.textContent = "KSh 0";
+        percent.textContent = "0%";
+
+        createButton.disabled = true;
+
+        return;
+
+    }
+
+    /* Prevent invalid prices */
+
+    if (dealPrice <= 0) {
+
+        newPrice.setCustomValidity(
+            "Price must be greater than zero."
+        );
+
+        createButton.disabled = true;
+
+        return;
+
+    }
+
+    if (dealPrice >= currentPrice) {
+
+        newPrice.setCustomValidity(
+            "Deal price must be lower than the original price."
+        );
+
+        summaryNew.textContent =
+            "KSh " + dealPrice.toLocaleString();
+
+        saving.textContent = "KSh 0";
+
+        percent.textContent = "0%";
+
+        createButton.disabled = true;
+
+        return;
+
+    }
+
+    newPrice.setCustomValidity("");
+
+    let saved = currentPrice - dealPrice;
+
+    let discount = (saved / currentPrice) * 100;
+
+    summaryNew.textContent =
+        "KSh " + dealPrice.toLocaleString();
+
+    saving.textContent =
+        "KSh " + saved.toLocaleString(undefined,{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
+
+    percent.textContent =
+        discount.toFixed(1) + "%";
+
+    createButton.disabled = false;
+
+}
+
+
+/* ========================================= */
+
+newPrice.addEventListener(
+    "input",
+    calculate
+);
+
+
+
+/* ==========================================================
+   LIVE SEARCH
+========================================================== */
+
+const searchInput =
+document.getElementById("productSearch");
+
+searchInput.addEventListener("input", function () {
+
+    let keyword =
+        this.value.toLowerCase().trim();
+
+    cards.forEach(function(card){
+
+        let searchable = (
+
+            card.dataset.name +
+
+            " " +
+
+            card.dataset.brand +
+
+            " " +
+
+            card.dataset.category
+
+        ).toLowerCase();
+
+        if(searchable.includes(keyword)){
+
+            card.style.display="flex";
+
+        }
+
+        else{
+
+            card.style.display="none";
+
+        }
+
+    });
+
+});
+
+
+
+/* ==========================================================
+   BUTTON LOADING STATE
+========================================================== */
+
+document
+.getElementById("dealForm")
+.addEventListener("submit",function(e){
+
+    if(createButton.disabled){
+
+        e.preventDefault();
+
+        return;
+
+    }
+
+    createButton.disabled=true;
+
+    createButton.innerHTML=`
+
+        <i class="fas fa-spinner fa-spin"></i>
+
+        Creating Deal...
+
+    `;
+
+});;
+/* ==========================================================
+   MODULE 3
+   Premium UX
+========================================================== */
+
+/* ---------- Elements ---------- */
+
+const startDate = document.querySelector('input[name="start_date"]');
+
+const endDate = document.querySelector('input[name="end_date"]');
+
+const dealDuration = document.getElementById("dealDuration");
+
+const today = new Date();
+
+/* ==========================================================
+   DEFAULT DATES
+========================================================== */
+
+function pad(number){
+
+    return String(number).padStart(2,"0");
+
+}
+
+function toDateTimeLocal(date){
+
+    return date.getFullYear()+"-"+
+
+    pad(date.getMonth()+1)+"-"+
+
+    pad(date.getDate())+"T"+
+
+    pad(date.getHours())+":"+
+
+    pad(date.getMinutes());
+
+}
+
+/* Current time */
+
+if(startDate){
+
+    startDate.min = toDateTimeLocal(today);
+
+}
+
+/* ==========================================================
+   DEAL DURATION
+========================================================== */
+
+function updateDuration(){
+
+    if(!startDate.value || !endDate.value){
+
+        if(dealDuration){
+
+            dealDuration.innerHTML="—";
+
+        }
+
+        return;
+
+    }
+
+    let start=new Date(startDate.value);
+
+    let end=new Date(endDate.value);
+
+    if(end<=start){
+
+        endDate.setCustomValidity(
+
+            "End date must be after start date."
+
+        );
+
+        dealDuration.innerHTML="Invalid";
+
+        createButton.disabled=true;
+
+        return;
+
+    }
+
+    endDate.setCustomValidity("");
+
+    let diff=end-start;
+
+    let days=Math.floor(diff/86400000);
+
+    let hours=Math.floor((diff%86400000)/3600000);
+
+    let mins=Math.floor((diff%3600000)/60000);
+
+    dealDuration.innerHTML=
+
+        days+"d "+hours+"h "+mins+"m";
+
+    if(selectedProduct.value && newPrice.value){
+
+        createButton.disabled=false;
+
+    }
+
+}
+
+if(startDate){
+
+    startDate.addEventListener("change",updateDuration);
+
+}
+
+if(endDate){
+
+    endDate.addEventListener("change",updateDuration);
+
+}
+
+/* ==========================================================
+   SCROLL TO DETAILS ON MOBILE
+========================================================== */
+
+cards.forEach(function(card){
+
+    card.addEventListener("click",function(){
+
+        if(window.innerWidth<992){
+
+            document.querySelector(".sticky-panel")
+
+            .scrollIntoView({
+
+                behavior:"smooth",
+
+                block:"start"
+
+            });
+
+        }
+
+    });
+
+});
+
+/* ==========================================================
+   HIGHLIGHT INVALID PRICE
+========================================================== */
+
+newPrice.addEventListener("blur",function(){
+
+    let value=parseFloat(this.value);
+
+    if(!value){
+
+        return;
+
+    }
+
+    if(value>=currentPrice){
+
+        this.style.borderColor="#dc2626";
+
+        this.style.background="#fef2f2";
+
+    }
+
+    else{
+
+        this.style.borderColor="#16a34a";
+
+        this.style.background="#f0fdf4";
+
+    }
+
+});
+
+/* ==========================================================
+   RESET FORM
+========================================================== */
+
+function resetDeal(){
+
+    selectedProduct.value="";
+
+    previewImage.src="";
+
+    previewImage.style.display="none";
+
+    previewPlaceholder.style.display="flex";
+
+    previewName.innerHTML="Select Product";
+
+    previewBrand.innerHTML="";
+
+    oldPrice.value="";
+
+    newPrice.value="";
+
+    summaryOld.innerHTML="—";
+
+    summaryNew.innerHTML="—";
+
+    saving.innerHTML="KSh 0";
+
+    percent.innerHTML="0%";
+
+    currentPrice=0;
+
+    createButton.disabled=true;
+
+    cards.forEach(function(card){
+
+        card.classList.remove("active");
+
+    });
+
+}
+
+/* ==========================================================
+   KEYBOARD SHORTCUT
+========================================================== */
+
+document.addEventListener("keydown",function(e){
+
+    if(e.key==="Escape"){
+
+        resetDeal();
+
+    }
+
+});
+
+/* ==========================================================
+   AUTO FOCUS SEARCH
+========================================================== */
+
+window.addEventListener("load",function(){
+
+    if(searchInput){
+
+        searchInput.focus();
+
+    }
+
+});
+
+/* ==========================================================
+   END
+========================================================== */</script>
+{% endblock %}

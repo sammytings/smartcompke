@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  :root {
+    --paper:      #F6F4EF;
+    --surface:    #FFFFFF;
+    --ink:        #22252A;
+    --ink-muted:  #767268;
+    --line:       #E4E0D6;
+    --accent:     #146356;   /* deep teal - confirmation / success */
+    --accent-soft:#E6EFEC;
+    --gold:       #A9822F;   /* totals / emphasis */
+    --danger:     #B23B3B;
+  }
+
+  .receipt-page {
+    background: var(--paper);
+    padding: 3rem 1rem 4rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--ink);
+  }
+
+  .receipt-page * { box-sizing: border-box; }
+
+  /* ---------- Confirmation receipt card ---------- */
+  .receipt {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto 3.5rem;
+    background: var(--surface);
+    padding: 2.75rem 2.25rem 2.25rem;
+    box-shadow: 0 1px 3px rgba(34,37,42,0.06), 0 12px 32px -16px rgba(34,37,42,0.18);
+  }
+
+  /* scalloped tear-off edges, top and bottom */
+  .receipt::before,
+  .receipt::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background:
+      radial-gradient(circle at 10px 6px, var(--paper) 9px, transparent 9.5px) repeat-x;
+    background-size: 20px 20px;
+  }
+  .receipt::before { top: -6px; }
+  .receipt::after   { bottom: -6px; transform: rotate(180deg); }
+
+  .receipt-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 0.6rem;
+  }
+
+  .receipt h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 2rem;
+    text-align: center;
+    margin: 0 0 0.4rem;
+    color: var(--ink);
+  }
+
+  .receipt-sub {
+    text-align: center;
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+    margin: 0 0 1.75rem;
+  }
+
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.55rem 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+  }
+
+  .receipt-row .label { color: var(--ink-muted); }
+  .receipt-row .value { color: var(--ink); font-weight: 500; }
+
+  .receipt-divider {
+    border: none;
+    border-top: 1px dashed var(--line);
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 0.9rem;
+  }
+  .receipt-total .label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+  }
+  .receipt-total .value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .receipt-cta {
+    display: block;
+    text-align: center;
+    margin-top: 2rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 3px;
+    transition: background 0.15s ease;
+  }
+  .receipt-cta:hover { background: #0f4c42; color: #fff; }
+
+  /* ---------- Order history ---------- */
+  .orders-section {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .orders-heading {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1.1rem;
+    color: var(--ink);
+  }
+
+  .orders-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  table.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .orders-table thead th {
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    font-weight: 600;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+    background: #FBFAF7;
+  }
+
+  .orders-table tbody td {
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  .orders-table tbody tr:last-child td { border-bottom: none; }
+  .orders-table tbody tr:hover { background: #FBFAF7; }
+
+  .order-id {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .order-total {
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: right;
+  }
+
+  .status-pill {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .status-pill[data-status="pending"]    { background: #FBF3E3; color: #92660F; }
+  .status-pill[data-status="processing"] { background: #E9EEF9; color: #33528C; }
+  .status-pill[data-status="shipped"]    { background: #E9EEF9; color: #33528C; }
+  .status-pill[data-status="delivered"]  { background: var(--accent-soft); color: var(--accent); }
+  .status-pill[data-status="cancelled"]  { background: #FBE9E9; color: var(--danger); }
+
+  .order-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .order-link:hover { text-decoration: underline; }
+
+  .orders-empty {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: var(--ink-muted);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+
+  /* ---------- Mobile: cards instead of table ---------- */
+  @media (max-width: 640px) {
+    .orders-table thead { display: none; }
+    .orders-table, .orders-table tbody, .orders-table tr, .orders-table td {
+      display: block; width: 100%;
+    }
+    .orders-table tbody tr {
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .orders-table tbody td {
+      border-bottom: none;
+      padding: 0.2rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .orders-table tbody td::before {
+      content: attr(data-label);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+    .order-total { text-align: right; }
+  }
+</style>
+
+<div class="receipt-page">
+
+  <!-- Confirmation receipt -->
+  <div class="receipt">
+    <p class="receipt-eyebrow">Order confirmed</p>
+    <h2>🎉 Thank you!</h2>
+    <p class="receipt-sub">Your order has been placed successfully.</p>
+
+    <div class="receipt-row">
+      <span class="label">Order</span>
+      <span class="value">#{{ order.id }}</span>
+    </div>
+    <div class="receipt-row">
+      <span class="label">Date</span>
+      <span class="value">{{ order.created_at|date:"d M Y, H:i" }}</span>
+    </div>
+
+    <hr class="receipt-divider">
+
+    <div class="receipt-total">
+      <span class="label">Total</span>
+      <span class="value">KSh {{ order.total_amount }}</span>
+    </div>
+
+    <a href="{% url 'home' %}" class="receipt-cta">Continue Shopping</a>
+  </div>
+
+  <!-- Order history -->
+  <div class="orders-section">
+    <h3 class="orders-heading">Your Orders</h3>
+
+    {% if orders %}
+      <div class="orders-table-wrap">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th style="text-align:right;">Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+            <tr>
+              <td data-label="Order"><span class="order-id">#{{ o.id }}</span></td>
+              <td data-label="Date">{{ o.created_at|date:"d M Y" }}</td>
+              <td data-label="Status">
+                <span class="status-pill" data-status="{{ o.status|lower }}">{{ o.get_status_display }}</span>
+              </td>
+              <td data-label="Total" class="order-total">KSh {{ o.total_amount }}</td>
+              <td data-label="">
+                <a href="{% url 'order_detail' o.id %}" class="order-link">View &rarr;</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="orders-empty">
+        You haven't placed any other orders yet.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+{% endblock %}

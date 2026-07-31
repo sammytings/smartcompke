@@ -1,0 +1,155 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid">
+
+    <div class="card stat-card">
+
+        <div>
+
+            <span>Total Products</span>
+
+            <h2>{{ products }}</h2>
+
+        </div>
+
+        <i class="fas fa-box"></i>
+
+    </div>
+
+    <div class="card stat-card">
+
+        <div>
+
+            <span>Total Orders</span>
+
+            <h2>{{ orders }}</h2>
+
+        </div>
+
+        <i class="fas fa-shopping-cart"></i>
+
+    </div>
+
+    <div class="card stat-card">
+
+        <div>
+
+            <span>Customers</span>
+
+            <h2>{{ customers }}</h2>
+
+        </div>
+
+        <i class="fas fa-users"></i>
+
+    </div>
+
+    <div class="card stat-card">
+
+        <div>
+
+            <span>Categories</span>
+
+            <h2>{{ categories }}</h2>
+
+        </div>
+
+        <i class="fas fa-layer-group"></i>
+
+    </div>
+
+</div>
+
+<div class="content-grid">
+
+    <div class="card">
+
+        <h3>Sales Overview</h3>
+
+        <canvas id="salesChart"></canvas>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Revenue</h3>
+
+        <canvas id="revenueChart"></canvas>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="table-header">
+
+        <h3>Recent Orders</h3>
+
+        <a href="#">View All</a>
+
+    </div>
+
+    <table>
+
+        <thead>
+
+        <tr>
+
+            <th>Order</th>
+
+            <th>Customer</th>
+
+            <th>Status</th>
+
+            <th>Total</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for order in recent_orders %}
+
+        <tr>
+
+            <td>{{ order.order_id }}</td>
+
+            <td>{{ order.full_name }}</td>
+
+            <td>{{ order.status }}</td>
+
+            <td>KSh {{ order.total_amount }}</td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="4">
+
+                No Orders Yet
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

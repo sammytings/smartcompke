@@ -1,0 +1,175 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}
+
+Specifications
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="d-flex justify-content-between mb-4">
+
+<h2>
+
+{{ product.name }}
+
+</h2>
+
+<a
+
+href="{% url 'dashboard_edit_product' product.id %}"
+
+class="btn btn-secondary">
+
+Back
+
+</a>
+
+</div>
+
+<div class="row">
+
+<div class="col-lg-4">
+
+<div class="card shadow-sm">
+
+<div class="card-header">
+
+<h5>
+
+Add Specification
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>
+
+Specification
+
+</label>
+
+{{ form.specification }}
+
+<br><br>
+
+<label>
+
+Value
+
+</label>
+
+{{ form.value }}
+
+<br><br>
+
+<button class="btn btn-primary w-100">
+
+Add
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-8">
+
+<div class="card shadow-sm">
+
+<div class="card-header">
+
+<h5>
+
+Current Specifications
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-hover">
+
+<thead>
+
+<tr>
+
+<th>
+
+Specification
+
+</th>
+
+<th>
+
+Value
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in specifications %}
+
+<tr>
+
+<td>
+
+{{ item.specification.name }}
+
+</td>
+
+<td>
+
+{{ item.value }}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="2">
+
+No specifications.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
