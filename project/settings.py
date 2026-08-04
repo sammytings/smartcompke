@@ -173,6 +173,7 @@ LOGGING["loggers"] = {
 
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = "login"

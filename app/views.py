@@ -1397,6 +1397,7 @@ def new_password(request):
 
     return render(request, "accounts/new_password.html")
 
+from .models import UserProfile
 
 @csrf_exempt
 def google_one_tap(request):
@@ -1421,11 +1422,21 @@ def google_one_tap(request):
 
         first_name = google_user.get("given_name", "")
         last_name = google_user.get("family_name", "")
+        picture = google_user.get("picture", "")
 
         user, created = User.objects.get_or_create(
             email=email,
             defaults={"username": email, "first_name": first_name, "last_name": last_name},
         )
+
+        if created:
+            user.set_unusable_password()
+            user.save()
+
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        if picture and profile.google_picture != picture:
+            profile.google_picture = picture
+            profile.save()
 
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
