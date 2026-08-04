@@ -1326,7 +1326,7 @@ body.sidebar-open{overflow:hidden;}
 .newsletter h3{color:#fff;font-size:21px;margin-bottom:6px;}
 .newsletter p{color:#93A0B8;font-size:13px;font-weight:500;letter-spacing:.005em;margin:0;line-height:1.6;max-width:400px;}
 
-.nl-form{display:flex;gap:10px;flex:0 1 420px;width:100%;max-width:420px;}
+.nl-form{display:flex;align-items:flex-start;gap:6px;flex:0 1 420px;width:100%;max-width:420px;}
 .nl-field{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;}
 .nl-form input[type="email"]{
   width:100%;height:48px;padding:0 16px;
@@ -1367,12 +1367,13 @@ body.sidebar-open{overflow:hidden;}
 }
 
 /* ============ FOOTER ============ */
-/* Thin red accent strip that opens the footer — replaces the old
-   scrolling ticker carousel. One flat rule, no animation. */
+/* Thin premium accent strip that opens the footer, sitting
+   immediately above it — one flat rule, no animation. */
 .footer-topline{
-  height:3px;
+  height:2px;
   width:100%;
-  background:linear-gradient(90deg,var(--accent-dark) 0%,var(--accent) 50%,var(--accent-dark) 100%);
+  background:linear-gradient(90deg,var(--primary-dark) 0%,var(--primary) 50%,var(--primary-dark) 100%);
+  opacity:.9;
 }
 
 footer{background:var(--navy);padding-top:52px;border-top:1px solid rgba(255,255,255,.06);}
@@ -1423,9 +1424,19 @@ footer ul li a:hover{color:#fff;}
 ================================================================ */
 .whatsapp-float{
     position:fixed;
-    right:18px;
-    bottom:24px;
+    right:20px;
+    bottom:26px;
     z-index:9998;
+    width:58px;
+    height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    cursor:pointer;
+    text-decoration:none;
+    animation:wa-enter .55s cubic-bezier(.34,1.56,.64,1) both,
+              wa-float 3.6s ease-in-out 1s infinite;
 }
 /* core gradient disc */
 .whatsapp-float::after{
@@ -1443,7 +1454,7 @@ footer ul li a:hover{color:#fff;}
   -webkit-backdrop-filter:blur(2px);
   backdrop-filter:blur(2px);
 }
-.wa-icon{position:relative;z-index:1;width:26px;height:26px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15));transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.wa-icon{position:relative;z-index:1;font-size:26px;line-height:1;color:#fff;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15));transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
 .whatsapp-float:hover .wa-icon{transform:scale(1.12) rotate(-6deg);}
 
 /* ripple pulse ring */
@@ -1501,7 +1512,7 @@ footer ul li a:hover{color:#fff;}
     bottom:calc(78px + env(safe-area-inset-bottom));
     width:52px;height:52px;
   }
-  .wa-icon{width:23px;height:23px;}
+  .wa-icon{font-size:23px;}
 }
 
 /* ============ CART DRAWER ============ */
@@ -2333,6 +2344,7 @@ label.co-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-so
 
   /* App-style bottom tab bar replaces the top header actions on mobile */
   body{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
+}
 /* ===========================
    MOBILE BOTTOM NAVIGATION
    =========================== */
@@ -2342,62 +2354,86 @@ label.co-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-so
 
 .mobile-bottom-nav{
     position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100%;
-    height:62px;
+    left:0;right:0;bottom:0;
     display:flex;
-    justify-content:space-evenly;
     align-items:stretch;
-    background:#fff;
-    border-top:1px solid #e5e7eb;
-    box-shadow:0 -4px 15px rgba(0,0,0,.08);
-    z-index:999999;
+    gap:2px;
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.92);
+    -webkit-backdrop-filter:saturate(180%) blur(14px);
+    backdrop-filter:saturate(180%) blur(14px);
+    border-top:1px solid var(--line-soft,#EEF2F7);
+    box-shadow:0 -10px 30px -18px rgba(15,23,42,.28);
+    z-index:99998;
 }
 
 .mobile-bottom-nav .mbn-item{
-    flex:1;
+    flex:1 1 0;
+    min-width:0;
     display:flex;
     flex-direction:column;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
+    gap:4px;
+    padding:8px 2px 7px;
+    min-height:56px;
+    border-radius:14px;
     text-decoration:none;
-    color:#6b7280;
-    font-size:11px;
+    color:var(--ink-soft,#475569);
+    font-family:var(--font-body,system-ui);
+    font-size:10.5px;
     font-weight:600;
-    transition:.25s;
-    cursor:pointer;
-
-    min-height:62px;
-    min-width:0;
-
+    letter-spacing:.01em;
+    line-height:1;
+    background:transparent;
+    transition:background .2s var(--ease,ease), color .2s var(--ease,ease), transform .15s var(--ease,ease);
     -webkit-tap-highlight-color:transparent;
     touch-action:manipulation;
     user-select:none;
     position:relative;
+    cursor:pointer;
 }
 
-.mobile-bottom-nav .mbn-item:hover,
+.mobile-bottom-nav .mbn-item::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%) scaleX(0);
+    width:26px;height:3px;
+    border-radius:0 0 3px 3px;
+    background:var(--primary,#1E40AF);
+    transition:transform .22s var(--ease,ease);
+}
+
+.mobile-bottom-nav .mbn-item.active::before{transform:translateX(-50%) scaleX(1);}
+
 .mobile-bottom-nav .mbn-item.active{
-    color:#2563eb;
+    color:var(--primary,#1E40AF);
+    background:var(--primary-tint,#EAF1FF);
 }
 
 .mobile-bottom-nav .mbn-item:active{
-    background:#f3f4f6;
+    transform:scale(.94);
+    background:var(--paper,#F8FAFC);
 }
 
 .mobile-bottom-nav .mbn-item i{
-    font-size:20px;
-    margin-bottom:4px;
+    font-size:19px;
     line-height:1;
     pointer-events:none;
 }
 
 .mobile-bottom-nav .mbn-item span{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
     line-height:1;
     pointer-events:none;
 }
+
+.mobile-bottom-nav .mbn-item *{pointer-events:none;}
 
 .mbn-cart-icon{
     position:relative;
@@ -3271,52 +3307,6 @@ div[id^="credential_picker"]{
 
 /* ============ MOBILE BOTTOM NAV PROFILE AVATAR ============ */
 .mbn-item img{flex-shrink:0;}
-.share-modal-overlay{position:fixed;inset:0;pointer-events:none;background:rgba(15,23,42,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:99990;}
-.share-modal-overlay.open{opacity:1;pointer-events:auto;}
-.share-modal{
-  position:fixed;left:50%;top:50%;
-  transform:translate(-50%,-46%) scale(.96);
-  width:460px;max-width:calc(100vw - 32px);
-  background:#fff;border-radius:22px;
-  box-shadow:0 40px 90px -20px rgba(15,23,42,.4);
-  padding:24px;z-index:99991;
-  opacity:0;pointer-events:none;
-  transition:opacity .3s cubic-bezier(.16,1,.3,1), transform .3s cubic-bezier(.16,1,.3,1);
-}
-.share-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
-.share-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.share-modal-head h3{font-size:16.5px;display:flex;align-items:center;gap:10px;color:var(--primary);}
-.share-modal-close{width:30px;height:30px;border-radius:50%;border:none;background:var(--paper);color:var(--muted);font-size:15px;transition:.2s;}
-.share-modal-close:hover{background:var(--accent-tint);color:var(--accent-dark);transform:rotate(90deg);}
-.share-modal-preview{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:18px;}
-.share-modal-preview img{width:52px;height:52px;object-fit:cover;border-radius:8px;background:#fff;border:1px solid var(--line);}
-.share-modal-title{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;}
-.share-modal-url{font-size:11px;color:var(--muted);margin-top:2px;word-break:break-all;}
-.share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.share-chip{
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  padding:14px 6px;border-radius:14px;border:1px solid var(--line);
-  background:#fff;color:var(--ink-soft);font-size:11px;font-weight:700;
-  cursor:pointer;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,border-color .18s ease;
-}
-.share-chip:hover{transform:translateY(-3px);box-shadow:0 10px 20px -8px rgba(15,23,42,.2);}
-.share-chip i{font-size:19px;}
-.share-chip.sc-whatsapp i{color:#25D366;}
-.share-chip.sc-facebook i{color:#1877F2;}
-.share-chip.sc-x i{color:#000;}
-.share-chip.sc-linkedin i{color:#0A66C2;}
-.share-chip.sc-telegram i{color:#26A5E4;}
-.share-chip.sc-email i{color:var(--accent);}
-.share-chip.sc-pinterest i{color:#E60023;}
-.share-chip.sc-copy i{color:var(--primary);}
-.share-chip.sc-copy.copied{background:var(--success-tint);border-color:var(--success);color:var(--success);}
-.share-native-btn{
-  width:100%;margin-top:16px;padding:13px;border:1.5px solid var(--primary);border-radius:12px;
-  background:var(--primary-tint);color:var(--primary);font-weight:700;font-size:13.5px;
-  display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;
-}
-.share-native-btn:hover{background:var(--primary);color:#fff;}
-@media(max-width:480px){.share-grid{grid-template-columns:repeat(3,1fr);}}
 </style>
 
 <!-- ============================================================
@@ -3553,7 +3543,7 @@ div[id^="credential_picker"]{
   </div>
 </section>
 
-<!-- ============ FOOTER TOP REDLINE (replaces the old ticker carousel) ============ -->
+<!-- ============ FOOTER TOP ACCENT LINE (sits immediately above the footer only) ============ -->
 <div class="footer-topline" role="presentation" aria-hidden="true"></div>
 
 <footer>
@@ -3644,10 +3634,10 @@ div[id^="credential_picker"]{
    class="whatsapp-float"
    target="_blank"
    rel="noopener noreferrer"
-   aria-label="Chat on WhatsApp">
-
-    <i class="fab fa-whatsapp"></i>
-
+   aria-label="Chat with us on WhatsApp">
+    <span class="wa-ripple" aria-hidden="true"></span>
+    <i class="fab fa-whatsapp wa-icon" aria-hidden="true"></i>
+    <span class="wa-badge" aria-hidden="true">1</span>
 </a>
 
 <div class="cart-overlay" id="cartOverlay"></div>
@@ -3840,22 +3830,22 @@ div[id^="credential_picker"]{
 </aside>
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
 
-    <a href="{% url 'home' %}" class="mbn-item">
+    <a href="{% url 'home' %}" class="mbn-item" title="Home">
         <i class="fas fa-house"></i>
         <span>Home</span>
     </a>
 
-    <a href="{% url 'shop' %}" class="mbn-item">
+    <a href="{% url 'shop' %}" class="mbn-item" title="Shop">
         <i class="fas fa-store"></i>
         <span>Shop</span>
     </a>
 
-    <a href="{% url 'brands' %}" class="mbn-item">
+    <a href="{% url 'brands' %}" class="mbn-item" title="Brands">
         <i class="fas fa-tags"></i>
         <span>Brands</span>
     </a>
 
-    <a href="{% url 'cart' %}" class="mbn-item">
+    <a href="{% url 'cart' %}" class="mbn-item" title="Cart">
         <span class="mbn-cart-icon">
             <i class="fas fa-cart-shopping"></i>
             <span class="mbn-badge">{{ cart_count|default:"0" }}</span>
@@ -3863,18 +3853,30 @@ div[id^="credential_picker"]{
         <span>Cart</span>
     </a>
 
-    <a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}" class="mbn-item">
+    <a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}" class="mbn-item" title="Profile">
 
         {% if user.is_authenticated %}
             {% with user.socialaccount_set.first as social %}
                 {% if social and social.extra_data.picture %}
-                    <img src="{{ social.extra_data.picture }}" class="mbn-avatar-img">
+                    <img
+                        src="{{ social.extra_data.picture }}"
+                        class="mbn-avatar-img"
+                        alt="{{ user.first_name|default:user.username }}"
+                        referrerpolicy="no-referrer"
+                        onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'mbn-avatar-circle',textContent:'{{ user.first_name|first|default:user.username|first|escapejs }}'}));">
+                {% elif user.userprofile.google_picture %}
+                    <img
+                        src="{{ user.userprofile.google_picture }}"
+                        class="mbn-avatar-img"
+                        alt="{{ user.first_name|default:user.username }}"
+                        referrerpolicy="no-referrer"
+                        onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'mbn-avatar-circle',textContent:'{{ user.first_name|first|default:user.username|first|escapejs }}'}));">
                 {% else %}
-                    <i class="fas fa-user-circle"></i>
+                    <div class="mbn-avatar-circle">{{ user.first_name|first|default:user.username|first }}</div>
                 {% endif %}
             {% endwith %}
         {% else %}
-            <i class="fas fa-user-circle"></i>
+            <i class="fas fa-user-circle mbn-guest-icon"></i>
         {% endif %}
 
         <span>Profile</span>
@@ -3882,34 +3884,24 @@ div[id^="credential_picker"]{
     </a>
 
 </nav>
+
+<script>
+/* Mobile bottom nav: highlight the tab for the page you're on. The whole
+   tile (icon + label) is a single anchor, so any tap navigates. */
+(function () {
+  var nav = document.getElementById('mobileBottomNav');
+  if (!nav) return;
+  var here = location.pathname.replace(/\/+$/, '') || '/';
+  var best = null, bestLen = -1;
+  nav.querySelectorAll('.mbn-item').forEach(function (item) {
+    var path = (item.getAttribute('href') || '').split('?')[0].replace(/\/+$/, '') || '/';
+    var match = path === '/' ? here === '/' : here === path || here.indexOf(path + '/') === 0;
+    if (match && path.length > bestLen) { best = item; bestLen = path.length; }
+  });
+  if (best) best.classList.add('active');
+})();
+</script>
 <!-- Cookie consent removed -->
-<div class="share-modal-overlay" id="shareModalOverlay"></div>
-<div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-label="Share this product">
-  <div class="share-modal-head">
-    <h3><i class="fas fa-share-nodes"></i> Share this product</h3>
-    <button type="button" class="share-modal-close" id="shareModalClose" aria-label="Close">×</button>
-  </div>
-  <div class="share-modal-preview" id="shareModalPreview">
-    <img id="shareModalImg" src="" alt="">
-    <div>
-      <div class="share-modal-title" id="shareModalTitle"></div>
-      <div class="share-modal-url" id="shareModalUrlText"></div>
-    </div>
-  </div>
-  <div class="share-grid">
-    <a class="share-chip sc-whatsapp" id="shareWhatsapp" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-    <a class="share-chip sc-facebook" id="shareFacebook" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
-    <a class="share-chip sc-x" id="shareX" target="_blank" rel="noopener"><i class="fab fa-x-twitter"></i><span>X</span></a>
-    <a class="share-chip sc-linkedin" id="shareLinkedin" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i><span>LinkedIn</span></a>
-    <a class="share-chip sc-telegram" id="shareTelegram" target="_blank" rel="noopener"><i class="fab fa-telegram"></i><span>Telegram</span></a>
-    <a class="share-chip sc-email" id="shareEmail"><i class="fas fa-envelope"></i><span>Email</span></a>
-    <a class="share-chip sc-pinterest" id="sharePinterest" target="_blank" rel="noopener"><i class="fab fa-pinterest-p"></i><span>Pinterest</span></a>
-    <button type="button" class="share-chip sc-copy" id="shareCopyLink"><i class="fas fa-link"></i><span>Copy Link</span></button>
-  </div>
-  <button type="button" class="share-native-btn" id="shareNativeBtn" style="display:none;">
-    <i class="fas fa-arrow-up-from-bracket"></i> Share via device
-  </button>
-</div>
 
 <script>
   window.IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
@@ -4488,161 +4480,6 @@ div[id^="credential_picker"]{
   });
 })();
 
-/* ============================================================
-   PREMIUM SHARE PRODUCT MODAL
-   Global helper: openShareModal({title, url, image}) — call this
-   from any "Share" button on any page (e.g. the product detail
-   page) to populate and open the modal below. Falls back to the
-   current page's own title/URL/og:image if no data is passed, so a
-   generic .share-trigger button works with zero extra markup.
-   ============================================================ */
-(function () {
-  const overlay = document.getElementById('shareModalOverlay');
-  const modal = document.getElementById('shareModal');
-  const closeBtn = document.getElementById('shareModalClose');
-  if (!overlay || !modal) return;
-
-  const imgEl = document.getElementById('shareModalImg');
-  const titleEl = document.getElementById('shareModalTitle');
-  const urlTextEl = document.getElementById('shareModalUrlText');
-  const previewEl = document.getElementById('shareModalPreview');
-
-  const linkWhatsapp = document.getElementById('shareWhatsapp');
-  const linkFacebook = document.getElementById('shareFacebook');
-  const linkX = document.getElementById('shareX');
-  const linkLinkedin = document.getElementById('shareLinkedin');
-  const linkTelegram = document.getElementById('shareTelegram');
-  const linkEmail = document.getElementById('shareEmail');
-  const linkPinterest = document.getElementById('sharePinterest');
-  const copyBtn = document.getElementById('shareCopyLink');
-  const nativeBtn = document.getElementById('shareNativeBtn');
-
-  let currentShare = { title: '', url: '', image: '' };
-
-  function metaContent(selector) {
-    const el = document.querySelector(selector);
-    return el ? (el.getAttribute('content') || '') : '';
-  }
-
-  function openShareModal(data) {
-    data = data || {};
-    currentShare = {
-      title: data.title || document.title || '',
-      url: data.url || window.location.href,
-      image: data.image || metaContent('meta[property="og:image"]') || '',
-    };
-
-    if (titleEl) titleEl.textContent = currentShare.title;
-    if (urlTextEl) urlTextEl.textContent = currentShare.url;
-    if (imgEl) {
-      if (currentShare.image) {
-        imgEl.src = currentShare.image;
-        imgEl.style.display = '';
-      } else {
-        imgEl.style.display = 'none';
-      }
-    }
-    if (previewEl) previewEl.style.display = currentShare.title || currentShare.image ? 'flex' : 'none';
-
-    const encodedUrl = encodeURIComponent(currentShare.url);
-    const encodedTitle = encodeURIComponent(currentShare.title);
-
-    if (linkWhatsapp) linkWhatsapp.href = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
-    if (linkFacebook) linkFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-    if (linkX) linkX.href = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
-    if (linkLinkedin) linkLinkedin.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
-    if (linkTelegram) linkTelegram.href = `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
-    if (linkEmail) linkEmail.href = `mailto:?subject=${encodedTitle}&body=${encodeURIComponent(currentShare.title + '\n\n' + currentShare.url)}`;
-    if (linkPinterest) {
-      const media = currentShare.image ? encodeURIComponent(currentShare.image) : '';
-      linkPinterest.href = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${media}&description=${encodedTitle}`;
-    }
-
-    if (nativeBtn) {
-      nativeBtn.style.display = (navigator.share) ? 'flex' : 'none';
-    }
-
-    overlay.classList.add('open');
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-  }
-
-  function closeShareModal() {
-    overlay.classList.remove('open');
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden', 'true');
-  }
-
-  window.openShareModal = openShareModal;
-  window.closeShareModal = closeShareModal;
-
-  if (closeBtn) closeBtn.addEventListener('click', closeShareModal);
-  overlay.addEventListener('click', closeShareModal);
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && modal.classList.contains('open')) closeShareModal();
-  });
-
-  // Any element anywhere on the site with class="share-trigger" (and
-  // optional data-share-title / data-share-url / data-share-image
-  // attributes) opens this modal — no extra JS needed on other pages.
-  document.addEventListener('click', function (e) {
-    const trigger = e.target.closest('.share-trigger, [data-share-trigger]');
-    if (!trigger) return;
-    e.preventDefault();
-    openShareModal({
-      title: trigger.getAttribute('data-share-title') || undefined,
-      url: trigger.getAttribute('data-share-url') || undefined,
-      image: trigger.getAttribute('data-share-image') || undefined,
-    });
-  });
-
-  if (copyBtn) {
-    copyBtn.addEventListener('click', function () {
-      const text = currentShare.url || window.location.href;
-      function markCopied() {
-        copyBtn.classList.add('copied');
-        const label = copyBtn.querySelector('span');
-        const prevLabel = label ? label.textContent : null;
-        if (label) label.textContent = 'Link copied';
-        if (typeof showToast === 'function') showToast('✓ Link copied', 'success');
-        setTimeout(function () {
-          copyBtn.classList.remove('copied');
-          if (label && prevLabel) label.textContent = prevLabel;
-        }, 1800);
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(markCopied).catch(function () {
-          fallbackCopy(text);
-          markCopied();
-        });
-      } else {
-        fallbackCopy(text);
-        markCopied();
-      }
-    });
-  }
-
-  function fallbackCopy(text) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); } catch (e) { /* no-op */ }
-    document.body.removeChild(ta);
-  }
-
-  if (nativeBtn) {
-    nativeBtn.addEventListener('click', function () {
-      if (!navigator.share) return;
-      navigator.share({
-        title: currentShare.title,
-        url: currentShare.url,
-      }).catch(function () { /* user cancelled — no-op */ });
-    });
-  }
-})();
 </script>
 <script src="{% static 'js/main.js' %}"></script>
 <script src="{% static 'js/cart.js' %}"></script>

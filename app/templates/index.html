@@ -1195,11 +1195,11 @@
 {% endif %}
 </div>
           <div class="price-container">
-            {% if product.discount_price %}
+            {% if product.default_variant.discount_active %}
             <div
               class="prod-price vat-price"
-              data-inclusive="{{ product.discount_price_with_vat }}"
-              data-exclusive="{{ product.default_variant.discount_price|default:product.default_variant.price_without_vat }}">
+              data-inclusive="{{ product.default_variant.price_including_vat }}"
+              data-exclusive="{{ product.default_variant.price_excluding_vat }}">
               KSh {{ product.discount_price_with_vat|floatformat:0 }}
             </div>
             <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
@@ -1290,11 +1290,11 @@
           <div class="prod-specs" data-raw="{{ product.short_description|escapejs }}"></div>
           <div class="prod-rating"><span class="stars">★★★★★</span><span>(4.8)</span></div>
           <div class="price-container">
-            {% if product.discount_price %}
+            {% if product.default_variant.discount_active %}
             <div
               class="prod-price vat-price"
-              data-inclusive="{{ product.discount_price_with_vat }}"
-              data-exclusive="{{ product.default_variant.discount_price|default:product.default_variant.price_without_vat }}">
+              data-inclusive="{{ product.default_variant.price_including_vat }}"
+              data-exclusive="{{ product.default_variant.price_excluding_vat }}">
               KSh {{ product.discount_price_with_vat|floatformat:0 }}
             </div>
             <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
