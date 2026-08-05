@@ -1,0 +1,819 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shipping Policy | SmartComputersKE Technologies{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ==========================================================
+   SMARTCOMPUTERSKE SHIPPING POLICY
+========================================================== */
+
+:root{
+
+    --primary:#0d6efd;
+    --primary-dark:#0b5ed7;
+
+    --secondary:#dc2626;
+
+    --text:#1f2937;
+    --text-light:#64748b;
+
+    --border:#e5e7eb;
+
+    --bg:#ffffff;
+
+    --section:#fafafa;
+
+    --hover:#f8fbff;
+
+}
+
+/* ========================================================== */
+
+.lg-scope{
+
+    font-family:'Manrope',sans-serif;
+
+    background:#fff;
+
+    color:var(--text);
+
+}
+
+.lg-scope h1,
+.lg-scope h2{
+
+    font-family:'Sora',sans-serif;
+
+    color:var(--text);
+
+}
+
+.lg-scope a{
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+}
+
+.lg-scope a:hover{
+
+    text-decoration:underline;
+
+}
+
+/* ==========================================================
+HEADER
+========================================================== */
+
+.lg-topbar{
+
+    background:#fff;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.lg-topbar-inner{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    padding:18px 20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-weight:700;
+
+    font-size:18px;
+
+    color:var(--primary);
+
+}
+
+.lg-brand-mark{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:8px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+HERO
+========================================================== */
+
+.lg-hero{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    padding:40px 20px 30px;
+
+}
+
+.lg-hero h1{
+
+    font-size:32px;
+
+    margin-bottom:10px;
+
+}
+
+.lg-updated{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:var(--text-light);
+
+    font-size:14px;
+
+}
+
+/* ==========================================================
+BODY
+========================================================== */
+
+.lg-body{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    padding:0 20px 60px;
+
+}
+
+.lg-card{
+
+    background:#fff;
+
+}
+
+/* ==========================================================
+TABLE OF CONTENTS
+========================================================== */
+
+.lg-toc{
+
+    background:#fafafa;
+
+    border:1px solid var(--border);
+
+    border-radius:8px;
+
+    padding:24px;
+
+    margin-bottom:40px;
+
+}
+
+.lg-toc h4{
+
+    color:var(--primary);
+
+    margin-bottom:18px;
+
+    text-transform:uppercase;
+
+    font-size:13px;
+
+    letter-spacing:.05em;
+
+}
+
+.lg-toc ol{
+
+    columns:2;
+
+    column-gap:40px;
+
+    margin:0;
+
+    padding-left:18px;
+
+}
+
+.lg-toc li{
+
+    margin-bottom:10px;
+
+}
+
+@media(max-width:768px){
+
+.lg-toc ol{
+
+columns:1;
+
+}
+
+}
+
+/* ==========================================================
+SECTIONS
+========================================================== */
+
+.lg-section{
+
+    padding:25px 0;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.lg-section:last-child{
+
+    border-bottom:none;
+
+}
+
+.lg-section h2{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-size:22px;
+
+    margin-bottom:15px;
+
+}
+
+.lg-num{
+
+    width:30px;
+
+    height:30px;
+
+    border-radius:50%;
+
+    background:#eef4ff;
+
+    color:var(--primary);
+
+    border:1px solid #cfe0ff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+.lg-section p{
+
+    color:var(--text-light);
+
+    line-height:1.9;
+
+    margin-bottom:14px;
+
+}
+
+.lg-section ul{
+
+    padding-left:22px;
+
+}
+
+.lg-section li{
+
+    margin-bottom:10px;
+
+    color:var(--text-light);
+
+    line-height:1.8;
+
+}
+
+/* ==========================================================
+NOTICE
+========================================================== */
+
+.lg-callout{
+
+    display:flex;
+
+    gap:14px;
+
+    margin-top:20px;
+
+    background:#fff7f7;
+
+    border-left:4px solid var(--secondary);
+
+    border:1px solid #ffdada;
+
+    border-radius:6px;
+
+    padding:18px;
+
+}
+
+.lg-callout svg{
+
+    color:var(--secondary);
+
+    flex-shrink:0;
+
+}
+
+/* ==========================================================
+CONTACT
+========================================================== */
+
+.lg-contact{
+
+    font-size:15px;
+
+}
+
+.lg-contact a{
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+RESPONSIVE
+========================================================== */
+
+@media(max-width:768px){
+
+.lg-topbar-inner{
+
+font-size:16px;
+
+}
+
+.lg-hero h1{
+
+font-size:26px;
+
+}
+
+.lg-section h2{
+
+font-size:19px;
+
+}
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="lg-scope">
+
+<div class="lg-topbar">
+
+<div class="lg-topbar-inner">
+
+<span class="lg-brand-mark">
+
+{{ site_initials|default:"SC" }}
+
+</span>
+
+{{ site_name|default:"SmartComputersKE Technologies" }}
+
+</div>
+
+</div>
+
+<div class="lg-hero">
+
+<h1>Shipping Policy</h1>
+
+<div class="lg-updated">
+
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+<circle cx="12" cy="12" r="10"/>
+
+<path d="M12 6v6l4 2"/>
+
+</svg>
+
+Last updated:
+
+{{ shipping_updated_date|default:"5 August 2026" }}
+
+</div>
+
+</div>
+
+<div class="lg-body">
+
+<div class="lg-card">
+
+<div class="lg-toc">
+
+<h4>On this page</h4>
+
+<ol>
+
+<li><a href="#processing">Order Processing</a></li>
+
+<li><a href="#delivery">Delivery Areas</a></li>
+
+<li><a href="#charges">Shipping Charges</a></li>
+
+<li><a href="#timelines">Delivery Timelines</a></li>
+
+<li><a href="#tracking">Order Tracking</a></li>
+
+<li><a href="#delays">Delivery Delays</a></li>
+
+<li><a href="#inspection">Receiving Your Order</a></li>
+
+<li><a href="#international">International Shipping</a></li>
+
+<li><a href="#contact">Contact Us</a></li>
+
+</ol>
+
+</div>
+<!-- ==========================================================
+ORDER PROCESSING
+========================================================== -->
+
+<div class="lg-section" id="processing">
+
+    <h2>
+        <span class="lg-num">1</span>
+        Order Processing
+    </h2>
+
+    <p>
+        Once your order has been placed, our team will verify product
+        availability, payment status and delivery information before preparing
+        your order for dispatch.
+    </p>
+
+    <p>
+        Orders placed during normal business hours are usually processed within
+        the same business day. Orders received on weekends or public holidays
+        are processed on the next working day.
+    </p>
+
+    <p>
+        If we require additional information before processing your order, one
+        of our representatives will contact you using the phone number or email
+        address provided during checkout.
+    </p>
+
+</div>
+
+<!-- ==========================================================
+DELIVERY AREAS
+========================================================== -->
+
+<div class="lg-section" id="delivery">
+
+    <h2>
+        <span class="lg-num">2</span>
+        Delivery Areas
+    </h2>
+
+    <p>
+        SmartComputersKE delivers to customers across Kenya through our own
+        delivery team and trusted courier partners.
+    </p>
+
+    <ul>
+
+        <li>Same-day delivery may be available within selected areas of Nairobi.</li>
+
+        <li>Next-day delivery is available for most major towns.</li>
+
+        <li>Remote locations may require additional delivery time.</li>
+
+        <li>Some oversized products may require special transport arrangements.</li>
+
+    </ul>
+
+</div>
+
+<!-- ==========================================================
+SHIPPING CHARGES
+========================================================== -->
+
+<div class="lg-section" id="charges">
+
+    <h2>
+        <span class="lg-num">3</span>
+        Shipping Charges
+    </h2>
+
+    <p>
+        Shipping fees are calculated based on your delivery location,
+        the weight of your order and the selected shipping method.
+    </p>
+
+    <p>
+        Delivery charges displayed during checkout are estimates and may vary
+        for large, fragile or bulky products.
+    </p>
+
+    <div class="lg-callout">
+
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+
+            <circle cx="12" cy="12" r="10"/>
+
+            <path d="M12 16v-4"/>
+
+            <path d="M12 8h.01"/>
+
+        </svg>
+
+        <span>
+
+            <strong>Important:</strong>
+
+            Customers will always be informed of any additional delivery
+            charges before an order is dispatched.
+
+        </span>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+DELIVERY TIMELINES
+========================================================== -->
+
+<div class="lg-section" id="timelines">
+
+    <h2>
+
+        <span class="lg-num">4</span>
+
+        Estimated Delivery Timelines
+
+    </h2>
+
+    <ul>
+
+        <li><strong>Nairobi:</strong> Same day or within 24 hours.</li>
+
+        <li><strong>Major towns:</strong> 1–3 business days.</li>
+
+        <li><strong>Remote counties:</strong> 2–5 business days.</li>
+
+        <li><strong>Special orders:</strong> Delivery timelines will be communicated individually.</li>
+
+    </ul>
+
+    <p>
+
+        Delivery timelines are estimates and may change depending on
+        weather conditions, courier schedules or unforeseen circumstances.
+
+    </p>
+
+</div>
+
+<!-- ==========================================================
+TRACKING
+========================================================== -->
+
+<div class="lg-section" id="tracking">
+
+    <h2>
+
+        <span class="lg-num">5</span>
+
+        Order Tracking
+
+    </h2>
+
+    <p>
+
+        After your order has been dispatched, you may receive updates through
+        SMS, email or phone call depending on the delivery method selected.
+
+    </p>
+
+    <p>
+
+        Customers may also contact our support team at any time for the latest
+        delivery status.
+
+    </p>
+
+</div>
+
+<!-- ==========================================================
+DELAYS
+========================================================== -->
+
+<div class="lg-section" id="delays">
+
+    <h2>
+
+        <span class="lg-num">6</span>
+
+        Delivery Delays
+
+    </h2>
+
+    <p>
+
+        Although we strive to deliver every order on time,
+        delays may occasionally occur due to factors beyond our control.
+
+    </p>
+
+    <ul>
+
+        <li>Heavy rainfall or extreme weather.</li>
+
+        <li>Road closures or traffic disruptions.</li>
+
+        <li>Public holidays.</li>
+
+        <li>Courier operational delays.</li>
+
+        <li>Incomplete delivery information.</li>
+
+    </ul>
+
+    <p>
+
+        Where possible, customers will be informed promptly if a delay occurs.
+
+    </p>
+
+</div>
+
+<!-- ==========================================================
+RECEIVING ORDER
+========================================================== -->
+
+<div class="lg-section" id="inspection">
+
+    <h2>
+
+        <span class="lg-num">7</span>
+
+        Receiving Your Order
+
+    </h2>
+
+    <p>
+
+        Please inspect your package immediately upon delivery.
+
+    </p>
+
+    <ul>
+
+        <li>Confirm the package is sealed.</li>
+
+        <li>Verify that the correct products have been delivered.</li>
+
+        <li>Report any visible damage immediately.</li>
+
+        <li>Notify us within 24 hours if an item is missing or incorrect.</li>
+
+    </ul>
+
+</div>
+
+<!-- ==========================================================
+INTERNATIONAL SHIPPING
+========================================================== -->
+
+<div class="lg-section" id="international">
+
+    <h2>
+
+        <span class="lg-num">8</span>
+
+        International Shipping
+
+    </h2>
+
+    <p>
+
+        At this time, SmartComputersKE primarily serves customers within Kenya.
+
+    </p>
+
+    <p>
+
+        International shipping may be arranged for selected products upon
+        request. Additional shipping charges, customs duties and taxes are the
+        responsibility of the customer unless otherwise stated.
+
+    </p>
+
+</div>
+<!-- ==========================================================
+CONTACT
+========================================================== -->
+
+<div class="lg-section" id="contact">
+
+    <h2>
+
+        <span class="lg-num">9</span>
+
+        Contact Us
+
+    </h2>
+
+    <p class="lg-contact">
+
+        If you have any questions regarding our Shipping Policy,
+        delivery options or your order, please contact our customer
+        support team.
+
+    </p>
+
+    <p class="lg-contact">
+
+        <strong>Email:</strong>
+
+        <a href="mailto:{{ support_email|default:'support@smartcomputerske.co.ke' }}">
+            {{ support_email|default:"support@smartcomputerske.co.ke" }}
+        </a>
+
+    </p>
+
+    <p class="lg-contact">
+
+        <strong>Phone:</strong>
+
+        <a href="tel:{{ support_phone|default:'+254700000000' }}">
+            {{ support_phone|default:"+254 700 000 000" }}
+        </a>
+
+    </p>
+
+    <p class="lg-contact">
+
+        <strong>Business Hours:</strong><br>
+
+        Monday – Friday: 8:00 AM – 6:00 PM<br>
+
+        Saturday: 9:00 AM – 4:00 PM<br>
+
+        Sundays & Public Holidays: Closed
+
+    </p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

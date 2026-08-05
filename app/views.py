@@ -3491,3 +3491,21 @@ def buy_now(request, variant_id):
     }
 
     return redirect("checkout")
+
+from django.shortcuts import render
+
+
+def shipping_policy(request):
+    context = {
+        "site_name": "SmartComputersKE Technologies",
+        "site_initials": "SC",
+        "shipping_updated_date": "5 August 2026",
+        "support_email": "support@smartcomputerske.co.ke",
+        "support_phone": "+254 700 000 000",
+    }
+
+    return render(
+        request,
+        "shipping_policy.html",
+        context,
+    )

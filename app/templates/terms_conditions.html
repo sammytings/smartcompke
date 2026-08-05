@@ -14,50 +14,7 @@ page's visual language.
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-<style>
-  .lg-scope{
-    --lg-ink:#152420; --lg-ink-soft:#5C6B65; --lg-line:#E3E8E5; --lg-bg:#F6F8F7;
-    --lg-card:#FFFFFF; --lg-brand:#0E3B2E; --lg-brand-dark:#0A2C22; --lg-brand-soft:#E7F0EB;
-    --lg-gold:#B9924C; --lg-gold-soft:#F7EFDD;
-    font-family:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    color:var(--lg-ink); background:var(--lg-bg);
-  }
-  .lg-scope h1,.lg-scope h2{ font-family:'Sora',sans-serif; letter-spacing:-.01em; }
-  .lg-scope a{ color:var(--lg-brand); }
 
-  .lg-topbar{ background:var(--lg-brand); }
-  .lg-topbar-inner{ max-width:860px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; gap:10px; color:#fff; font-weight:700; font-size:16px; }
-  .lg-brand-mark{ width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:#fff; }
-
-  .lg-hero{ max-width:860px; margin:0 auto; padding:36px 24px 8px; }
-  .lg-hero h1{ font-size:28px; font-weight:700; margin:0 0 8px; }
-  .lg-hero .lg-updated{ font-size:13px; color:var(--lg-ink-soft); display:flex; align-items:center; gap:6px; }
-
-  .lg-body{ max-width:860px; margin:0 auto; padding:20px 24px 60px; }
-  .lg-card{ background:var(--lg-card); border:1px solid var(--lg-line); border-radius:12px; box-shadow:0 1px 2px rgba(15,30,25,.04), 0 8px 24px -12px rgba(15,30,25,.12); padding:30px 32px; }
-
-  .lg-toc{ background:var(--lg-brand-soft); border-radius:10px; padding:16px 20px; margin-bottom:26px; }
-  .lg-toc h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--lg-brand); margin:0 0 10px; }
-  .lg-toc ol{ margin:0; padding-left:18px; columns:2; column-gap:20px; }
-  .lg-toc li{ font-size:13.5px; margin-bottom:6px; }
-  .lg-toc a{ text-decoration:none; }
-  .lg-toc a:hover{ text-decoration:underline; }
-  @media (max-width:600px){ .lg-toc ol{ columns:1; } }
-
-  .lg-section{ padding:20px 0; border-bottom:1px solid var(--lg-line); }
-  .lg-section:last-child{ border-bottom:none; padding-bottom:0; }
-  .lg-section h2{ font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; margin:0 0 10px; }
-  .lg-num{ width:24px; height:24px; border-radius:50%; background:var(--lg-brand-soft); color:var(--lg-brand); font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Manrope',sans-serif; flex:none; }
-  .lg-section p, .lg-section li{ font-size:14px; line-height:1.7; color:var(--lg-ink-soft); }
-  .lg-section ul{ margin:8px 0 0; padding-left:20px; }
-  .lg-section strong{ color:var(--lg-ink); }
-
-  .lg-callout{ display:flex; gap:10px; align-items:flex-start; background:var(--lg-gold-soft); border-radius:8px; padding:12px 14px; margin-top:12px; font-size:13px; color:#7A5E28; }
-  .lg-callout svg{ flex:none; margin-top:2px; }
-
-  .lg-contact{ margin-top:8px; font-size:14px; color:var(--lg-ink-soft); }
-  .lg-contact a{ font-weight:600; }
-</style>
 {% endblock %}
 
 {% block content %}

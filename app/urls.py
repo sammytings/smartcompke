@@ -750,4 +750,11 @@ path(
     views.dashboard_bulk_products,
     name="dashboard_bulk_products",
 ),
+
+    path(
+        "shipping-policy/",
+        views.shipping_policy,
+        name="shipping_policy",
+    ),
+
 ]

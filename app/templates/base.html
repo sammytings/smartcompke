@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>{% block title %}Smartcomputerske Technologies — Genuine Computer Hardware, Nairobi{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -515,7 +515,7 @@
   .btn-whatsapp-card:hover{ background:#1ebe5a; transform:translateY(-1px); color:#fff; }
   .btn-whatsapp-card svg{ flex-shrink:0; }
 
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html,body{overflow-x:hidden;max-width:100%;}
 body{
   margin:0;
@@ -1366,9 +1366,9 @@ body.sidebar-open{overflow:hidden;}
   .nl-form button{width:100%;}
 }
 
-/* ============ FOOTER ============ */
-/* Thin premium accent strip that opens the footer, sitting
-   immediately above it — one flat rule, no animation. */
+/* ============ FOOTER v2 — matches the reference layout:
+   Address | Site Map | Payment methods, with a CBD Branch
+   block, social icons, operating hours, and a copyright bar. ============ */
 .footer-topline{
   height:2px;
   width:100%;
@@ -1376,16 +1376,117 @@ body.sidebar-open{overflow:hidden;}
   opacity:.9;
 }
 
-footer{background:var(--navy);padding-top:52px;border-top:1px solid rgba(255,255,255,.06);}
-.footer-top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1.1fr;gap:26px;padding-bottom:36px;}
-footer h5{color:#fff;font-size:13.5px;margin-bottom:15px;letter-spacing:.02em;}
-.footer-desc{color:#7C8AA3;font-size:13px;line-height:1.7;max-width:270px;margin-bottom:16px;}
-.pay-row{display:flex;gap:8px;flex-wrap:wrap;}
-.pay-chip{background:var(--navy-raise);color:#B9C2D4;font-size:10.5px;font-weight:700;padding:6px 10px;border-radius:6px;}
-.pay-chip.mpesa{color:#3CB043;}
-.pay-chip.visa{color:#8AB4F8;}
+.site-footer-v2{
+  background:var(--navy,#0F172A);
+  color:#CBD5E1;
+  padding:48px 0 0;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.footer-v2-grid{
+  display:grid;
+  grid-template-columns:1.1fr 1fr 1fr;
+  gap:40px;
+  padding-bottom:34px;
+}
+.footer-v2-heading{
+  display:flex;align-items:center;gap:10px;
+  color:#fff;font-size:14.5px;font-weight:700;
+  font-family:var(--font-display,'Space Grotesk',sans-serif);
+  letter-spacing:.02em;
+  margin:0 0 16px;
+}
+.footer-v2-heading i{color:var(--accent,#DC2626);font-size:13px;}
+.footer-v2-heading-sm{margin-top:26px;}
 
-/* ============ PREMIUM SOCIAL ICONS (flip on hover) ============ */
+.footer-v2-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;}
+.footer-v2-list li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:#AEB8CC;line-height:1.5;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;
+}
+.footer-v2-list li::after{
+  content:'';position:absolute;left:0;bottom:-1px;width:26px;height:2px;
+  background:var(--accent,#DC2626);border-radius:2px;
+}
+.footer-v2-list li:last-child{border-bottom:none;}
+.footer-v2-list li i{color:var(--accent,#DC2626);font-size:12px;margin-top:2px;flex-shrink:0;width:14px;text-align:center;}
+
+.footer-v2-links li{border-bottom:none;padding-bottom:0;}
+.footer-v2-links li::after{display:none;}
+.footer-v2-links a{
+  display:flex;align-items:center;gap:9px;
+  color:#AEB8CC;font-size:13.5px;font-weight:600;
+  transition:color .15s ease,transform .15s ease;
+}
+.footer-v2-links a i{color:var(--accent,#DC2626);font-size:11px;}
+.footer-v2-links a:hover{color:#fff;transform:translateX(3px);}
+
+.footer-v2-wa-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  color:#25D366;font-weight:700;font-size:13px;
+}
+.footer-v2-wa-pill:hover{color:#3CE383;}
+
+.footer-v2-social{display:flex;gap:12px;}
+.footer-v2-social-icon{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  color:#fff;font-size:15px;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),background .2s ease;
+}
+.footer-v2-social-icon:hover{transform:translateY(-3px) scale(1.06);}
+.footer-v2-social-icon.fb:hover{background:#1877F2;}
+.footer-v2-social-icon.tw:hover{background:#1DA1F2;}
+.footer-v2-social-icon.tt:hover{background:#000;}
+.footer-v2-social-icon.ig:hover{background:radial-gradient(circle at 30% 110%,#feda75,#fa7e1e 25%,#d62976 45%,#962fbf 65%,#4f5bd5 90%);}
+
+.footer-v2-pay-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.footer-v2-pay-chip{
+  height:34px;padding:0 14px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;font-weight:800;font-size:12px;letter-spacing:.02em;
+  box-shadow:0 4px 10px -4px rgba(0,0,0,.4);
+}
+.footer-v2-pay-chip.visa{color:#1A1F71;font-family:var(--font-display,sans-serif);}
+.footer-v2-pay-chip.mc{color:#EB001B;font-size:18px;background:#fff;}
+.footer-v2-pay-chip.cash{color:var(--success,#16A34A);font-size:16px;}
+.footer-v2-pay-chip.mpesa{color:#3CB043;}
+
+.footer-v2-hours{display:flex;flex-direction:column;gap:12px;}
+.footer-v2-hours-row{
+  display:flex;flex-direction:column;gap:4px;
+  padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;
+}
+.footer-v2-hours-row::after{
+  content:'';position:absolute;left:0;bottom:-1px;width:26px;height:2px;
+  background:var(--accent,#DC2626);border-radius:2px;
+}
+.footer-v2-hours-day{color:#fff;font-weight:700;font-size:13.5px;}
+.footer-v2-hours-time{color:#8A93A6;font-size:12.5px;display:flex;align-items:center;gap:7px;}
+.footer-v2-hours-time i{color:var(--accent,#DC2626);font-size:11px;}
+.footer-v2-hours-time.closed{color:#F87171;}
+
+.footer-v2-bottom{
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 24px;color:#5C6579;font-size:12px;flex-wrap:wrap;gap:8px;
+}
+.footer-v2-bottom i{color:var(--accent,#DC2626);margin-right:4px;}
+
+@media (max-width:900px){
+  .footer-v2-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:600px){
+  .footer-v2-grid{grid-template-columns:1fr;gap:32px;padding:0 4px 28px;}
+  .footer-v2-bottom{flex-direction:column;text-align:center;padding:16px;}
+}
+
+/* ============ PREMIUM SOCIAL ICONS (flip on hover) — legacy, unused by footer v2 but kept for other pages ============ */
 .social-row{display:flex;gap:12px;margin-top:16px;perspective:800px;}
 .social-chip{
   position:relative;width:38px;height:38px;background:transparent;border:none;
@@ -1416,11 +1517,6 @@ footer ul li a:hover{color:#fff;}
 
 /* ================================================================
    SMARTCOMPUTERSKE — PREMIUM WHATSAPP FLOAT
-   Single canonical rule set (previously duplicated three times with
-   conflicting bottom offsets / z-index values — that has all been
-   consolidated here so the button position is deterministic).
-   Glass disc over a green gradient core, soft ambient float, ripple
-   pulse ring, small unread-style badge and a spring entrance.
 ================================================================ */
 .whatsapp-float{
     position:fixed;
@@ -1438,7 +1534,6 @@ footer ul li a:hover{color:#fff;}
     animation:wa-enter .55s cubic-bezier(.34,1.56,.64,1) both,
               wa-float 3.6s ease-in-out 1s infinite;
 }
-/* core gradient disc */
 .whatsapp-float::after{
   content:"";position:absolute;inset:0;border-radius:50%;z-index:-2;
   background:linear-gradient(150deg,#34e88a 0%,#25d366 55%,#149650 100%);
@@ -1447,7 +1542,6 @@ footer ul li a:hover{color:#fff;}
     0 14px 30px -8px rgba(19,148,79,.55);
   transition:box-shadow .25s var(--ease);
 }
-/* glass rim on top */
 .whatsapp-float::before{
   content:"";position:absolute;inset:2px;border-radius:50%;z-index:-1;
   background:linear-gradient(160deg,rgba(255,255,255,.35),rgba(255,255,255,0) 55%);
@@ -1457,7 +1551,6 @@ footer ul li a:hover{color:#fff;}
 .wa-icon{position:relative;z-index:1;font-size:26px;line-height:1;color:#fff;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15));transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
 .whatsapp-float:hover .wa-icon{transform:scale(1.12) rotate(-6deg);}
 
-/* ripple pulse ring */
 .wa-ripple{position:absolute;inset:0;border-radius:50%;z-index:-3;pointer-events:none;}
 .wa-ripple::before,.wa-ripple::after{
   content:"";position:absolute;inset:0;border-radius:50%;
@@ -1471,7 +1564,6 @@ footer ul li a:hover{color:#fff;}
   100%{box-shadow:0 0 0 0 rgba(37,211,102,0);}
 }
 
-/* unread-style badge */
 .wa-badge{
   position:absolute;top:-4px;right:-4px;z-index:2;
   min-width:19px;height:19px;padding:0 4px;border-radius:99px;
@@ -1505,7 +1597,6 @@ footer ul li a:hover{color:#fff;}
   .wa-ripple::before,.wa-ripple::after{animation:none;display:none;}
 }
 
-/* Mobile: sit above the fixed bottom nav, respecting the safe area */
 @media (max-width:600px){
   .whatsapp-float{
     right:16px;
@@ -1546,6 +1637,9 @@ footer ul li a:hover{color:#fff;}
    Frosted glass card, status-tinted accent bar + icon, progress
    timer, and a spring slide-in. Mobile variant docks above the
    bottom nav / WhatsApp button and behaves like a native banner.
+   FIX: pointer-events:none while hidden so this invisible fixed
+   element never swallows taps on things underneath it (this was
+   blocking the mobile bottom nav).
 ================================================================ */
 
 .toast {
@@ -1581,6 +1675,7 @@ footer ul li a:hover{color:#fff;}
 
     transform: translateX(120%) scale(.96) translateY(4px);
     opacity: 0;
+    pointer-events: none;
 
     transition: transform .5s cubic-bezier(.16,1,.3,1), opacity .32s ease;
 }
@@ -1588,6 +1683,7 @@ footer ul li a:hover{color:#fff;}
 .toast.show {
     transform: translateX(0) scale(1) translateY(0);
     opacity: 1;
+    pointer-events: auto;
 }
 
 .toast-icon{
@@ -1650,7 +1746,6 @@ footer ul li a:hover{color:#fff;}
     to{transform:scaleX(0);}
 }
 
-/* spinner used briefly while a request is in-flight */
 .toast-spinner{
     display:none;
     flex-shrink:0;
@@ -1683,14 +1778,18 @@ footer ul li a:hover{color:#fff;}
 
 @media (max-width:600px){
   .toast{
-    left:16px;right:16px;top:auto;
-    bottom:calc(84px + env(safe-area-inset-bottom));
-    min-width:0;max-width:none;
+    left:12px;right:12px;top:auto;
+    bottom:calc(90px + env(safe-area-inset-bottom));
+    min-width:0;max-width:none;width:auto;
     border-radius:16px;
-    padding:14px 14px 15px 13px;
-    transform:translateY(140%) scale(.97);
+    padding:12px 14px 14px 12px;
+    transform:translateY(30px) scale(.97);
+    gap:10px;
   }
   .toast.show{transform:translateY(0) scale(1);}
+  .toast-title{font-size:10.5px;}
+  #toastMessage{font-size:13px;}
+  .toast-icon{width:32px;height:32px;font-size:13px;}
 }
 
 /* ================================
@@ -2343,7 +2442,15 @@ label.co-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-so
   .logo-marquee-track{gap:40px;animation-duration:34s;}
 
   /* App-style bottom tab bar replaces the top header actions on mobile */
-  body{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
+  body{padding-bottom:calc(64px + max(16px, env(safe-area-inset-bottom)));}
+
+  /* Prevent iOS Safari from auto-zooming the page when a form field is
+     focused (any input under 16px triggers this). That auto-zoom is
+     what was leaving the layout viewport out of sync with the visual
+     viewport afterward, which is why the bottom nav (and anything else
+     fixed-position) could stop responding to taps until the user
+     manually pinched back out — this removes the trigger entirely. */
+  input,select,textarea{font-size:16px !important;}
 }
 /* ===========================
    MOBILE BOTTOM NAVIGATION
@@ -2358,13 +2465,14 @@ label.co-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-so
     display:flex;
     align-items:stretch;
     gap:2px;
-    padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+    padding:6px 6px max(16px, calc(6px + env(safe-area-inset-bottom)));
     background:rgba(255,255,255,.92);
     -webkit-backdrop-filter:saturate(180%) blur(14px);
     backdrop-filter:saturate(180%) blur(14px);
     border-top:1px solid var(--line-soft,#EEF2F7);
     box-shadow:0 -10px 30px -18px rgba(15,23,42,.28);
     z-index:99998;
+    pointer-events:auto;
 }
 
 .mobile-bottom-nav .mbn-item{
@@ -2392,6 +2500,7 @@ label.co-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-so
     user-select:none;
     position:relative;
     cursor:pointer;
+    z-index:1;
 }
 
 .mobile-bottom-nav .mbn-item::before{
@@ -2621,8 +2730,6 @@ img.mobile-sidebar-avatar-img,
 
 /* =========================================================
    Blog styles — matches the "Fahavi Blog" card-grid reference
-   Load this after base.css, e.g.:
-   <link rel="stylesheet" href="{% static 'css/blog.css' %}">
    ========================================================= */
 
 :root {
@@ -3304,6 +3411,518 @@ div[id^="credential_picker"]{
 .btn-cart-add.is-done .btn-icon{animation:sck-cart-land .5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes sck-cart-land{0%{transform:translateY(-8px) scale(.7);opacity:.4;}100%{transform:none;opacity:1;}}
 
+/* ==========================================================
+   SMARTCOMPUTERSKE - TERMS & CONDITIONS
+   Clean professional styling
+   ========================================================== */
+
+
+/* ==========================================================
+   BASE
+   ========================================================== */
+
+.lg-scope{
+
+    font-family:'Manrope',sans-serif;
+
+    background:var(--background);
+
+    color:var(--text);
+
+}
+
+.lg-scope h1,
+.lg-scope h2{
+
+    font-family:'Sora',sans-serif;
+
+    color:var(--text);
+
+    letter-spacing:-0.02em;
+
+}
+
+.lg-scope a{
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+    transition:.2s;
+
+}
+
+.lg-scope a:hover{
+
+    text-decoration:underline;
+
+}
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+
+.lg-topbar{
+
+    background:#fff;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.lg-topbar-inner{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    padding:18px 20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+}
+
+.lg-brand-mark{
+
+    width:38px;
+
+    height:38px;
+
+    border-radius:8px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   HERO
+   ========================================================== */
+
+.lg-hero{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    padding:40px 20px 25px;
+
+}
+
+.lg-hero h1{
+
+    font-size:30px;
+
+    margin-bottom:12px;
+
+    font-weight:700;
+
+}
+
+.lg-updated{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:var(--text-light);
+
+    font-size:14px;
+
+}
+
+.lg-updated svg{
+
+    color:var(--primary);
+
+}
+
+/* ==========================================================
+   CONTENT
+   ========================================================== */
+
+.lg-body{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    padding:0 20px 60px;
+
+}
+
+.lg-card{
+
+    background:#fff;
+
+    padding:0;
+
+}
+
+/* ==========================================================
+   TABLE OF CONTENTS
+   ========================================================== */
+
+.lg-toc{
+
+    background:var(--section);
+
+    border:1px solid var(--border);
+
+    border-radius:8px;
+
+    padding:24px;
+
+    margin-bottom:35px;
+
+}
+
+.lg-toc h4{
+
+    margin:0 0 18px;
+
+    color:var(--primary);
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:.05em;
+
+    text-transform:uppercase;
+
+}
+
+.lg-toc ol{
+
+    margin:0;
+
+    padding-left:18px;
+
+    columns:2;
+
+    column-gap:40px;
+
+}
+
+.lg-toc li{
+
+    margin-bottom:10px;
+
+    color:var(--text-light);
+
+    font-size:14px;
+
+}
+
+.lg-toc a{
+
+    color:var(--text);
+
+    font-weight:500;
+
+}
+
+.lg-toc a:hover{
+
+    color:var(--primary);
+
+}
+
+@media(max-width:700px){
+
+    .lg-toc ol{
+
+        columns:1;
+
+    }
+
+}
+
+/* ==========================================================
+   SECTIONS
+   ========================================================== */
+
+.lg-section{
+
+    padding:24px 0;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.lg-section:last-child{
+
+    border-bottom:none;
+
+}
+
+.lg-section h2{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:15px;
+
+    font-size:21px;
+
+    font-weight:700;
+
+}
+
+.lg-num{
+
+    width:30px;
+
+    height:30px;
+
+    border-radius:50%;
+
+    background:#eef4ff;
+
+    border:1px solid #c9dcff;
+
+    color:var(--primary);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    flex-shrink:0;
+
+}
+
+.lg-section p{
+
+    margin:0 0 15px;
+
+    font-size:15px;
+
+    line-height:1.8;
+
+    color:var(--text-light);
+
+}
+
+.lg-section strong{
+
+    color:var(--text);
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   LISTS
+   ========================================================== */
+
+.lg-section ul{
+
+    margin:12px 0;
+
+    padding-left:22px;
+
+}
+
+.lg-section li{
+
+    margin-bottom:10px;
+
+    line-height:1.8;
+
+    color:var(--text-light);
+
+    font-size:15px;
+
+}
+
+/* ==========================================================
+   NOTICE
+   ========================================================== */
+
+.lg-callout{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:12px;
+
+    background:#fff8f8;
+
+    border:1px solid #ffd5d5;
+
+    border-left:4px solid var(--secondary);
+
+    border-radius:6px;
+
+    padding:18px;
+
+    margin:20px 0;
+
+}
+
+.lg-callout svg{
+
+    color:var(--secondary);
+
+    flex-shrink:0;
+
+    margin-top:2px;
+
+}
+
+.lg-callout span{
+
+    color:var(--text-light);
+
+    line-height:1.7;
+
+    font-size:14px;
+
+}
+
+.lg-callout strong{
+
+    color:var(--secondary);
+
+}
+
+/* ==========================================================
+   CONTACT
+   ========================================================== */
+
+.lg-contact{
+
+    font-size:15px;
+
+    color:var(--text-light);
+
+}
+
+.lg-contact a{
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   HOVER EFFECTS
+   ========================================================== */
+
+.lg-section:hover{
+
+    background:var(--hover);
+
+    transition:.2s ease;
+
+    padding-left:12px;
+
+    padding-right:12px;
+
+    border-radius:6px;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media(max-width:768px){
+
+    .lg-topbar-inner{
+
+        font-size:16px;
+
+        padding:15px;
+
+    }
+
+    .lg-brand-mark{
+
+        width:34px;
+
+        height:34px;
+
+    }
+
+    .lg-hero{
+
+        padding:30px 16px 20px;
+
+    }
+
+    .lg-hero h1{
+
+        font-size:26px;
+
+    }
+
+    .lg-body{
+
+        padding:0 16px 40px;
+
+    }
+
+    .lg-section{
+
+        padding:20px 0;
+
+    }
+
+    .lg-section h2{
+
+        font-size:18px;
+
+    }
+
+    .lg-section p,
+
+    .lg-section li{
+
+        font-size:14px;
+
+    }
+
+    .lg-callout{
+
+        padding:15px;
+
+    }
+
+}
 
 /* ============ MOBILE BOTTOM NAV PROFILE AVATAR ============ */
 .mbn-item img{flex-shrink:0;}
@@ -3311,8 +3930,6 @@ div[id^="credential_picker"]{
 
 <!-- ============================================================
      SEO META TAGS
-     Update the canonical URL / social image path to match your
-     production domain and static asset location.
      ============================================================ -->
 <meta name="description" content="{% block meta_description %}Smartcomputerske Technologies is the greatest computer and hardware shop in Kenya — genuine laptops, desktops, printers, monitors, servers and accessories in Nairobi. Same-day delivery, warranty on every device, and prices you can trust.{% endblock %}">
 <meta name="keywords" content="{% block meta_keywords %}computer shop Nairobi, best computer shop in Kenya, genuine laptops Kenya, buy laptop Nairobi, computer hardware Kenya, desktop computers Nairobi, HP laptops Kenya, Dell laptops Kenya, Lenovo laptops Kenya, printers Nairobi, computer accessories Kenya, refurbished laptops Nairobi, laptop shop Kimathi Street, Smartcomputerske, greatest computer shop in Kenya, computer store Nairobi CBD{% endblock %}">
@@ -3341,12 +3958,12 @@ div[id^="credential_picker"]{
 <meta name="geo.placename" content="Nairobi">
 <meta name="ICBM" content="-1.2833, 36.8167">
 
-<!-- Favicon / touch icons — crawled and used by Google in search results -->
+<!-- Favicon / touch icons -->
 <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
 <link rel="shortcut icon" href="{% static 'images/logo.png' %}">
 <link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
 
-<!-- Structured data: helps Google understand this as a real local business -->
+<!-- Structured data -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -3373,10 +3990,7 @@ div[id^="credential_picker"]{
 {% csrf_token %}
 
 <!-- ============================================================
-     STICKY NAV WRAPPER — utility bar + header stay pinned as one
-     fixed unit at the top of the viewport on every screen size.
-     .is-scrolled (toggled by the script near the end) adds a soft
-     shadow once the page has actually scrolled.
+     STICKY NAV WRAPPER
      ============================================================ -->
 <div class="site-nav-sticky" id="siteNavSticky">
 
@@ -3543,93 +4157,89 @@ div[id^="credential_picker"]{
   </div>
 </section>
 
-<!-- ============ FOOTER TOP ACCENT LINE (sits immediately above the footer only) ============ -->
+<!-- ============ FOOTER TOP ACCENT LINE ============ -->
 <div class="footer-topline" role="presentation" aria-hidden="true"></div>
 
-<footer>
-  <div class="wrap footer-top">
-    <div>
-      <div class="footer-brand-mark">
-        <img src="{% static 'images/logo.png' %}" alt="Smartcomputerske Technologies — Genuine Computer Hardware Shop in Nairobi, Kenya">
-      </div>
-      <p class="footer-seo-line"><strong>Smartcomputerske Technologies</strong> — the greatest computer and hardware shop in Kenya. Genuine laptops, desktops, printers, monitors and accessories in Nairobi CBD.</p>
-      
-      <div class="pay-row"><span class="pay-chip mpesa">M-PESA</span><span class="pay-chip visa">VISA</span><span class="pay-chip">CASH</span><span class="pay-chip">BANK TRANSFER</span></div>
-      <div class="social-row">
-        <a class="social-chip sc-fb" href="https://www.facebook.com/share/19PxvhkEw9/" target="_blank" rel="noopener" aria-label="Facebook">
-          <span class="chip-face chip-front"><i class="fab fa-facebook-f"></i></span>
-          <span class="chip-face chip-back"><i class="fab fa-facebook-f"></i></span>
-        </a>
-        <a class="social-chip sc-ig" href="https://www.instagram.com/smartcomputerske_technologies?igsh=MTY0NmZ1eHp4dG5xZg==" target="_blank" rel="noopener" aria-label="Instagram">
-          <span class="chip-face chip-front"><i class="fab fa-instagram"></i></span>
-          <span class="chip-face chip-back"><i class="fab fa-instagram"></i></span>
-        </a>
-        <a class="social-chip sc-tiktok" href="https://www.tiktok.com/@smartcomputerske?_r=1&_t=ZS-98DJG5hmbpN" target="_blank" rel="noopener" aria-label="TikTok">
-          <span class="chip-face chip-front"><i class="fab fa-tiktok"></i></span>
-          <span class="chip-face chip-back"><i class="fab fa-tiktok"></i></span>
-        </a>
-        <a class="social-chip sc-wa" href="https://wa.me/254792758560" target="_blank" rel="noopener" aria-label="WhatsApp">
-          <span class="chip-face chip-front"><i class="fab fa-whatsapp"></i></span>
-          <span class="chip-face chip-back"><i class="fab fa-whatsapp"></i></span>
-        </a>
-        <a class="social-chip sc-email" href="mailto:smartcomputerske626@gmail.com" aria-label="Email">
-          <span class="chip-face chip-front"><i class="fas fa-envelope"></i></span>
-          <span class="chip-face chip-back"><i class="fas fa-envelope"></i></span>
-        </a>
-      </div>
-    </div>
-    <div>
-      <h5>Company</h5>
-      <ul>
-        <li><a href="{% url 'about' %}">About Us</a></li>
-        <li><a href="{% url 'blog_list' %}">Blog</a></li>
-        <li><a href="{% url 'faq' %}">FAQs</a></li>
-        
-      </ul>
-    </div>
-    <div>
-      <h5>Support</h5>
-      <ul>
+<!-- =========================================================
+     FOOTER v2 — matches the reference layout:
+     Address | Site Map | Payment methods, with a CBD Branch
+     block, social icons, operating hours, and a copyright bar.
+     ========================================================= -->
+<footer class="site-footer-v2">
+  <div class="wrap footer-v2-grid">
+
+    <!-- ===== COLUMN 1 — ADDRESS ===== -->
+    <div class="footer-v2-col">
+      <h5 class="footer-v2-heading"><i class="fas fa-location-dot"></i> Address</h5>
+      <ul class="footer-v2-list">
+        <li><i class="fas fa-phone"></i> Mobile : +254 111787140</li>
+        <li><i class="fas fa-phone"></i> Mobile : +254 792 758560</li>
         <li>
-    <a href="{% url 'help_center' %}">
-        Help Centre
-    </a>
-</li>
+          <a href="https://wa.me/254792758560" target="_blank" rel="noopener" class="footer-v2-wa-pill">
+            <i class="fab fa-whatsapp"></i> Chat with us on WhatsApp
+          </a>
+        </li>
+        <li><i class="fas fa-envelope"></i> Email : smartcomputerske626@gmail.com</li>
+      </ul>
 
-<li>
-    <a href="{% url 'request_quote' %}">
-       Request Quote
-    </a>
-</li>
-
-<li>
-    <a href="{% url 'warranty' %}">
-        Warranty
-    </a>
-</li>
-
-<li>
-    <a href="{% url 'returns_refunds' %}">
-        Returns & Refunds
-    </a>
-</li>
+      <h5 class="footer-v2-heading footer-v2-heading-sm"><i class="fas fa-location-dot"></i> CBD Branch</h5>
+      <ul class="footer-v2-list">
+        <li><i class="fas fa-building"></i> Moi Avenue, Rahimtulla Trust Building, 2nd Floor, Room 32B</li>
       </ul>
     </div>
-    <div>
-      <h5>Contact</h5>
-      <ul class="footer-contact">
-        <li>Trust Building, 2nd Floor, Right Wing, Shop 32B, Moi Avenue, Nairobi CBD</li>
-        <li>0792 758560</li>
-        <li><a href="mailto:smartcomputerske626@gmail.com">sales@smartcomputers.co.ke</a></li>
-        <li>Mon – Sat, 8:30am – 6:00pm</li>
+
+    <!-- ===== COLUMN 2 — SITE MAP ===== -->
+    <div class="footer-v2-col">
+      <h5 class="footer-v2-heading"><i class="fas fa-map-location-dot"></i> Site Map</h5>
+      <ul class="footer-v2-list footer-v2-links">
+        <li><a href="{% url 'returns_refunds' %}"><i class="fas fa-arrow-up-right-from-square"></i> Return Policy</a></li>
+        <li><a href="{% url 'warranty' %}"><i class="fas fa-arrow-up-right-from-square"></i> Warranty </a></li>
+        <li><a href="{% url 'help_center' %}"><i class="fas fa-arrow-up-right-from-square"></i> Customer Help</a></li>
+        <li><a href="{% url 'shipping_policy' %}"><i class="fas fa-arrow-up-right-from-square"></i> Shipping Policy </a></li>
+        <li></li><a href="{% url 'terms' %}"><i class="fas fa-arrow-up-right-from-square"></i> Terms &amp; Conditions</a></li>
+        <li><a href="{% url 'faq' %}"><i class="fas fa-arrow-up-right-from-square"></i> FAQ</a></li>
       </ul>
+
+      <h5 class="footer-v2-heading footer-v2-heading-sm"><i class="fas fa-globe"></i> Follow us on social media</h5>
+      <div class="footer-v2-social">
+        <a href="https://www.facebook.com/share/19PxvhkEw9/" target="_blank" rel="noopener" class="footer-v2-social-icon fb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://x.com/" target="_blank" rel="noopener" class="footer-v2-social-icon tw" aria-label="Twitter/X"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.tiktok.com/@smartcomputerske?_r=1&_t=ZS-98DJG5hmbpN" target="_blank" rel="noopener" class="footer-v2-social-icon tt" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        <a href="https://www.instagram.com/smartcomputerske_technologies?igsh=MTY0NmZ1eHp4dG5xZg==" target="_blank" rel="noopener" class="footer-v2-social-icon ig" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
     </div>
+
+    <!-- ===== COLUMN 3 — PAYMENT + HOURS ===== -->
+    <div class="footer-v2-col">
+      <h5 class="footer-v2-heading"><i class="fas fa-wallet"></i> Payment methods</h5>
+      <div class="footer-v2-pay-row">
+        <span class="footer-v2-pay-chip visa">VISA</span>
+        <span class="footer-v2-pay-chip mc"><i class="fab fa-cc-mastercard"></i></span>
+        <span class="footer-v2-pay-chip cash"><i class="fas fa-money-bill-wave"></i></span>
+        <span class="footer-v2-pay-chip mpesa">M-PESA</span>
+      </div>
+
+      <h5 class="footer-v2-heading footer-v2-heading-sm"><i class="fas fa-clock"></i> Shop Operating Hours</h5>
+      <div class="footer-v2-hours">
+        <div class="footer-v2-hours-row">
+          <span class="footer-v2-hours-day">Monday - Saturday</span>
+          <span class="footer-v2-hours-time"><i class="fas fa-clock"></i> 8:30 AM : 6:30 PM</span>
+        </div>
+        <div class="footer-v2-hours-row">
+          <span class="footer-v2-hours-day">Sunday</span>
+          <span class="footer-v2-hours-time closed"><i class="fas fa-clock"></i> CLOSED</span>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <div class="footer-bottom wrap">
-    <span>© 2026 Smartcomputerske Technologies. All rights reserved.</span>
+
+  <div class="footer-v2-bottom wrap">
+    <span><i class="fas fa-copyright"></i> Copyright 2026 — Smartcomputerske Technologies Ltd</span>
     <span class="footer-credit">Built &amp; designed by <a href="https://wa.me/254727698319" target="_blank" rel="noopener">TingdTech Technologies</a><span class="fc-sep">|</span><a href="tel:0727698319"><i class="fas fa-phone" style="font-size:10px;"></i> 0727 698319</a></span>
   </div>
 </footer>
+
 <a href="https://wa.me/254792758560"
    class="whatsapp-float"
    target="_blank"
@@ -3846,7 +4456,7 @@ div[id^="credential_picker"]{
     </a>
 
     <a href="{% url 'cart' %}" class="mbn-item" title="Cart">
-        <span class="mbn-cart-icon">
+        <span class="mbn-cart-icon" id="mbnCartIcon">
             <i class="fas fa-cart-shopping"></i>
             <span class="mbn-badge">{{ cart_count|default:"0" }}</span>
         </span>
@@ -3912,10 +4522,6 @@ div[id^="credential_picker"]{
 
 /* ============================================================
    STICKY NAV SCROLL SHADOW + dynamic content offset
-   Since the nav is position:fixed, we measure its real height and
-   push .page-content-wrap down by exactly that much — recalculated
-   on load/resize so the utility bar wrapping to two lines on small
-   screens never causes content to hide underneath it.
    ============================================================ */
 (function () {
   const nav = document.getElementById('siteNavSticky');
@@ -4279,7 +4885,6 @@ div[id^="credential_picker"]{
             btn.classList.toggle('active', !wasActive);
             bumpBadge('wishCount', data.wishlist_count);
             if (!wasActive) {
-              // fire the burst once, then clean the class so it can replay next time
               requestAnimationFrame(() => {
                 btn.classList.add('bursting');
                 setTimeout(() => btn.classList.remove('bursting'), 600);
@@ -4447,9 +5052,6 @@ div[id^="credential_picker"]{
 
 /* ============================================================
    HEADER CHATBOT LAUNCHER
-   Opens the SmartAI Assistant widget (partials/ai_assistant.html +
-   ai/js/assistant.js), which exposes window.openAIAssistant /
-   toggleAIAssistant / aiAssistant.{open,close,toggle}.
    ============================================================ */
 (function () {
   const btn = document.getElementById('headerChatbotBtn');
@@ -4488,9 +5090,6 @@ div[id^="credential_picker"]{
 
 <!-- ============================================================
      GOOGLE SIGN-IN (One Tap + reliable rendered-button fallback)
-     One Tap is intentionally delayed a few seconds after the page
-     has settled, so it appears once someone has actually arrived
-     on the site rather than popping up instantly on load.
      ============================================================ -->
 {% if not user.is_authenticated %}
 <script>
@@ -4552,8 +5151,6 @@ div[id^="credential_picker"]{
         callback: handleCredentialResponse
       });
 
-      // The sign-in buttons in the header / mobile sidebar render right
-      // away — only the automatic One Tap popup is deferred.
       renderSignInButtons();
 
       setTimeout(function () {
@@ -4637,10 +5234,6 @@ function handleCredentialResponse(response) {
         alert("Sign-in failed. Please try again.");
       });
   } catch (err) {
-    // Guards against a synchronous failure before the fetch chain even
-    // starts (e.g. getCookie() throwing because it isn't defined yet in
-    // main.js/cart.js) — previously this left the page loader stuck on
-    // screen forever with no visible error.
     if (window.pageLoader) window.pageLoader.hide();
     console.error("handleCredentialResponse fatal error:", err);
     alert("Sign-in failed. Please try again.");

@@ -36,7 +36,7 @@ Read the latest technology articles, laptop buying guides, computer tips, smartp
 </section>
 
 
-
+{% if featured_posts %}
 <section class="featured-blog container">
 
 <h2>
@@ -51,11 +51,17 @@ Featured Articles
 
 <article class="blog-card">
 
-
-<img 
+{% if post.image %}
+<img
 src="{{ post.image.url }}"
 alt="{{ post.title }}"
 loading="lazy">
+{% else %}
+<img
+src="{% static 'images/no-image.png' %}"
+alt="{{ post.title }}"
+loading="lazy">
+{% endif %}
 
 
 <div class="blog-content">
@@ -82,14 +88,14 @@ loading="lazy">
 <div class="blog-meta">
 
 <span>
-<i class="fa fa-user"></i>
+<i class="fas fa-user"></i>
 SmartComputersKe
 </span>
 
 
 <span>
-<i class="fa fa-calendar"></i>
-{{post.created_at|date:"M d, Y"}}
+<i class="fas fa-calendar"></i>
+{{ post.created_at|date:"M d, Y" }}
 </span>
 
 
@@ -109,6 +115,7 @@ SmartComputersKe
 
 
 </section>
+{% endif %}
 
 
 
@@ -130,11 +137,17 @@ Latest Technology Articles
 
 <article class="blog-card">
 
-
+{% if post.image %}
 <img
-src="{{post.image.url}}"
-alt="{{post.title}}"
+src="{{ post.image.url }}"
+alt="{{ post.title }}"
 loading="lazy">
+{% else %}
+<img
+src="{% static 'images/no-image.png' %}"
+alt="{{ post.title }}"
+loading="lazy">
+{% endif %}
 
 
 
@@ -144,7 +157,7 @@ loading="lazy">
 <h3>
 
 <a href="{% url 'blog_detail' post.slug %}">
-{{post.title}}
+{{ post.title }}
 </a>
 
 </h3>
@@ -152,7 +165,7 @@ loading="lazy">
 
 
 <p>
-{{post.excerpt|truncatewords:25}}
+{{ post.excerpt|truncatewords:25 }}
 </p>
 
 
@@ -160,14 +173,14 @@ loading="lazy">
 <div class="blog-meta">
 
 <span>
-<i class="fa fa-user"></i>
+<i class="fas fa-user"></i>
 SmartComputersKe
 </span>
 
 
 <span>
-<i class="fa fa-calendar"></i>
-{{post.created_at|date:"M d, Y"}}
+<i class="fas fa-calendar"></i>
+{{ post.created_at|date:"M d, Y" }}
 </span>
 
 

@@ -1,25 +1,342 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-<div class="container py-5 text-center">
+<section class="quote-success-page">
+    <div class="container">
 
-<i class="fas fa-circle-check text-success fa-4x mb-4"></i>
+        <div class="success-wrapper">
 
-<h2>Quote Request Submitted</h2>
+            <div class="success-animation">
+                <div class="success-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
 
-<p>
-Thank you for contacting SmartComputersKe Technologies.
-</p>
+            <span class="status-badge">
+                <i class="fas fa-shield-check"></i> Request Received
+            </span>
 
-<p>
-Our sales team has received your request and will contact you shortly.
-</p>
+            <h1>Thank You!</h1>
 
-<a href="{% url 'shop' %}" class="btn btn-primary">
-Continue Shopping
-</a>
+            <h3>Your Quote Request Has Been Submitted Successfully</h3>
 
-</div>
+            <p class="intro">
+                We've received your quotation request and our sales team is already
+                reviewing it.
+            </p>
+
+            <p class="description">
+                One of our specialists will contact you shortly with pricing,
+                availability and professional recommendations tailored to your
+                requirements.
+            </p>
+
+            <div class="info-grid">
+
+                <div class="info-card">
+                    <div class="icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+
+                    <h5>Fast Response</h5>
+
+                    <p>
+                        Most quotations are answered within
+                        <strong>30 minutes</strong> during business hours.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <div class="icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+
+                    <h5>Expert Assistance</h5>
+
+                    <p>
+                        Our product specialists will help you choose the
+                        best solution for your needs.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <div class="icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+
+                    <h5>Need Immediate Help?</h5>
+
+                    <p>
+                        Contact us via WhatsApp or phone if your request
+                        is urgent.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="button-group">
+
+                <a href="{% url 'shop' %}" class="btn btn-shop">
+                    <i class="fas fa-shopping-bag"></i>
+                    Continue Shopping
+                </a>
+
+                <a href="" class="btn btn-outline-custom">
+                    <i class="fas fa-phone-alt"></i>
+                    Contact Us
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<style>
+
+.quote-success-page{
+    background:#ffffff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:60px 20px;
+}
+
+.success-wrapper{
+    width:100%;
+    max-width:850px;
+    background:#ffffff;
+    border-radius:24px;
+    padding:60px;
+    text-align:center;
+    border:1px solid #e5e7eb;
+    box-shadow:0 20px 60px rgba(0,0,0,.08);
+    position:relative;
+    overflow:hidden;
+}
+
+.success-wrapper::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:6px;
+    background:linear-gradient(90deg,#ef233c,#ff4d6d);
+}
+
+.success-wrapper h1{
+    color:#111827;
+    font-size:2.8rem;
+    font-weight:700;
+    margin-top:25px;
+}
+
+.success-wrapper h3{
+    color:#374151;
+    margin-bottom:20px;
+}
+
+.intro,
+.description{
+    color:#6b7280;
+}
+
+.info-card{
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    transition:.3s;
+}
+
+.info-card:hover{
+    transform:translateY(-6px);
+    border-color:#ef233c;
+    box-shadow:0 12px 30px rgba(239,35,60,.12);
+}
+
+.info-card h5{
+    color:#111827;
+}
+
+.info-card p{
+    color:#6b7280;
+}
+.success-circle{
+    width:120px;
+    height:120px;
+    margin:auto;
+    border-radius:50%;
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-shadow:0 15px 35px rgba(34,197,94,.25);
+}
+
+.success-circle i{
+    color:#fff;
+    font-size:60px;
+}
+@keyframes pop{
+    0%{
+        transform:scale(.3);
+        opacity:0;
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.status-badge{
+    display:inline-block;
+    margin-top:30px;
+    background:rgba(239,35,60,.15);
+    color:#ff5b5b;
+    padding:8px 18px;
+    border-radius:40px;
+    font-weight:600;
+}
+
+.success-wrapper h1{
+    margin-top:25px;
+    font-size:3rem;
+    font-weight:700;
+}
+
+.success-wrapper h3{
+    margin-top:10px;
+    color:#d9e2f1;
+    font-size:1.5rem;
+}
+
+.intro{
+    margin-top:20px;
+    color:#b7c4d7;
+    font-size:1.1rem;
+}
+
+.description{
+    margin:25px auto 45px;
+    max-width:650px;
+    line-height:1.9;
+    color:#95a4bc;
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-bottom:45px;
+}
+
+.info-card{
+    background:#18253d;
+    padding:28px;
+    border-radius:16px;
+    transition:.35s;
+    border:1px solid rgba(255,255,255,.06);
+}
+
+.info-card:hover{
+    transform:translateY(-8px);
+    border-color:#ef233c;
+    box-shadow:0 20px 35px rgba(0,0,0,.3);
+}
+
+.info-card .icon{
+    width:65px;
+    height:65px;
+    margin:auto;
+    border-radius:50%;
+    background:#ef233c;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    margin-bottom:18px;
+}
+
+.info-card h5{
+    margin-bottom:12px;
+    color:#fff;
+}
+
+.info-card p{
+    color:#a8b4c7;
+    margin:0;
+    line-height:1.7;
+}
+
+.button-group{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+}
+
+.btn-shop{
+    background:#ef233c;
+    color:#fff;
+    padding:15px 35px;
+    border-radius:12px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-shop:hover{
+    background:#d90429;
+    color:#fff;
+    transform:translateY(-4px);
+    box-shadow:0 15px 35px rgba(239,35,60,.35);
+}
+
+.btn-outline-custom{
+    border:2px solid #ef233c;
+    color:#ef233c;
+    padding:15px 35px;
+    border-radius:12px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-outline-custom:hover{
+    background:#ef233c;
+    color:#fff;
+    transform:translateY(-4px);
+}
+
+@media (max-width:768px){
+
+.success-wrapper{
+    padding:35px 25px;
+}
+
+.success-wrapper h1{
+    font-size:2.2rem;
+}
+
+.success-wrapper h3{
+    font-size:1.2rem;
+}
+
+.success-circle{
+    width:95px;
+    height:95px;
+}
+
+.success-circle i{
+    font-size:48px;
+}
+
+}
+
+</style>
 
 {% endblock %}
