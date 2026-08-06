@@ -1951,106 +1951,86 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function sckPaginateGrid(gridId, navId, pageSize, maxVisible) {
-    var grid = document.getElementById(gridId);
-    var nav = document.getElementById(navId);
-    if (!grid || !nav) return;
+const cards = document.querySelectorAll(".prod-card");
+const pagination = document.getElementById("featuredPagination");
 
-    var items = Array.prototype.filter.call(grid.children, function (el) {
-      return el.classList && el.classList.contains('prod-card');
+const perPage = 30;
+const totalPages = Math.ceil(cards.length / perPage);
+
+let currentPage = 1;
+
+function showPage(page){
+
+    if(page < 1 || page > totalPages) return;
+
+    currentPage = page;
+
+    cards.forEach((card,index)=>{
+
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+
+        if(index >= start && index < end){
+
+            card.style.display = "";
+
+        }else{
+
+            card.style.display = "none";
+
+        }
+
     });
 
-    if (!items.length) { nav.style.display = 'none'; return; }
+    document.querySelectorAll(".page-btn").forEach(btn=>{
 
-    var totalPages = Math.ceil(items.length / pageSize);
-    var current = 1;
-    maxVisible = maxVisible || 3;
+        btn.classList.toggle(
+            "active",
+            Number(btn.dataset.page) === page
+        );
 
-    function addPageBtn(pageNum) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'sck-page-btn sck-page-num' + (pageNum === current ? ' active' : '');
-      btn.textContent = pageNum;
-      btn.addEventListener('click', function () { goTo(pageNum); });
-      nav.appendChild(btn);
+    });
+
+    document
+        .getElementById("shop")
+        .scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+}
+
+function createPagination(){
+
+    pagination.innerHTML = "";
+
+    for(let i=1;i<=totalPages;i++){
+
+        const btn = document.createElement("button");
+
+        btn.type = "button";
+
+        btn.className = "page-btn";
+
+        btn.dataset.page = i;
+
+        btn.textContent = i;
+
+        btn.addEventListener("click",()=>{
+
+            showPage(i);
+
+        });
+
+        pagination.appendChild(btn);
+
     }
 
-    function addEllipsis() {
-      var span = document.createElement('span');
-      span.className = 'sck-page-ellipsis';
-      span.textContent = '…';
-      nav.appendChild(span);
-    }
+}
 
-    function applyPageVisibility() {
-      items.forEach(function (item, i) {
-        var page = Math.floor(i / pageSize) + 1;
-        var isCurrent = page === current;
-        item.style.display = isCurrent ? '' : 'none';
-        /* Only fetch the images for the page that's actually showing */
-        if (isCurrent) sckLoadImagesIn(item);
-      });
-    }
+createPagination();
 
-    function renderNav() {
-      if (totalPages <= 1) { nav.style.display = 'none'; return; }
-      nav.style.display = '';
-      nav.innerHTML = '';
-
-      var prev = document.createElement('button');
-      prev.type = 'button';
-      prev.className = 'sck-page-btn';
-      prev.innerHTML = '&larr; Previous';
-      prev.disabled = current === 1;
-      prev.addEventListener('click', function () { goTo(current - 1); });
-      nav.appendChild(prev);
-
-      /* work out a sliding window of page numbers so at most
-         `maxVisible` numbered buttons are ever shown at once, but
-         the window always tracks `current` so Next/Previous keep
-         walking forward until totalPages is reached */
-      var windowStart = Math.max(1, Math.min(current - 1, totalPages - maxVisible + 1));
-      windowStart = Math.max(1, windowStart);
-      var windowEnd = Math.min(totalPages, windowStart + maxVisible - 1);
-
-      if (windowStart > 1) {
-        addPageBtn(1);
-        if (windowStart > 2) addEllipsis();
-      }
-
-      for (var p = windowStart; p <= windowEnd; p++) {
-        addPageBtn(p);
-      }
-
-      if (windowEnd < totalPages) {
-        if (windowEnd < totalPages - 1) addEllipsis();
-        addPageBtn(totalPages);
-      }
-
-      var next = document.createElement('button');
-      next.type = 'button';
-      next.className = 'sck-page-btn';
-      next.innerHTML = 'Next &rarr;';
-      next.disabled = current === totalPages;
-      next.addEventListener('click', function () { goTo(current + 1); });
-      nav.appendChild(next);
-    }
-
-    function goTo(page) {
-      if (page < 1 || page > totalPages || page === current) return;
-      current = page;
-      applyPageVisibility();
-      renderNav();
-      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    /* Initial paint: show + load page 1 only, build the nav controls */
-    applyPageVisibility();
-    renderNav();
-  }
-
-  sckPaginateGrid('newArrivalsGrid', 'newArrivalsPagination', 10, 3);
-  sckPaginateGrid('featuredGrid', 'featuredPagination', 10, 3);
+showPage(1);
 });
 </script>
 
