@@ -2,70 +2,89 @@
 {% for product in featured_products %}
 <article class="prod-card">
     <div class="prod-media">
-        <a href="{% url 'product_detail' product.slug %}">
-            {% if product.image %}
-                <img data-src="{{ product.image.url }}"
-                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                     alt="{{ product.name }}"
-                     loading="lazy"
-                     decoding="async"
-                     class="sck-lazy-img">
-            {% elif product.primary_image %}
-                <img data-src="{{ product.primary_image.image.url }}"
-                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                     alt="{{ product.name }}"
-                     loading="lazy"
-                     decoding="async"
-                     class="sck-lazy-img">
-            {% else %}
-                <img data-src="{% static 'images/no-image.webp' %}"
-                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                     alt="{{ product.name }}"
-                     loading="lazy"
-                     decoding="async"
-                     class="sck-lazy-img">
-            {% endif %}
-        </a>
 
-        {% if product.brand %}
-        <span class="brand-badge">{{ product.brand }}</span>
+    <a href="{% url 'product_detail' product.slug %}">
+
+        {% if product.image and product.image.name %}
+
+            <img
+                src="{{ product.image.url }}"
+                alt="{{ product.name }}"
+                class="product-image"
+                loading="lazy"
+                decoding="async"
+                onerror="this.onerror=null;this.src='{% static 'images/no-image.webp' %}';">
+
+        {% elif product.primary_image and product.primary_image.image %}
+
+            <img
+                src="{{ product.primary_image.image.url }}"
+                alt="{{ product.name }}"
+                class="product-image"
+                loading="lazy"
+                decoding="async"
+                onerror="this.onerror=null;this.src='{% static 'images/no-image.webp' %}';">
+
+        {% else %}
+
+            <img
+                src="{% static 'images/no-image.webp' %}"
+                alt="{{ product.name }}"
+                class="product-image"
+                loading="lazy"
+                decoding="async">
+
         {% endif %}
 
-        <div class="product-tools">
-            <button type="button"
-                    class="tool-btn wishlist js-wishlist-toggle"
-                    data-url="/wishlist/toggle/{{ product.id }}/"
-                    data-product-id="{{ product.id }}"
-                    data-product-name="{{ product.name|escapejs }}"
-                    title="Add to Wishlist">
+    </a>
 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
-                </svg>
+    {% if product.brand %}
+        <span class="brand-badge">{{ product.brand }}</span>
+    {% endif %}
 
-            </button>
+    <div class="product-tools">
 
-            <button type="button"
-                    class="tool-btn compare-btn"
-                    data-product="{{ product.id }}"
-                    title="Compare Product">
+        <button
+            type="button"
+            class="tool-btn wishlist js-wishlist-toggle"
+            data-url="/wishlist/toggle/{{ product.id }}/"
+            data-product-id="{{ product.id }}"
+            data-product-name="{{ product.name|escapejs }}"
+            title="Add to Wishlist">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     fill="none"
-                     viewBox="0 0 24 24"
-                     stroke="currentColor"
-                     stroke-width="2">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M10 3H5v18h5M14 21h5V3h-5"/>
-                </svg>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+            </svg>
 
-            </button>
-        </div>
+        </button>
+
+        <button
+            type="button"
+            class="tool-btn compare-btn"
+            data-product="{{ product.id }}"
+            title="Compare Product">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M10 3H5v18h5M14 21h5V3h-5"/>
+            </svg>
+
+        </button>
+
     </div>
+
+</div>
 
     <div class="prod-body">
 
