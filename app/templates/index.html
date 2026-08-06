@@ -1915,122 +1915,146 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   PAGINATION — windowed page numbers (max 3 visible) with working
-   Previous / Next controls that walk through ALL available pages.
+document.addEventListener("DOMContentLoaded", () => {
 
-   LAZY IMAGE LOADING PER PAGE
-   ─────────────────────────────────────────────────────────────────
-   Product images are rendered with a tiny placeholder in `src` and
-   the real image URL parked in `data-src`. Only the images belonging
-   to the currently visible page are swapped from `data-src` → `src`.
-   This means the browser only ever fetches the ~10 images needed for
-   the page the visitor is looking at, instead of downloading every
-   product image on the grid at once — this is what was slowing the
-   homepage down. As the visitor pages through (page 1, then 2, then
-   3…) each page's images are fetched on demand, right when that page
-   is shown.
+    function lazyLoadImages(container){
 
-   IMPORTANT: the server no longer truncates new_arrivals /
-   featured_products to a fixed count — every product passed in the
-   context is rendered into the grid, and this script paginates the
-   FULL set client-side (10 per page), so Next/Previous and the page
-   numbers always reach the very last page, however many products
-   there are.
-   ══════════════════════════════════════════════════════════════════ */
-document.addEventListener("DOMContentLoaded", function () {
+        container.querySelectorAll("img[data-src]").forEach(img=>{
 
-  function sckLoadImagesIn(item) {
-    if (!item) return;
-    var imgs = item.querySelectorAll("img[data-src]");
-    imgs.forEach(function (img) {
-      var real = img.getAttribute("data-src");
-      if (!real) return;
-      img.src = real;
-      img.removeAttribute("data-src");
-    });
-  }
+            if(img.dataset.loaded) return;
 
-const cards = document.querySelectorAll(".prod-card");
-const pagination = document.getElementById("featuredPagination");
-
-const perPage = 30;
-const totalPages = Math.ceil(cards.length / perPage);
-
-let currentPage = 1;
-
-function showPage(page){
-
-    if(page < 1 || page > totalPages) return;
-
-    currentPage = page;
-
-    cards.forEach((card,index)=>{
-
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-
-        if(index >= start && index < end){
-
-            card.style.display = "";
-
-        }else{
-
-            card.style.display = "none";
-
-        }
-
-    });
-
-    document.querySelectorAll(".page-btn").forEach(btn=>{
-
-        btn.classList.toggle(
-            "active",
-            Number(btn.dataset.page) === page
-        );
-
-    });
-
-    document
-        .getElementById("shop")
-        .scrollIntoView({
-            behavior:"smooth",
-            block:"start"
-        });
-
-}
-
-function createPagination(){
-
-    pagination.innerHTML = "";
-
-    for(let i=1;i<=totalPages;i++){
-
-        const btn = document.createElement("button");
-
-        btn.type = "button";
-
-        btn.className = "page-btn";
-
-        btn.dataset.page = i;
-
-        btn.textContent = i;
-
-        btn.addEventListener("click",()=>{
-
-            showPage(i);
+            img.src = img.dataset.src;
+            img.dataset.loaded = "1";
 
         });
-
-        pagination.appendChild(btn);
 
     }
 
-}
+    function paginate(gridId,paginationId,pageSize){
 
-createPagination();
+        const grid=document.getElementById(gridId);
+        const pagination=document.getElementById(paginationId);
 
-showPage(1);
+        if(!grid || !pagination) return;
+
+        const cards=[...grid.querySelectorAll(".prod-card")];
+
+        if(cards.length===0) return;
+
+        const totalPages=Math.ceil(cards.length/pageSize);
+
+        let currentPage=1;
+
+        function render(){
+
+            cards.forEach((card,index)=>{
+
+                const page=Math.floor(index/pageSize)+1;
+
+                card.style.display=
+                    page===currentPage
+                    ? ""
+                    : "none";
+
+            });
+
+            lazyLoadImages(grid);
+
+            renderPagination();
+
+        }
+
+        function renderPagination(){
+
+            pagination.innerHTML="";
+
+            const prev=document.createElement("button");
+
+            prev.className="sck-page-btn";
+            prev.innerHTML="&laquo;";
+
+            prev.disabled=currentPage===1;
+
+            prev.onclick=()=>{
+
+                if(currentPage>1){
+
+                    currentPage--;
+
+                    render();
+
+                }
+
+            };
+
+            pagination.appendChild(prev);
+
+            for(let i=1;i<=totalPages;i++){
+
+                const btn=document.createElement("button");
+
+                btn.className="sck-page-btn";
+
+                if(i===currentPage){
+
+                    btn.classList.add("active");
+
+                }
+
+                btn.textContent=i;
+
+                btn.onclick=()=>{
+
+                    currentPage=i;
+
+                    render();
+
+                    grid.scrollIntoView({
+
+                        behavior:"instant",
+                        block:"start"
+
+                    });
+
+                };
+
+                pagination.appendChild(btn);
+
+            }
+
+            const next=document.createElement("button");
+
+            next.className="sck-page-btn";
+
+            next.innerHTML="&raquo;";
+
+            next.disabled=currentPage===totalPages;
+
+            next.onclick=()=>{
+
+                if(currentPage<totalPages){
+
+                    currentPage++;
+
+                    render();
+
+                }
+
+            };
+
+            pagination.appendChild(next);
+
+        }
+
+        render();
+
+    }
+
+    paginate("featuredGrid","featuredPagination",10);
+
+    paginate("newArrivalsGrid","newArrivalsPagination",10);
+
+
 });
 </script>
 
@@ -2308,41 +2332,6 @@ if (newsletterForm) {
     });
 
   });
-}
-let featuredPage = {{ featured_products.number }};
-
-async function loadFeaturedProducts(page){
-
-    const response = await fetch(
-        `/ajax/featured-products/?page=${page}`
-    );
-
-    const data = await response.json();
-
-    document.getElementById("featuredGrid").innerHTML = data.html;
-
-    loadFeaturedProducts(data.page);
-    featuredPage = data.page;
-
-    document.getElementById("featuredPrev").disabled =
-        !data.previous;
-
-    document.getElementById("featuredNext").disabled =
-        !data.next;
-
-    initLazyImages();
-}
-
-document.getElementById("featuredNext").onclick=function(){
-
-    loadFeaturedProducts(featuredPage+1);
-
-}
-
-document.getElementById("featuredPrev").onclick=function(){
-
-    loadFeaturedProducts(featuredPage-1);
-
 }
 
 </script>
