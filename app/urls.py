@@ -231,7 +231,11 @@ path(
     views.order_detail,
     name="order_detail"
 ),
-
+path(
+    "categories/",
+    views.categories_page,
+    name="categories_page",
+),
 
 path(
     "dashboard/orders/<str:order_id>/delete/",
@@ -750,7 +754,16 @@ path(
     views.dashboard_bulk_products,
     name="dashboard_bulk_products",
 ),
-
+path(
+    "ajax/featured-deals/",
+    views.featured_deals_page,
+    name="featured_deals_page",
+),
+path(
+    "ajax/featured-products/",
+    views.featured_products_ajax,
+    name="featured_products_ajax",
+),
     path(
         "shipping-policy/",
         views.shipping_policy,

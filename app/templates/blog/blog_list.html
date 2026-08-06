@@ -11,213 +11,391 @@ Read the latest technology articles, laptop buying guides, computer tips, smartp
 {% endblock %}
 
 
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  #main-content, .blog-page {
+    --primary-blue:   #1E40AF;
+    --primary-blue-d: #16307F;
+    --secondary-blue: #2563EB;
+    --primary-blue-l: #EEF2FB;
+    --accent-red:     #DC2626;
+    --accent-red-d:   #B91C1C;
+    --accent-red-bg:  #FDECEC;
+    --ink:            #111827;
+    --ink-soft:       #1F2937;
+    --muted:          #6B7280;
+    --surface:        #FFFFFF;
+    --surface-alt:    #F8FAFC;
+    --border:         #EAECF1;
+    --navy:           #0B1330;
+    --r-xl: 28px;
+    --r-lg: 20px;
+    --r-md: 14px;
+    --r-sm: 10px;
+    --shadow-sm: 0 2px 12px rgba(17,24,39,.06);
+    --shadow-md: 0 18px 38px rgba(17,24,39,.10);
+    --shadow-lg: 0 32px 64px rgba(17,24,39,.16);
+    --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', sans-serif;
+  }
+
+  .blog-page { font-family: var(--font-body); color: var(--ink); background: var(--surface-alt); }
+  .blog-page *, .blog-page *::before, .blog-page *::after { box-sizing: border-box; }
+  .blog-page h1, .blog-page h2, .blog-page h3,
+  .blog-page .blog-content h3, .blog-page .category {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  /* ============ BREADCRUMB ============ */
+  .blog-page ~ .breadcrumb,
+  .breadcrumb {
+    max-width: 1280px; margin: 0 auto; padding: 18px 24px 0;
+    font-size: 13px; color: var(--muted); font-weight: 500;
+  }
+  .breadcrumb a { color: var(--muted); text-decoration: none; transition: color .15s ease; }
+  .breadcrumb a:hover { color: var(--primary-blue); }
+  .breadcrumb .current { color: var(--ink); font-weight: 700; }
+
+  /* ============ HERO ============ */
+  .blog-hero {
+    position: relative;
+    background:
+      radial-gradient(900px 480px at 82% 10%, rgba(37,69,166,.5), transparent 60%),
+      linear-gradient(160deg, var(--navy), #16215A 72%);
+    color: #fff;
+    padding: 64px 0 58px;
+    margin-top: 18px;
+    overflow: hidden;
+  }
+  .blog-hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse at 25% 30%, black 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .blog-hero .container { position: relative; max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .blog-hero .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: #8FB4FF; background: rgba(37,69,166,.18); border: 1px solid rgba(37,69,166,.35);
+    padding: 7px 14px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .blog-hero .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-red); }
+  .blog-hero h1 {
+    font-size: clamp(28px, 4vw, 42px); font-weight: 700; line-height: 1.12;
+    color: #fff; max-width: 720px; margin: 0 0 14px;
+  }
+  .blog-hero p {
+    font-size: 15.5px; line-height: 1.7; color: #B9C2DD;
+    max-width: 560px; margin: 0;
+  }
+
+  /* ============ SECTIONS / GENERAL ============ */
+  .blog-page .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .featured-blog, .latest-blog { padding: 56px 0; }
+  .latest-blog { padding-top: 8px; }
+
+  .blog-page .section-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 20px; margin-bottom: 30px; flex-wrap: wrap;
+  }
+  .blog-page h2 {
+    position: relative;
+    font-size: clamp(21px, 2.6vw, 27px); font-weight: 700;
+    padding-bottom: 12px; margin: 0;
+  }
+  .blog-page h2::after {
+    content: ""; position: absolute; left: 0; bottom: 0;
+    width: 44px; height: 3px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-red), var(--primary-blue));
+  }
+  .featured-blog .eyebrow-sm, .latest-blog .eyebrow-sm {
+    display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--primary-blue); margin-bottom: 8px;
+  }
+
+  /* ============ GRID — 4 columns desktop / 2 columns mobile ============ */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 1080px) {
+    .blog-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  }
+  @media (max-width: 720px) {
+    .blog-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  }
+  @media (max-width: 420px) {
+    .blog-grid { gap: 10px; }
+  }
+
+  /* ============ BLOG CARD ============ */
+  .blog-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .26s ease, border-color .26s ease;
+  }
+  .blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md);
+    border-color: #d7e3f7;
+  }
+
+  .blog-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+    background: var(--surface-alt);
+    transition: transform .5s cubic-bezier(.2,.7,.3,1);
+  }
+  .blog-card:hover img { transform: scale(1.06); }
+
+  .blog-content {
+    padding: 16px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+  }
+
+  .category {
+    display: inline-flex;
+    align-self: flex-start;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--primary-blue);
+    background: var(--primary-blue-l);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .blog-content h3 {
+    font-size: 15.5px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 2px 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(1.35em * 2);
+  }
+  .blog-content h3 a {
+    color: var(--ink);
+    text-decoration: none;
+    transition: color .15s ease;
+  }
+  .blog-content h3 a:hover { color: var(--primary-blue); }
+
+  .blog-content p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 600;
+    padding-top: 12px;
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+  }
+  .blog-meta span { display: inline-flex; align-items: center; gap: 5px; }
+  .blog-meta i { font-size: 10.5px; color: var(--primary-blue); opacity: .8; }
+
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--primary-blue);
+    text-decoration: none;
+    margin-top: 10px;
+    transition: gap .18s ease, color .18s ease;
+  }
+  .read-more:hover { gap: 9px; color: var(--primary-blue-d); }
+
+  /* ============ FEATURED SECTION — subtle divider from the rest ============ */
+  .featured-blog {
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+  }
+  .featured-blog .blog-card {
+    box-shadow: var(--shadow-sm);
+  }
+  .featured-blog .blog-card::before {
+    content: "Featured";
+    position: absolute;
+  }
+
+  /* first featured card gets a small ribbon accent */
+  .featured-blog .blog-grid .blog-card { position: relative; }
+  .featured-blog .blog-grid .blog-card:first-child::after {
+    content: "\2605 Editor's Pick";
+    position: absolute;
+    top: 10px; left: 10px;
+    background: linear-gradient(120deg, var(--accent-red), var(--accent-red-d));
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    padding: 5px 10px;
+    border-radius: 999px;
+    z-index: 2;
+    box-shadow: 0 6px 14px rgba(220,38,38,.3);
+  }
+
+  /* ============ EMPTY STATE ============ */
+  .blog-page .no-articles {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 70px 20px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--r-lg);
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .blog-hero { padding: 44px 0 38px; margin-top: 10px; }
+    .featured-blog, .latest-blog { padding: 38px 0; }
+    .blog-content { padding: 13px 13px 15px; gap: 6px; }
+    .blog-content h3 { font-size: 13.5px; min-height: calc(1.35em * 2); }
+    .blog-content p { font-size: 12px; -webkit-line-clamp: 2; }
+    .category { font-size: 9.5px; padding: 3px 8px; }
+    .blog-meta { font-size: 10px; }
+    .read-more { font-size: 11.5px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-page * { animation-duration: .001s !important; transition-duration: .001s !important; }
+  }
+</style>
+{% endblock %}
+
 
 {% block content %}
 
-<div class="breadcrumb">
+<div class="blog-page">
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
     <a href="{% url 'home' %}">Home</a> / <span class="current">Blog</span>
-</div>
+  </nav>
 
-<section class="blog-hero">
-
+  <section class="blog-hero">
     <div class="container">
-
-        <h1>
-            SmartComputersKe Technology Blog
-        </h1>
-
-        <p>
-            Expert guides, technology tips, product reviews and buying advice
-            to help you make smarter decisions.
-        </p>
-
+      <span class="hero-eyebrow"><span class="dot"></span>SmartComputersKe Insights</span>
+      <h1>SmartComputersKe Technology Blog</h1>
+      <p>Expert guides, technology tips, product reviews and buying advice to help you make smarter decisions.</p>
     </div>
+  </section>
 
-</section>
+  {% if featured_posts %}
+  <section class="featured-blog">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow-sm">Handpicked</span>
+          <h2>Featured Articles</h2>
+        </div>
+      </div>
 
+      <div class="blog-grid">
+        {% for post in featured_posts %}
+        <article class="blog-card">
+          {% if post.image %}
+          <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+          {% else %}
+          <img src="{% static 'images/no-image.png' %}" alt="{{ post.title }}" loading="lazy">
+          {% endif %}
 
-{% if featured_posts %}
-<section class="featured-blog container">
+          <div class="blog-content">
+            <span class="category">{{ post.category.name }}</span>
 
-<h2>
-Featured Articles
-</h2>
+            <h3><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h3>
 
+            <p>{{ post.excerpt|truncatewords:25 }}</p>
 
-<div class="blog-grid">
+            <div class="blog-meta">
+              <span><i class="fas fa-user"></i> SmartComputersKe</span>
+              <span><i class="fas fa-calendar"></i> {{ post.created_at|date:"M d, Y" }}</span>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
 
+  <section class="latest-blog">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow-sm">Fresh Off the Press</span>
+          <h2>Latest Technology Articles</h2>
+        </div>
+      </div>
 
-{% for post in featured_posts %}
+      <div class="blog-grid">
+        {% for post in posts %}
+        <article class="blog-card">
+          {% if post.image %}
+          <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+          {% else %}
+          <img src="{% static 'images/no-image.png' %}" alt="{{ post.title }}" loading="lazy">
+          {% endif %}
 
-<article class="blog-card">
+          <div class="blog-content">
+            <h3><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h3>
 
-{% if post.image %}
-<img
-src="{{ post.image.url }}"
-alt="{{ post.title }}"
-loading="lazy">
-{% else %}
-<img
-src="{% static 'images/no-image.png' %}"
-alt="{{ post.title }}"
-loading="lazy">
-{% endif %}
+            <p>{{ post.excerpt|truncatewords:25 }}</p>
 
+            <div class="blog-meta">
+              <span><i class="fas fa-user"></i> SmartComputersKe</span>
+              <span><i class="fas fa-calendar"></i> {{ post.created_at|date:"M d, Y" }}</span>
+            </div>
 
-<div class="blog-content">
-
-
-<span class="category">
-{{ post.category.name }}
-</span>
-
-
-<h3>
-<a href="{% url 'blog_detail' post.slug %}">
-{{ post.title }}
-</a>
-</h3>
-
-
-<p>
-{{ post.excerpt|truncatewords:25 }}
-</p>
-
-
-
-<div class="blog-meta">
-
-<span>
-<i class="fas fa-user"></i>
-SmartComputersKe
-</span>
-
-
-<span>
-<i class="fas fa-calendar"></i>
-{{ post.created_at|date:"M d, Y" }}
-</span>
-
+            <a class="read-more" href="{% url 'blog_detail' post.slug %}">Read More →</a>
+          </div>
+        </article>
+        {% empty %}
+        <p class="no-articles">No articles published yet. Check back soon for new guides and reviews.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 
 </div>
-
-
-</div>
-
-
-</article>
-
-
-{% endfor %}
-
-
-</div>
-
-
-</section>
-{% endif %}
-
-
-
-
-<section class="container latest-blog">
-
-
-<h2>
-Latest Technology Articles
-</h2>
-
-
-
-<div class="blog-grid">
-
-
-{% for post in posts %}
-
-
-<article class="blog-card">
-
-{% if post.image %}
-<img
-src="{{ post.image.url }}"
-alt="{{ post.title }}"
-loading="lazy">
-{% else %}
-<img
-src="{% static 'images/no-image.png' %}"
-alt="{{ post.title }}"
-loading="lazy">
-{% endif %}
-
-
-
-<div class="blog-content">
-
-
-<h3>
-
-<a href="{% url 'blog_detail' post.slug %}">
-{{ post.title }}
-</a>
-
-</h3>
-
-
-
-<p>
-{{ post.excerpt|truncatewords:25 }}
-</p>
-
-
-
-<div class="blog-meta">
-
-<span>
-<i class="fas fa-user"></i>
-SmartComputersKe
-</span>
-
-
-<span>
-<i class="fas fa-calendar"></i>
-{{ post.created_at|date:"M d, Y" }}
-</span>
-
-
-</div>
-
-
-
-<a class="read-more"
-href="{% url 'blog_detail' post.slug %}">
-Read More →
-</a>
-
-
-
-</div>
-
-
-</article>
-
-
-
-{% empty %}
-
-
-<p>
-No articles published yet.
-</p>
-
-
-{% endfor %}
-
-
-</div>
-
-
-</section>
-
-
 
 {% endblock %}

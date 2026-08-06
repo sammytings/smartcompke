@@ -608,8 +608,11 @@ Receipt {{ order.order_id }}
 
                         <td>
 
-                            <img src="{{ item.product.image.url }}"
-                                 class="product-image">
+                            {% if item.product.image %}
+    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+{% else %}
+    <img src="{% static 'images/no-image.png' %}" alt="No image available">
+{% endif %}
 
                         </td>
 

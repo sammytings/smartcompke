@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Browse Categories | SmartComputersKe{% endblock %}
+
+{% block content %}
+
+<style>
+
+:root{
+
+--secondary:#dc2626;
+--dark:blue;
+--light:#f8fafc;
+--border:#e2e8f0;
+--text:#475569;
+
+}
+
+body{
+
+background:#f8fafc;
+
+}
+
+/* HERO */
+
+.categories-hero{
+
+background:
+linear-gradient(rgba(7, 72, 224, 0.88),rgba(15,23,42,.88)),
+url("{% static 'images/hero-bg.jpg' %}") center/cover;
+
+padding:90px 20px;
+
+text-align:center;
+
+color:#fff;
+
+}
+
+.categories-hero h1{
+
+font-size:42px;
+
+font-weight:800;
+
+margin-bottom:14px;
+
+}
+
+.categories-hero p{
+
+max-width:700px;
+
+margin:auto;
+
+opacity:.92;
+
+line-height:1.8;
+
+}
+
+.breadcrumbs{
+
+margin-top:18px;
+
+font-size:14px;
+
+opacity:.9;
+
+}
+
+.breadcrumbs a{
+
+color:#fff;
+
+text-decoration:none;
+
+}
+
+.wrapper{
+
+width:min(1400px,95%);
+
+margin:60px auto;
+
+}
+
+/* SEARCH */
+
+.category-search{
+
+max-width:700px;
+
+margin:0 auto 45px;
+
+position:relative;
+
+}
+
+.category-search input{
+
+width:100%;
+
+height:58px;
+
+padding:0 60px 0 20px;
+
+border-radius:50px;
+
+border:1px solid var(--border);
+
+background:#fff;
+
+font-size:16px;
+
+box-shadow:0 10px 30px rgba(0,0,0,.05);
+
+}
+
+.category-search i{
+
+position:absolute;
+
+right:24px;
+
+top:50%;
+
+transform:translateY(-50%);
+
+color:var(--primary);
+
+font-size:20px;
+
+}
+
+/* GRID */
+
+.category-grid{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:28px;
+
+}
+
+/* CARD */
+
+.category-card{
+
+background:#fff;
+
+border-radius:20px;
+
+padding:28px;
+
+text-align:center;
+
+text-decoration:none;
+
+border:1px solid var(--border);
+
+transition:.35s;
+
+position:relative;
+
+overflow:hidden;
+
+box-shadow:0 10px 25px rgba(0,0,0,.04);
+
+}
+
+.category-card::before{
+
+content:"";
+
+position:absolute;
+
+left:0;
+
+right:0;
+
+top:0;
+
+height:5px;
+
+background:linear-gradient(90deg,var(--primary),var(--secondary));
+
+transform:scaleX(0);
+
+transition:.35s;
+
+}
+
+.category-card:hover::before{
+
+transform:scaleX(1);
+
+}
+
+.category-card:hover{
+
+transform:translateY(-8px);
+
+box-shadow:0 20px 45px rgba(0,0,0,.12);
+
+}
+
+.category-image{
+
+width:95px;
+
+height:95px;
+
+margin:auto;
+
+border-radius:50%;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+background:#eff6ff;
+
+overflow:hidden;
+
+margin-bottom:18px;
+
+}
+
+.category-image img{
+
+width:75%;
+
+height:75%;
+
+object-fit:contain;
+
+}
+
+.category-fallback{
+
+font-size:34px;
+
+color:var(--primary);
+
+}
+
+.category-name{
+
+font-size:20px;
+
+font-weight:700;
+
+color:var(--dark);
+
+margin-bottom:8px;
+
+}
+
+.category-count{
+
+display:inline-flex;
+
+align-items:center;
+
+gap:6px;
+
+padding:6px 14px;
+
+border-radius:40px;
+
+background:#f1f5f9;
+
+color:var(--text);
+
+font-size:14px;
+
+font-weight:600;
+
+margin-bottom:18px;
+
+}
+
+.category-btn{
+
+display:inline-flex;
+
+align-items:center;
+
+gap:8px;
+
+padding:11px 22px;
+
+border-radius:10px;
+
+background:var(--primary);
+
+color:#fff;
+
+font-weight:700;
+
+transition:.3s;
+
+}
+
+.category-card:hover .category-btn{
+
+background:var(--secondary);
+
+}
+
+.empty{
+
+text-align:center;
+
+padding:80px;
+
+font-size:20px;
+
+color:#64748b;
+
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1200px){
+
+.category-grid{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+}
+
+@media(max-width:900px){
+
+.category-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.categories-hero h1{
+
+font-size:34px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.category-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.categories-hero{
+
+padding:70px 18px;
+
+}
+
+.categories-hero h1{
+
+font-size:28px;
+
+}
+
+.category-card{
+
+padding:22px;
+
+}
+
+}
+
+</style>
+
+
+<section class="categories-hero">
+
+<h1>Browse All Categories</h1>
+
+<p>
+
+Find laptops, desktops, printers, networking equipment,
+gaming accessories, storage devices, CCTV systems and much more.
+
+</p>
+
+<div class="breadcrumbs">
+
+<a href="{% url 'home' %}">Home</a>
+
+<i class="fas fa-angle-right"></i>
+
+Categories
+
+</div>
+
+</section>
+
+
+
+<div class="wrapper">
+
+<div class="category-search">
+
+<input
+type="text"
+id="categorySearch"
+placeholder="Search categories...">
+
+<i class="fas fa-search"></i>
+
+</div>
+
+
+
+<div class="category-grid" id="categoryGrid">
+
+{% for category in categories %}
+
+<a
+href="{% url 'category_products' category.slug %}"
+class="category-card">
+
+<div class="category-image">
+
+{% if category.icon %}
+
+<img
+src="{{ category.icon.url }}"
+alt="{{ category.name }}">
+
+{% else %}
+
+<div class="category-fallback">
+
+<i class="fas fa-laptop"></i>
+
+</div>
+
+{% endif %}
+
+</div>
+
+<div class="category-name">
+
+{{ category.name }}
+
+</div>
+
+<div class="category-count">
+
+<i class="fas fa-box-open"></i>
+
+{{ category.products.count }} Products
+
+</div>
+
+<div class="category-btn">
+
+Explore
+
+<i class="fas fa-arrow-right"></i>
+
+</div>
+
+</a>
+
+{% empty %}
+
+<div class="empty">
+
+No categories found.
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+
+<script>
+
+const search=document.getElementById("categorySearch");
+
+search.addEventListener("keyup",function(){
+
+const value=this.value.toLowerCase();
+
+document.querySelectorAll(".category-card").forEach(card=>{
+
+const text=card.querySelector(".category-name").innerText.toLowerCase();
+
+card.style.display=text.includes(value)?"block":"none";
+
+});
+
+});
+
+</script>
+
+{% endblock %}

@@ -427,9 +427,23 @@
     transform: scale(1.05);
   }
   .sck-home .cat-icon img { width: 32px; height: 32px; object-fit: contain; }
+  .sck-home .cat-icon-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--primary-blue);
+    user-select: none;
+  }
   @media (max-width: 620px) {
     .sck-home .cat-icon { width: 64px; height: 64px; }
     .sck-home .cat-icon img { width: 26px; height: 26px; }
+    .sck-home .cat-icon-fallback { font-size: 18px; }
   }
   .sck-home .cat-card h3 { position: relative; z-index: 1; font-size: 13px; font-weight: 700; margin: 0; line-height: 1.3; }
   .sck-home .cat-card p, .sck-home .cat-link { display: none; }
@@ -908,7 +922,99 @@
   .sck-home .review-source-link { display: flex; justify-content: center; margin-top: 16px; }
   .sck-home .review-source-link a { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--border); padding: 9px 16px; border-radius: 999px; transition: border-color .15s ease, color .15s ease; }
   .sck-home .review-source-link a:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+.sck-pagination{
 
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin:50px 0;
+
+    flex-wrap:wrap;
+
+}
+
+.page-btn,
+.page-number{
+
+    min-width:46px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#fff;
+
+    color:#1f2937;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    padding:0 18px;
+
+}
+
+.page-number:hover,
+.page-btn:hover{
+
+    background:#0d6efd;
+
+    color:#fff;
+
+    transform:translateY(-2px);
+
+}
+
+.page-number.active{
+
+    background:#0d6efd;
+
+    color:#fff;
+
+    box-shadow:0 10px 25px rgba(13,110,253,.35);
+
+}
+
+.page-btn:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+@media(max-width:768px){
+
+    .page-btn{
+
+        padding:0 14px;
+
+        font-size:13px;
+
+    }
+
+    .page-number{
+
+        width:40px;
+
+        height:40px;
+
+    }
+
+}
   /* ============ NEWSLETTER ============ */
   .sck-home .newsletter-wrap {
     background: linear-gradient(120deg, #0F1B33, #16307F 68%, var(--secondary-blue));
@@ -1002,9 +1108,9 @@
       </div>
 
       <div class="hero-actions">
-        <a class="btn btn-white" href="#shop">Shop Now</a>
-        <a class="btn btn-outline-light" href="#categories">Browse Categories</a>
-        <a class="btn btn-whatsapp" href="https://wa.me/254700000000" target="_blank" rel="noopener">WhatsApp an Expert</a>
+        <a class="btn btn-white" href="{url 'shop'}">Shop Now</a>
+        <a class="btn btn-outline-light" href="{%url 'categoris_page'%}">Browse Categories</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/254792758560" target="_blank" rel="noopener">WhatsApp an Expert</a>
       </div>
 
       <p class="hero-help">Need help choosing? Call or WhatsApp <a href="tel:0700000000">0700 000000</a></p>
@@ -1016,18 +1122,19 @@
           <div class="hero-slide active">
             <img src="{% static 'images/hero-1.jpg' %}" alt="ASUS ROG Strix gaming laptops on display" loading="eager" fetchpriority="high" decoding="async" />
             <div class="hero-slide-fade"></div>
-            <div class="ribbon">Gaming &amp; Performance</div>
+            
           </div>
           <div class="hero-slide">
             <img src="{% static 'images/hero-2.jpg' %}" alt="Lenovo business ultrabook lineup" loading="lazy" decoding="async" />
             <div class="hero-slide-fade"></div>
-            <div class="ribbon">Business Ultrabooks</div>
-          </div>
+            <div class="hero-slide">
+            <img src="{% static 'images/logo.png' %}" alt="In-store laptop display shelf" loading="lazy" decoding="async" />
+            <div class="hero-slide-fade"></div>
+            
           <div class="hero-slide">
             <img src="{% static 'images/hero-3.jpg' %}" alt="In-store laptop display shelf" loading="lazy" decoding="async" />
             <div class="hero-slide-fade"></div>
-            <div class="ribbon">In-Store Ready Stock</div>
-          </div>
+            
           <div class="hero-slider-dots" id="heroDots">
             <button class="active" data-slide="0" aria-label="Slide 1"></button>
             <button data-slide="1" aria-label="Slide 2"></button>
@@ -1087,7 +1194,9 @@
           {% if brand.name and brand.name != "Unknown" %}
           <a class="brand-tile" href="{% url 'brand_products' brand.slug %}" title="{{ brand.name }}">
             {% if brand.logo %}
-              <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" loading="lazy" decoding="async">
+              <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" loading="lazy" decoding="async"
+                   onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <span class="brand-fallback-name" style="display:none;">{{ brand.name }}</span>
             {% else %}
               <span class="brand-fallback-name">{{ brand.name }}</span>
             {% endif %}
@@ -1098,7 +1207,9 @@
           {% if brand.name and brand.name != "Unknown" %}
           <a class="brand-tile" href="{% url 'brand_products' brand.slug %}" title="{{ brand.name }}" aria-hidden="true" tabindex="-1">
             {% if brand.logo %}
-              <img src="{{ brand.logo.url }}" alt="" loading="lazy" decoding="async">
+              <img src="{{ brand.logo.url }}" alt="" loading="lazy" decoding="async"
+                   onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <span class="brand-fallback-name" style="display:none;">{{ brand.name }}</span>
             {% else %}
               <span class="brand-fallback-name">{{ brand.name }}</span>
             {% endif %}
@@ -1118,14 +1229,18 @@
   <div class="wrap">
     <div class="section-head">
       <div><span class="eyebrow-sm">Shop by Category</span><h2>Explore the hardware range</h2><p>From laptops and office desktops to printers, storage, and accessories.</p></div>
-      <a class="view-all" href="{% url 'home' %}">View All →</a>
+      <a class="view-all" href="{% url 'categories_page' %}">View All →</a>
     </div>
     <div class="cat-grid">
       {% for category in categories %}
       <a class="cat-card" href="{% url 'category_products' category.slug %}">
         <div class="cat-icon">
           {% if category.icon %}
-          <img src="{{ category.icon.url }}" alt="{{ category.name }} icon" loading="lazy" decoding="async">
+          <img src="{{ category.icon.url }}" alt="{{ category.name }} icon" loading="lazy" decoding="async"
+               onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <span class="cat-icon-fallback" style="display:none;">{{ category.name|slice:":2"|upper }}</span>
+          {% else %}
+          <span class="cat-icon-fallback">{{ category.name|slice:":2"|upper }}</span>
           {% endif %}
         </div>
         <h3>{{ category.name }}</h3>
@@ -1152,16 +1267,16 @@
     </div>
 
     <div class="arrivals-grid" id="newArrivalsGrid">
-      {% for product in new_arrivals|slice:":60" %}
+      {% for product in new_arrivals %}
       <article class="prod-card">
         <div class="prod-media">
           <a href="{% url 'product_detail' product.slug %}">
             {% if product.image %}
-    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+    <img data-src="{{ product.image.url }}" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="{{ product.name }}" loading="lazy" decoding="async" class="sck-lazy-img">
 {% elif product.primary_image %}
-    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+    <img data-src="{{ product.primary_image.image.url }}" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="{{ product.name }}" loading="lazy" decoding="async" class="sck-lazy-img">
 {% else %}
-    <img src="{% static 'images/no-image.webp' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+    <img data-src="{% static 'images/no-image.webp' %}" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="{{ product.name }}" loading="lazy" decoding="async" class="sck-lazy-img">
 {% endif %}
           </a>
           <span class="prod-tag">New</span>
@@ -1256,86 +1371,46 @@
       <a class="view-all" href="{% url 'home' %}?featured=1">See All →</a>
     </div>
     <div class="prod-grid" id="featuredGrid">
-      {% for product in featured_products|slice:":60" %}
-      <article class="prod-card">
-        <div class="prod-media">
-          <a href="{% url 'product_detail' product.slug %}">
-            {% if product.image %}
-    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
-{% elif product.primary_image %}
-    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
-{% else %}
-    <img src="{% static 'images/no-image.webp' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
-{% endif %}
-          </a>
-          {% if product.brand %}<span class="brand-badge">{{ product.brand }}</span>{% endif %}
-          <div class="product-tools">
-            <button type="button" class="tool-btn wishlist js-wishlist-toggle" data-url="/wishlist/toggle/{{ product.id }}/" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}" title="Add to Wishlist">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
-              </svg>
-            </button>
-            <button type="button" class="tool-btn compare-btn" data-product="{{ product.id }}" title="Compare Product">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 3H5v18h5M14 21h5V3h-5"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="prod-body">
-          <div class="prod-brand">{{ product.brand }}</div>
-          <a href="{% url 'product_detail' product.slug %}" class="product-title-link">
-            <div class="prod-name">{{ product.name }}</div>
-          </a>
-          <div class="prod-specs" data-raw="{{ product.short_description|escapejs }}"></div>
-          <div class="prod-rating"><span class="stars">★★★★★</span><span>(4.8)</span></div>
-          <div class="price-container">
-            {% if product.default_variant.discount_active %}
-            <div
-              class="prod-price vat-price"
-              data-inclusive="{{ product.default_variant.price_including_vat }}"
-              data-exclusive="{{ product.default_variant.price_excluding_vat }}">
-              KSh {{ product.discount_price_with_vat|floatformat:0 }}
-            </div>
-            <div class="prod-old-price">KSh {{ product.price_with_vat|floatformat:0 }}</div>
-            {% else %}
-            <div
-              class="prod-price vat-price"
-              data-inclusive="{{ product.price_with_vat }}"
-              data-exclusive="{{ product.default_variant.price_without_vat }}">
-              KSh {{ product.price_with_vat|floatformat:0 }}
-            </div>
-            {% endif %}
-          </div>
-          <div class="vat-note"><span class="vat-text">✓ Includes 16% VAT</span></div>
-        </div>
-        <div class="prod-actions">
-    <form action="{% url 'add_to_cart' product.id %}" method="post" class="js-add-to-cart-form" style="width:100%;">
-        {% csrf_token %}
-        <button class="btn-cart-add" type="button" data-product-id="{{ product.id }}" data-product-name="{{ product.name|escapejs }}">
-          <span class="cart-loader" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </span>
-          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
-          </svg>
-          <span class="btn-label">Add to Cart</span>
-        </button>
-    </form>
-    <a class="btn-whatsapp-card"
-       href="https://wa.me/254792758560?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}"
-       target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="currentColor">
-        <path d="M16.004 3C9.377 3 3.999 8.377 3.999 15.003c0 2.34.63 4.53 1.727 6.417L3.5 28.5l7.27-2.19a12.94 12.94 0 005.234 1.096h.005c6.627 0 12.005-5.377 12.005-12.003C28.014 8.377 22.636 3 16.004 3zm5.373 16.463c-.294-.148-1.74-.859-2.01-.957-.27-.099-.467-.148-.663.148-.196.295-.76.957-.932 1.153-.172.196-.343.222-.638.074-.294-.148-1.243-.458-2.367-1.462-.875-.78-1.466-1.744-1.638-2.038-.172-.295-.018-.454.13-.601.133-.133.294-.345.442-.517.147-.172.196-.295.294-.492.098-.196.049-.369-.025-.517-.074-.148-.663-1.6-.909-2.192-.24-.575-.483-.497-.663-.507-.172-.008-.369-.01-.565-.01-.196 0-.517.074-.787.369-.27.295-1.03 1.006-1.03 2.454 0 1.448 1.055 2.847 1.202 3.043.147.196 2.077 3.174 5.033 4.45.703.303 1.252.484 1.68.62.706.225 1.348.193 1.856.117.566-.084 1.74-.712 1.985-1.4.245-.688.245-1.278.172-1.4-.074-.123-.27-.197-.564-.345z"/>
-      </svg>
-      Order on WhatsApp
-    </a>
+    {% include "partials/featured_deals_grid.html" %}
 </div>
-      </article>
-      {% endfor %}
-    </div>
-    <nav class="sck-pagination" id="featuredPagination" aria-label="Featured products pagination"></nav>
+<nav class="sck-pagination">
+
+    {% if featured_products.has_previous %}
+        <button class="page-btn"
+                onclick="loadFeaturedProducts({{ featured_products.previous_page_number }})">
+            <i class="fas fa-chevron-left"></i>
+            Previous
+        </button>
+    {% endif %}
+
+    {% for page in featured_products.paginator.page_range %}
+
+        {% if page >= featured_products.number|add:"-6" and page <= featured_products.number|add:"7" %}
+
+            <button
+                class="page-number {% if page == featured_products.number %}active{% endif %}"
+                onclick="loadFeaturedProducts({{ page }})">
+
+                {{ page }}
+
+            </button>
+
+        {% endif %}
+
+    {% endfor %}
+
+    {% if featured_products.has_next %}
+        <button class="page-btn"
+                onclick="loadFeaturedProducts({{ featured_products.next_page_number }})">
+
+            Next
+
+            <i class="fas fa-chevron-right"></i>
+
+        </button>
+    {% endif %}
+
+</nav>
   </div>
 </section>
 
@@ -1513,7 +1588,6 @@ No reviews yet. Be the first customer to review us.
   </div>
 </section>
 
-</div>
 
 <!-- Cart + wishlist engine -->
 <script src="{% static 'js/shared-components.js' %}"></script>
@@ -1843,10 +1917,39 @@ document.addEventListener("DOMContentLoaded", function () {
 <script>
 /* ══════════════════════════════════════════════════════════════════
    PAGINATION — windowed page numbers (max 3 visible) with working
-   Previous / Next controls that walk through ALL available pages,
-   not just the first three.
+   Previous / Next controls that walk through ALL available pages.
+
+   LAZY IMAGE LOADING PER PAGE
+   ─────────────────────────────────────────────────────────────────
+   Product images are rendered with a tiny placeholder in `src` and
+   the real image URL parked in `data-src`. Only the images belonging
+   to the currently visible page are swapped from `data-src` → `src`.
+   This means the browser only ever fetches the ~10 images needed for
+   the page the visitor is looking at, instead of downloading every
+   product image on the grid at once — this is what was slowing the
+   homepage down. As the visitor pages through (page 1, then 2, then
+   3…) each page's images are fetched on demand, right when that page
+   is shown.
+
+   IMPORTANT: the server no longer truncates new_arrivals /
+   featured_products to a fixed count — every product passed in the
+   context is rendered into the grid, and this script paginates the
+   FULL set client-side (10 per page), so Next/Previous and the page
+   numbers always reach the very last page, however many products
+   there are.
    ══════════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", function () {
+
+  function sckLoadImagesIn(item) {
+    if (!item) return;
+    var imgs = item.querySelectorAll("img[data-src]");
+    imgs.forEach(function (img) {
+      var real = img.getAttribute("data-src");
+      if (!real) return;
+      img.src = real;
+      img.removeAttribute("data-src");
+    });
+  }
 
   function sckPaginateGrid(gridId, navId, pageSize, maxVisible) {
     var grid = document.getElementById(gridId);
@@ -1857,18 +1960,41 @@ document.addEventListener("DOMContentLoaded", function () {
       return el.classList && el.classList.contains('prod-card');
     });
 
-    var totalPages = Math.ceil(items.length / pageSize);
-    if (totalPages <= 1) { nav.style.display = 'none'; return; }
+    if (!items.length) { nav.style.display = 'none'; return; }
 
+    var totalPages = Math.ceil(items.length / pageSize);
     var current = 1;
     maxVisible = maxVisible || 3;
 
-    function render() {
+    function addPageBtn(pageNum) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sck-page-btn sck-page-num' + (pageNum === current ? ' active' : '');
+      btn.textContent = pageNum;
+      btn.addEventListener('click', function () { goTo(pageNum); });
+      nav.appendChild(btn);
+    }
+
+    function addEllipsis() {
+      var span = document.createElement('span');
+      span.className = 'sck-page-ellipsis';
+      span.textContent = '…';
+      nav.appendChild(span);
+    }
+
+    function applyPageVisibility() {
       items.forEach(function (item, i) {
         var page = Math.floor(i / pageSize) + 1;
-        item.style.display = (page === current) ? '' : 'none';
+        var isCurrent = page === current;
+        item.style.display = isCurrent ? '' : 'none';
+        /* Only fetch the images for the page that's actually showing */
+        if (isCurrent) sckLoadImagesIn(item);
       });
+    }
 
+    function renderNav() {
+      if (totalPages <= 1) { nav.style.display = 'none'; return; }
+      nav.style.display = '';
       nav.innerHTML = '';
 
       var prev = document.createElement('button');
@@ -1880,7 +2006,9 @@ document.addEventListener("DOMContentLoaded", function () {
       nav.appendChild(prev);
 
       /* work out a sliding window of page numbers so at most
-         `maxVisible` numbered buttons are ever shown at once */
+         `maxVisible` numbered buttons are ever shown at once, but
+         the window always tracks `current` so Next/Previous keep
+         walking forward until totalPages is reached */
       var windowStart = Math.max(1, Math.min(current - 1, totalPages - maxVisible + 1));
       windowStart = Math.max(1, windowStart);
       var windowEnd = Math.min(totalPages, windowStart + maxVisible - 1);
@@ -1908,37 +2036,19 @@ document.addEventListener("DOMContentLoaded", function () {
       nav.appendChild(next);
     }
 
-    function addPageBtn(pageNum) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'sck-page-btn sck-page-num' + (pageNum === current ? ' active' : '');
-      btn.textContent = pageNum;
-      btn.addEventListener('click', function () { goTo(pageNum); });
-      nav.appendChild(btn);
-    }
-
-    function addEllipsis() {
-      var span = document.createElement('span');
-      span.className = 'sck-page-ellipsis';
-      span.textContent = '…';
-      nav.appendChild(span);
-    }
-
     function goTo(page) {
       if (page < 1 || page > totalPages || page === current) return;
       current = page;
-      render();
+      applyPageVisibility();
+      renderNav();
       grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    render();
+    /* Initial paint: show + load page 1 only, build the nav controls */
+    applyPageVisibility();
+    renderNav();
   }
 
-  /* Grids are capped server-side to a maximum of 60 products
-     (see the |slice:":60" template filter above) and paginated
-     client-side in pages of 10 — showing at most 3 numbered page
-     buttons at a time, with Previous / Next walking through all
-     of them. */
   sckPaginateGrid('newArrivalsGrid', 'newArrivalsPagination', 10, 3);
   sckPaginateGrid('featuredGrid', 'featuredPagination', 10, 3);
 });
@@ -2219,6 +2329,42 @@ if (newsletterForm) {
 
   });
 }
+let featuredPage = {{ featured_products.number }};
+
+async function loadFeaturedProducts(page){
+
+    const response = await fetch(
+        `/ajax/featured-products/?page=${page}`
+    );
+
+    const data = await response.json();
+
+    document.getElementById("featuredGrid").innerHTML = data.html;
+
+    loadFeaturedProducts(data.page);
+    featuredPage = data.page;
+
+    document.getElementById("featuredPrev").disabled =
+        !data.previous;
+
+    document.getElementById("featuredNext").disabled =
+        !data.next;
+
+    initLazyImages();
+}
+
+document.getElementById("featuredNext").onclick=function(){
+
+    loadFeaturedProducts(featuredPage+1);
+
+}
+
+document.getElementById("featuredPrev").onclick=function(){
+
+    loadFeaturedProducts(featuredPage-1);
+
+}
+
 </script>
 
 {% endblock %}

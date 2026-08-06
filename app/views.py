@@ -178,22 +178,38 @@ BRAND_BANNERS = {
 # ==========================================
 # STOREFRONT
 # ==========================================
-
+from django.db.models import Min, Max, Q, Prefetch
+from django.core.paginator import Paginator
+from django.db.models import Min, Max, Q
+from django.utils import timezone
 def home(request):
     now = timezone.now()
 
+    # Categories
     categories = Category.objects.all()
+
+    # Brands
     all_brands = Brand.objects.all().order_by("name")
 
+    # Category Menu
     menu_categories = []
+
     for category in categories:
-        category_brands = Brand.objects.filter(
-            products__category=category,
-            products__active=True,
-        ).distinct().order_by("name")
+
+        category_brands = (
+            Brand.objects.filter(
+                products__category=category,
+                products__active=True,
+            )
+            .distinct()
+            .order_by("name")
+        )
 
         conditions = (
-            Product.objects.filter(category=category, active=True)
+            Product.objects.filter(
+                category=category,
+                active=True
+            )
             .exclude(condition="")
             .values_list("condition", flat=True)
             .distinct()
@@ -205,8 +221,129 @@ def home(request):
             "conditions": conditions,
         })
 
+    # -------------------------
+    # FEATURED PRODUCTS
+    # -------------------------
+
+    featured_queryset = (
+        Product.objects
+        .filter(featured=True, active=True)
+        .select_related("brand", "category")
+        .order_by("-id")
+    )
+
+    featured_paginator = Paginator(featured_queryset, 12)
+
+    featured_page = request.GET.get("featured_page", 1)
+
+    featured_products = featured_paginator.get_page(featured_page)
+
+    # -------------------------
+    # DEALS
+    # -------------------------
+
     deals = (
         Product.objects.filter(
+            active=True,
+            variants__active=True,
+            variants__discount_price__isnull=False,
+        )
+        .filter(
+            Q(variants__discount_start__isnull=True)
+            | Q(variants__discount_start__lte=now),
+
+            Q(variants__discount_end__isnull=True)
+            | Q(variants__discount_end__gte=now),
+        )
+        .distinct()
+        .select_related("brand", "category")
+    )
+
+    # -------------------------
+    # NEW ARRIVALS
+    # -------------------------
+
+    new_arrivals = (
+        Product.objects.filter(
+            new_arrival=True,
+            active=True,
+        )
+        .select_related("brand", "category")
+        .order_by("-id")[:12]
+    )
+
+    # -------------------------
+    # TRENDING
+    # -------------------------
+
+    trending = (
+        Product.objects.filter(
+            trending=True,
+            active=True,
+        )
+        .select_related("brand", "category")
+        .order_by("-id")[:12]
+    )
+
+    # -------------------------
+    # GOOGLE REVIEWS
+    # -------------------------
+
+    reviews = GoogleReview.objects.filter(
+        is_visible=True
+    )[:6]
+
+    # -------------------------
+    # PRICE RANGE
+    # -------------------------
+
+    price_range = (
+        ProductVariant.objects
+        .filter(active=True)
+        .aggregate(
+            price_floor=Min("price"),
+            price_ceiling=Max("price"),
+        )
+    )
+
+    context = {
+
+        "categories": categories,
+
+        "menu_categories": menu_categories,
+
+        "brands": all_brands,
+
+        "featured_products": featured_products,
+
+        "new_arrivals": new_arrivals,
+
+        "trending": trending,
+
+        "deals": deals,
+
+        "google_reviews": reviews,
+
+        "price_floor": price_range["price_floor"] or 0,
+
+        "price_ceiling": price_range["price_ceiling"] or 300000,
+
+        "selected_price_min": request.GET.get("price_min"),
+
+        "selected_price_max": request.GET.get("price_max"),
+    }
+
+    return render(request, "index.html", context)
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+
+def featured_deals_page(request):
+    now = timezone.now()
+
+    deals = (
+        Product.objects
+        .filter(
             active=True,
             variants__active=True,
             variants__discount_price__isnull=False,
@@ -215,35 +352,81 @@ def home(request):
             Q(variants__discount_start__isnull=True) | Q(variants__discount_start__lte=now),
             Q(variants__discount_end__isnull=True) | Q(variants__discount_end__gte=now),
         )
+        .select_related("brand", "category")
         .distinct()
+        .order_by("-id")
     )
 
-    reviews = GoogleReview.objects.filter(is_visible=True)[:6]
+    paginator = Paginator(deals, 12)
 
-    price_range = ProductVariant.objects.filter(active=True).aggregate(
-        price_floor=Min("price"),
-        price_ceiling=Max("price"),
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string(
+        "partials/featured_deals_grid.html",
+        {
+            "deals": page_obj,
+        },
+        request=request,
     )
 
-    context = {
-        "categories": categories,
-        "menu_categories": menu_categories,
-        "brands": all_brands,
-        "products": Product.objects.filter(active=True),
-        "featured_products": Product.objects.filter(featured=True, active=True),
-        "new_arrivals": Product.objects.filter(new_arrival=True, active=True),
-        "google_reviews": reviews,
-        "deals": deals,
-        "trending": Product.objects.filter(trending=True, active=True),
-        "price_floor": price_range["price_floor"] or 0,
-        "price_ceiling": price_range["price_ceiling"] or 300000,
-        "selected_price_min": request.GET.get("price_min"),
-        "selected_price_max": request.GET.get("price_max"),
-    }
+    return JsonResponse({
+        "html": html,
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "page": page_obj.number,
+        "total_pages": paginator.num_pages,
+    })
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+def featured_products_ajax(request):
 
-    return render(request, "index.html", context)
+    featured_queryset = (
+        Product.objects
+        .filter(featured=True, active=True)
+        .select_related("brand", "category")
+        .order_by("-id")
+    )
+
+    paginator = Paginator(featured_queryset, 12)
+
+    page = request.GET.get("page", 1)
+
+    featured_products = paginator.get_page(page)
+
+    html = render_to_string(
+        "partials/featured_deals_grid.html",
+        {
+            "featured_products": featured_products,
+        },
+        request=request
+    )
 
 
+    return JsonResponse({
+
+        "html": html,
+
+        "page": featured_products.number,
+
+        "pages": paginator.num_pages,
+
+        "next": featured_products.has_next(),
+
+        "previous": featured_products.has_previous(),
+
+    })
+def categories_page(request):
+
+    categories = Category.objects.all().order_by("name")
+
+    return render(
+        request,
+        "categories/categories.html",
+        {
+            "categories": categories,
+        },
+    )
 def category_products(request, slug):
     from collections import defaultdict
 

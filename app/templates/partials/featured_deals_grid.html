@@ -1,0 +1,184 @@
+{%load static%}
+{% for product in featured_products %}
+<article class="prod-card">
+    <div class="prod-media">
+        <a href="{% url 'product_detail' product.slug %}">
+            {% if product.image %}
+                <img data-src="{{ product.image.url }}"
+                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                     alt="{{ product.name }}"
+                     loading="lazy"
+                     decoding="async"
+                     class="sck-lazy-img">
+            {% elif product.primary_image %}
+                <img data-src="{{ product.primary_image.image.url }}"
+                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                     alt="{{ product.name }}"
+                     loading="lazy"
+                     decoding="async"
+                     class="sck-lazy-img">
+            {% else %}
+                <img data-src="{% static 'images/no-image.webp' %}"
+                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                     alt="{{ product.name }}"
+                     loading="lazy"
+                     decoding="async"
+                     class="sck-lazy-img">
+            {% endif %}
+        </a>
+
+        {% if product.brand %}
+        <span class="brand-badge">{{ product.brand }}</span>
+        {% endif %}
+
+        <div class="product-tools">
+            <button type="button"
+                    class="tool-btn wishlist js-wishlist-toggle"
+                    data-url="/wishlist/toggle/{{ product.id }}/"
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name|escapejs }}"
+                    title="Add to Wishlist">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 21s-7-4.35-9.33-8.28A5.5 5.5 0 0112 5.09a5.5 5.5 0 019.33 7.63C19 16.65 12 21 12 21z"/>
+                </svg>
+
+            </button>
+
+            <button type="button"
+                    class="tool-btn compare-btn"
+                    data-product="{{ product.id }}"
+                    title="Compare Product">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M10 3H5v18h5M14 21h5V3h-5"/>
+                </svg>
+
+            </button>
+        </div>
+    </div>
+
+    <div class="prod-body">
+
+        <div class="prod-brand">{{ product.brand }}</div>
+
+        <a href="{% url 'product_detail' product.slug %}"
+           class="product-title-link">
+
+            <div class="prod-name">
+                {{ product.name }}
+            </div>
+
+        </a>
+
+        <div class="prod-specs"
+             data-raw="{{ product.short_description|escapejs }}">
+        </div>
+
+        <div class="prod-rating">
+            <span class="stars">★★★★★</span>
+            <span>(4.8)</span>
+        </div>
+
+        <div class="price-container">
+
+            {% if product.default_variant.discount_active %}
+
+                <div class="prod-price vat-price"
+                     data-inclusive="{{ product.default_variant.price_including_vat }}"
+                     data-exclusive="{{ product.default_variant.price_excluding_vat }}">
+
+                    KSh {{ product.discount_price_with_vat|floatformat:0 }}
+
+                </div>
+
+                <div class="prod-old-price">
+                    KSh {{ product.price_with_vat|floatformat:0 }}
+                </div>
+
+            {% else %}
+
+                <div class="prod-price vat-price"
+                     data-inclusive="{{ product.price_with_vat }}"
+                     data-exclusive="{{ product.default_variant.price_without_vat }}">
+
+                    KSh {{ product.price_with_vat|floatformat:0 }}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <div class="vat-note">
+            <span class="vat-text">
+                ✓ Includes 16% VAT
+            </span>
+        </div>
+
+    </div>
+
+    <div class="prod-actions">
+
+        <form action="{% url 'add_to_cart' product.id %}"
+              method="post"
+              class="js-add-to-cart-form"
+              style="width:100%;">
+
+            {% csrf_token %}
+
+            <button class="btn-cart-add"
+                    type="button"
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name|escapejs }}">
+
+                <span class="cart-loader" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </span>
+
+                <svg class="btn-icon"
+                     width="16"
+                     height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+
+                </svg>
+
+                <span class="btn-label">
+                    Add to Cart
+                </span>
+
+            </button>
+
+        </form>
+
+        <a class="btn-whatsapp-card"
+           href="https://wa.me/254792758560?text=Hi%2C%20I%27m%20interested%20in%20{{ product.name|urlencode }}"
+           target="_blank"
+           rel="noopener">
+
+            Order on WhatsApp
+
+        </a>
+
+    </div>
+
+</article>
+{% endfor %}
